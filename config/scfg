@@ -1,0 +1,550 @@
+#!/usr/bin/env python
+#  -*- coding: iso-8859-1 -*-
+
+###
+# Command line tool to manage SALOME configuration.
+# Usage: type "scfg help" to learn how to use tool.
+###
+
+import sys
+import os
+from sconfig.salome_config import CfgTool, defaultConfFile
+
+###
+# TODO
+# 1. Improve parsing of command line: each command should be defined as:
+#    - command:    name of the command
+#    - help:       help string as appears in the short description of a command in a list
+#                  of commands and as a first line of command's help
+#    - options:    (dict) see below
+#    - parameters: (list or dict) see below
+#    Each option should be defined with:
+#    - title:      one letter signature
+#    - help:       help string
+#    - parameter:  name of parameter if option requires a parameter
+#    Each parameter should be defined with:
+#    - title:      as appears in help information
+#    - optional:   flag (boolean) showing if this parameter is optional
+#    - help:       help description
+#    
+#    Parser of command line should then automatically check validity of the command,
+#    its parameters and options.
+#  
+# 2. Usage and help information should be automaticall generated and formatted
+#    from command description as described above.
+# 
+# 3. Protect from adding same named option to a command.
+# 
+# 4. Improve formatting help for command's parameters (see 1) - namely, wrapping
+#    into a block.
+###
+
+##
+# function: get_tool_name
+# 
+# gets a name of this command line tool (string)
+##
+
+def get_tool_name():
+    return os.path.basename(sys.argv[0])
+
+##
+# function: verbose
+# 
+# returns True when in debug mode (env var VERBOSE is set to 1)
+##
+
+def verbose():
+    return bool(os.getenv("VERBOSE", False))
+
+##
+# function: debug
+# 
+# prints debug information (for debug purposes)
+#
+# Parameters:
+#   args: output data to be printed to the screen (any printable objects)
+##
+
+def debug(*args):
+    if verbose():
+        print "[DEBUG]",
+        for a in args: print a,
+        print
+    pass
+
+##
+# function: error_exit
+# 
+# prints error information and exits with non-zero status
+# 
+# Parameters:
+#   msg: error message (string)
+##
+
+def error_exit(msg):
+    print "%s: %s" % (get_tool_name(), msg)
+    sys.exit(1)
+    pass
+
+##
+# function: get_commands
+# 
+# get supported commands
+# 
+# return value is a dictionary:
+# { cmd : ( help, opt_map ) }
+# here:
+# - cmd is a command (string)
+# - help is a command's general help information on a command (string)
+# - opt_map is a disctionary of allowed command's options:
+#   { opt: opt_help }, where 
+#   - opt is option ("a:" if option requires a parameter or just "a" elsewhere, where
+#                    "a" is any letter)
+#   - opt_help is a help information on the option (string).
+# 
+# See also: add_command
+##
+
+def get_commands():
+    if not globals().get("__commands__"): globals()["__commands__"] = {}
+    return globals().get("__commands__")
+
+##
+# function: add_command
+# 
+# adds command to the tool
+#
+# Parameters:
+#   cmd: command (string)
+#   help_string: help information on the command (string)
+#   options: options supported by the command (map {opt: opt_help}, see get_commands)
+##
+
+def add_command(cmd, help_string, options):
+    if cmd in get_commands():
+        debug("command %s already exists" % cmd)
+    else:
+        get_commands()[ cmd ] = ( help_string, options )
+    pass
+
+##
+# function: get_opts
+# 
+# gets supported options for the command
+# 
+# Parameters:
+#   cmd: command (string)
+# 
+# return value is map {opt: opt_help} (see get_commands)
+##
+
+def get_opts(cmd):
+    if cmd is None: cmd = ""
+    opts = {}
+    try:
+        opts = get_commands()[cmd][1]
+    except:
+        pass
+    return opts
+
+##
+# function: get_help
+# 
+# gets help string for the command
+# 
+# Parameters:
+#   cmd: command (string)
+# 
+# return value is unformatted string
+##
+
+def get_help(cmd):
+    if cmd is None: cmd = ""
+    help_string = ""
+    try:
+        help_string = get_commands()[cmd][0]
+    except:
+        pass
+    return help_string
+
+##
+# function: format_string
+# 
+# formats string into block according to the given block width
+# 
+# Parameters:
+#   s: string data
+#   width: requested width of resulting string block
+# 
+# return formatted string block
+##
+
+def format_string(s, width):
+    blocks = s.split("\n")
+    result = []
+    for block in blocks:
+        block = block.replace("\t", " [[TAB]] ")
+        words = block.split()
+        current_string = ""
+        for word in words:
+            word = word if word != "[[TAB]]" else " "*2
+            if not current_string:
+                current_string = word
+            else:
+                if len(current_string + " " + word) <= width:
+                    current_string += " " + word
+                else:
+                    result.append(current_string)
+                    current_string = word
+                    pass
+                pass
+            pass
+        result.append(current_string)
+        pass
+    return "\n".join(result)
+
+##
+# function: format_commands
+# 
+# formats short help on all supported commands
+# 
+# return string that contains formatted help on commands
+##
+
+def format_commands():
+    commands = get_commands()
+    # filter out tool itself
+    commands = filter(lambda a: a != "", commands)
+    # sort commands alphabetically
+    commands.sort()
+    # get max command's length
+    max_length = max([ len(i) for i in commands])
+    # generate formatting string
+    prefix = "  "
+    separator = "    "
+    fmt_string = prefix + "%" + "-%ds" % max_length + separator
+    def _format(_c):
+        _h = get_help(_c).split("\n")[0]
+        _h = format_string(_h, 80-(max_length+len(prefix)+len(separator)))
+        _h = _h.split("\n")
+        _t = prefix + " " * max_length + separator
+        _r = []
+        _r.append(_h[0])
+        for _i in _h[1:]: _r.append(_t + _i)
+        return "\n".join(_r)
+    return "\n".join([ fmt_string % i + _format(i) for i in commands])
+
+##
+# function: format_list_options
+# 
+# formats short help on commands's options to be inserted into short help info on a command
+# 
+# Parameters:
+#   cmd: command (string)
+# 
+# return string that contains formatted help
+##
+
+def format_list_options(cmd):
+    opts = get_opts(cmd)
+    return "".join([" [%s]" % i for i in opts.keys()])
+
+##
+# function: format_options
+# 
+# formats help on commands's options to be inserted after short help info on a command
+# 
+# Parameters:
+#   cmd: command (string)
+# 
+# return string that contains formatted help
+##
+
+def format_options(cmd):
+    opts = get_opts(cmd)
+    opts_names = opts.keys()
+    if not opts: return ""
+    # get max command's length
+    max_length = max([ len(i) for i in opts_names])
+    # generate formatting string
+    prefix = "  "
+    separator = "    "
+    fmt_string = prefix + "%" + "-%ds" % max_length + separator
+    def _format(_o):
+        _h = opts[_o]
+        _h = format_string(_h, 80-(max_length+len(prefix)+len(separator)))
+        _h = _h.split("\n")
+        _t = prefix + " " * max_length + separator
+        _r = []
+        _r.append(_h[0])
+        for _i in _h[1:]: _r.append(_t + _i)
+        return "\n".join(_r)
+    return "\n" + "\n".join([ fmt_string % i + _format(i) for i in opts_names]) + "\n"
+
+##
+# function: usage
+# 
+# prints help and exits with zero status
+#
+# Parameters:
+#   cmd: command (string)
+##
+
+def usage(cmd=None):
+    if cmd is None: cmd = ""
+    if cmd not in get_commands(): error_exit("unknown command: %s" % cmd)
+    fmt = {}
+    fmt[ "prg" ] = get_tool_name()
+    fmt[ "cmd" ] = get_tool_name() if not cmd else cmd
+    fmt[ "cmd_list" ] = format_commands()
+    fmt[ "opts" ] = format_list_options(cmd)
+    fmt[ "opt_list" ] = format_options(cmd)
+    help_string = get_help(cmd)
+    help_string = help_string.replace("\t", "  ")
+    print help_string.format(**fmt)
+    sys.exit(0)
+    pass
+
+##
+# function: parse_cmd_line
+# 
+# parses command line; prints error and exits if unsupported command
+# or option is specified
+# 
+# Parameters:
+#   args: arguments being parsed (list of strings)
+##
+
+def parse_cmd_line(args):
+    tool_opts, cmd, cmd_opts, tgt, params = {}, None, {}, None, []
+    args.reverse()
+    commands = get_commands()
+    while args:
+        a = args.pop()
+        if a == "-":
+            # empty option
+            error_exit("empty option is not allowed")
+        if a.startswith("-"):
+            allowed_opts = get_opts(cmd).keys()
+            allowed_opts = dict([(i[1], len(i)>2) for i in allowed_opts])
+            processed_opts = tool_opts if cmd is None else cmd_opts
+            cmd_descr = "" if cmd is None else " for command '%s'" % cmd
+            opts = a[1:]
+            while opts:
+                o = opts[0]
+                opts = opts[1:]
+                if o == "-":
+                    # "--" format is not supported
+                    error_exit("invalid format of option")
+                elif o in allowed_opts.keys():
+                    if allowed_opts[o]:
+                        # supported option; requires parameter
+                        if opts:
+                            processed_opts[ o ] = opts
+                            opts = []
+                        elif args and not args[-1].startswith("-") and not args[-1] in commands:
+                            processed_opts[ o ] = args.pop()
+                        else:
+                            error_exit("option %s%s requires argument" % (o, cmd_descr))
+                    else:
+                        # supported option; does not require parameter
+                        processed_opts[ o ] = None
+                        pass
+                    pass
+                else:
+                    # unsupported option
+                    error_exit("unknown option: -%s%s" % (o, cmd_descr))
+                pass # while opts
+            pass
+        elif not cmd:
+            cmd = a
+            if cmd not in commands:
+                # unsupported command
+                error_exit("unknown command: %s" % cmd)
+            pass
+        elif not tgt:
+            tgt = a
+            pass
+        else:
+            params += [ a ]
+    return tool_opts, cmd, cmd_opts, tgt, params
+
+##
+# function: main
+# 
+# main entry point of the tool
+##
+
+def main():
+    # set-up commands
+
+    # - tool itself
+    help_string  = "Command line tool to manage SALOME configuration.\n\n"
+    help_string += "Usage: {prg}{opts} COMMAND [ARGS]\n"
+    help_string += "{opt_list}\n"
+    help_string += "Supported commands:\n"
+    help_string += "{cmd_list}\n\n"
+    help_string += "See '{prg} help COMMAND' for more information on a specific command."
+    options = {}
+    options [ "-s FILE" ] = "Path to the configuration file; default: %s." % defaultConfFile()
+    add_command("",
+                help_string,
+                options)
+
+    # - help command
+    help_string  = "Display help information about this tool.\n\n"
+    help_string += "Usage: {prg} {cmd}{opts}\n"
+    help_string += "{opt_list}"
+    add_command("help",
+                help_string,
+                {})
+
+    # - set command
+    help_string  = "Create or modify configuration object.\n\n"
+    help_string += "Usage: {prg} {cmd}{opts} TARGET [PARAM VALUE ...]\n\n"
+    help_string += "\tTARGET: configuration object being created / modified\n"
+    help_string += "\tPARAM: parameter of the target object\n"
+    help_string += "\tVALUE: value to be assigned to the attribute of the target object\n"
+    help_string += "{opt_list}"
+    add_command("set",
+                help_string,
+                {})
+
+    # - get command
+    help_string  = "Get parameter of configuration object.\n\n"
+    help_string += "Usage: {prg} {cmd}{opts} TARGET PARAM\n\n"
+    help_string += "\tTARGET: configuration object being inspected\n"
+    help_string += "\tPARAM: parameter of the target object\n"
+    help_string += "{opt_list}"
+    add_command("get",
+                help_string,
+                {})
+
+    # - remove command
+    help_string  = "Remove configuration object or its attribute(s).\n\n"
+    help_string += "Usage: {prg} {cmd}{opts} TARGET [PARAM ...]\n\n"
+    help_string += "\tTARGET: configuration object\n"
+    help_string += "\tPARAM: attribute of the target object\n"
+    help_string += "{opt_list}"
+    add_command("remove",
+                help_string,
+                {})
+
+    # - dump command
+    help_string  = "Dump configuration.\n\n"
+    help_string += "Usage: {prg} {cmd}{opts} [TARGET]\n\n"
+    help_string += "\tTARGET: optional configuration object (if not specified,\n"
+    help_string += "\t        all configuration is dumped).\n"
+    help_string += "{opt_list}"
+    add_command("dump",
+                help_string,
+                {})
+
+    # - verify command
+    help_string  = "Verify configuration.\n\n"
+    help_string += "Usage: {prg} {cmd}{opts} [TARGET]\n\n"
+    help_string += "\tTARGET: optional configuration object (if not specified,\n"
+    help_string += "\t        all configuration is verified).\n"
+    help_string += "{opt_list}"
+    add_command("verify",
+                help_string,
+                {})
+
+    # - clean command
+    help_string  = "Clean configuration.\n\n"
+    help_string += "Usage: {prg} {cmd}{opts}\n"
+    help_string += "{opt_list}"
+    add_command("clean",
+                help_string,
+                {})
+
+    # parse command line
+
+    opts, cmd, cmd_opts, tgt, params = parse_cmd_line(sys.argv[1:])
+    debug("parse command line: options =", opts, "; command =", cmd, "; command options =", cmd_opts, "; target =", tgt, "; arguments =", params)
+
+    # process command
+
+    if not cmd or cmd == "help":
+        # show help and exit
+        usage(tgt)
+        pass
+
+    try:
+        # check if custom source file is specified
+        
+        src_file = opts["s"] if opts.has_key("s") else None
+        debug("source file:", src_file)
+        
+        # create config tool
+
+        cfg_tool = CfgTool(src_file)
+        debug("cfg tool:", cfg_tool)
+
+        # TODO: we should not check commands in a switch-like block below;
+        # instead processing should be done automatically basing on the
+        # predefined set of commands (TODO)
+
+        if cmd == "get":
+            if not tgt:
+                error_exit("%s: target is not specified!" % cmd)
+            if len(params) < 1:
+                error_exit("%s: parameter of target %s is not specified!" % (cmd, tgt))
+            # only one parameter can be read!
+            if len(params) > 1:
+                error_exit("%s: can't read more than one parameter at once!" % cmd)
+            def _toString(v):
+                if v is None: return ""
+                elif type(v) is list: return " ".join(v)
+                else: return v
+            print _toString(cfg_tool.get(tgt, params[0]))
+            pass
+        elif cmd == "set":
+            if not tgt:
+                error_exit("%s: target is not specified!" % cmd)
+            # empty parameters list is allowed!
+            cfg_tool.set(tgt, *params)
+            pass
+        elif cmd == "remove":
+            if not tgt:
+                error_exit("%s: target is not specified!" % cmd)
+            # empty parameters list is allowed!
+            cfg_tool.remove(tgt, *params)
+            pass
+        elif cmd == "dump":
+            if len(params) > 0:
+                error_exit("%s: command does not support parameters!" % cmd)
+            # empty target is allowed!
+            cfg_tool.dump(tgt)
+            pass
+        elif cmd == "verify":
+            if len(params) > 0:
+                error_exit("%s: command does not support parameters!" % cmd)
+            # empty target is allowed!
+            errors = []
+            if cfg_tool.verify(tgt, errors):
+                msg = " (no products found)" if not cfg_tool.get("cfg", "products") else ""
+                print "Configuration is valid%s." % msg
+            else:
+                raise Exception("Configuration is invalid:\n"+ "\n".join(errors))
+            pass
+        elif cmd == "clean":
+            if tgt:
+                error_exit("%s: command does not support target!" % cmd)
+            if len(params) > 0:
+                error_exit("%s: command does not support parameters!" % cmd)
+            # empty target is allowed!
+            cfg_tool.clean()
+            pass
+        else:
+            # unknown command: normally we should not go here
+            error_exit("unknown command: %s" % cmd)
+            pass
+        pass
+    except Exception, e:
+        error_exit(e)
+    pass
+    
+if __name__ == "__main__":
+    main()

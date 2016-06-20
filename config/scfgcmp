@@ -1,0 +1,158 @@
+#!/usr/bin/env python
+#  -*- coding: iso-8859-1 -*-
+
+###
+# Command line tool to compare two SALOME configurations.
+# Usage: type "scfgcmp help" to learn how to use tool.
+###
+
+import sys
+import os
+from sconfig.salome_config import *
+import getopt
+
+def get_tool_name():
+    return os.path.basename(sys.argv[0])
+
+def error_exit(msg):
+    print "%s: %s" % (get_tool_name(), msg)
+    print "Try '%s --help' for more information." % get_tool_name()
+    sys.exit(2)
+    pass
+
+def usage():
+    print "Command line tool to compare two SALOME configurations."
+    print
+    print "Usage: %s [options] CFGFILE1 [CFGFILE2]" % get_tool_name()
+    print
+    print "  CFGFILE1       First configuration file to compare."
+    print "  CFGFILE2       Second configuration file to compare; if not specified,"
+    print "                 default one is used: %s." % defaultConfFile()
+    print
+    print "Options:"
+    print "  --help (-h)    Prints this help information."
+    print "  --force (-f)   Perform full comparation, including optional parameters."
+    print "  --verbose (-v) Print results of comparison to the screen."
+    print
+
+def main():
+    # parse command line
+
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "hfv", ["help", "force", "verbose"])
+    except getopt.GetoptError as err:
+        error_exit(str(err))
+        pass
+    opt_keys = [i[0] for i in opts]
+    isusage   = "-h" in opt_keys or "--help" in opt_keys
+    isverbose = "-v" in opt_keys or "--verbose" in opt_keys
+    isforce   = "-f" in opt_keys or "--force" in opt_keys
+
+    if isusage:
+        usage()
+        pass
+
+    cfgfile1 = args[0] if len(args) > 0 else defaultConfFile()
+    cfgfile2 = args[1] if len(args) > 1 else defaultConfFile()
+
+    if not cfgfile1:
+        error_exit("missing configuration file")
+        pass
+
+    if cfgfile1 and not os.path.isfile(cfgfile1):
+        error_exit("configuration file %s is not found" % cfgfile1)
+        pass
+
+    if cfgfile2 and not os.path.isfile(cfgfile2):
+        error_exit("configuration file %s is not found" % cfgfile2)
+        pass
+
+    if cfgfile1 and cfgfile2 and os.path.samefile(cfgfile1, cfgfile2):
+        error_exit("cannot compare the file with itself")
+        pass
+
+    # create config tools
+
+    try:
+        tool1 = CfgTool(cfgfile1)
+        tool2 = CfgTool(cfgfile2)
+    except Exception, e:
+        error_exit(str(e))
+        pass
+    
+    # diff config files
+
+    errors = []
+
+    def _cmpAttrs(_what, _where):
+        _attrs = tagAttributes(_what)
+        for _attr in _attrs:
+            try:
+                _v1 = tool1.get(_where, _attr)
+            except:
+                _v1 = None
+                pass
+            try:
+                _v2 = tool2.get(_where, _attr)
+            except:
+                _v2 = None
+                pass
+            if (isforce or _attrs[_attr]) and _v1 != _v2:
+                errors.append("attribute '%s' of '%s' differs: '%s' in %s vs '%s' in %s" % (_attr, _where, str(_v1), tool1.cfgFile, str(_v2), tool2.cfgFile))
+                pass
+            pass
+        pass
+    
+    # - compare parameters of configuration
+    _cmpAttrs(configTag(), configTag())
+
+    # - compare products
+
+    products1 = tool1.get(configTag(), softwareAlias())
+    products2 = tool2.get(configTag(), softwareAlias())
+    all_products = list(set(products1+products2))
+
+    for product in all_products:
+        if product in products1 and product not in products2:
+            errors.append("%s '%s' is only in '%s'" % (softwareTag(), product, tool1.cfgFile))
+            pass
+        elif product in products2 and product not in products1:
+            errors.append("%s '%s' is only in '%s'" % (softwareTag(), product, tool2.cfgFile))
+            pass
+        else:
+            # -- compare parameters of products
+            _cmpAttrs(softwareTag(), product)
+            # -- compare patches
+            patches1 = tool1.get(product, patchesAlias())
+            patches2 = tool2.get(product, patchesAlias())
+            all_patches = list(set(patches1+patches2))
+            for patch in all_patches:
+                if patch in patches1 and patch not in patches2:
+                    errors.append("%s '%s' for '%s' is only in '%s'" % (patchTag(), patch, product, tool1.cfgFile))
+                    pass
+                if patch in patches2 and patch not in patches1:
+                    errors.append("%s '%s' for '%s' is only in '%s'" % (patchTag(), patch, product, tool2.cfgFile))
+                    pass
+                else:
+                    # -- compare parameters of products
+                    _cmpAttrs(patchTag(), "%s.%s.%s" % (product, patchesTag(), patch))
+                    pass
+                pass
+            pass
+        pass
+    
+    # print results
+
+    if errors:
+        if isverbose:
+            print "Files %s and %s differ:" % (tool1.cfgFile, tool2.cfgFile)
+            print "\n".join(["  " + i for i in errors])
+            pass
+        return 1
+
+    return 0
+
+# -----------------------------------------------------------------------------
+
+if __name__ == '__main__':
+    sys.exit(main())

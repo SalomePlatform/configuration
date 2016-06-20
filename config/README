@@ -1,0 +1,21 @@
+The contents of this package:
+
+salome.xml        SALOME configuration file.
+
+patches           Directory with patches needed to build SALOME configuration.
+
+sconfig           Python module to manage SALOME configuration files.
+                  To learn about usage, run Python and type:
+
+                  from sconfig import salome_config
+                  help(salome_config)
+
+scfg              Command line tool to manage SALOME configuration files.
+                  To learn about usage, type:
+
+                  scfg help
+
+scfgcmp           Command line tool to compare two SALOME configuration files.
+                  To learn about usage, type:
+
+                  scfgcmp -h
