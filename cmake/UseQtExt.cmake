@@ -28,7 +28,7 @@ ENDIF()
 # installdir contains directory (relative to install_prefix) where to install files after compilation of ts files too qm.
 MACRO(QT_INSTALL_TS_RESOURCES tsfiles installdir)
   FOREACH(_input ${tsfiles})
-    GET_FILENAME_COMPONENT(_name ${_input} NAME)
+    GET_FILENAME_COMPONENT(_name ${_input} NAME_WE)
     SET(_output ${CMAKE_CURRENT_BINARY_DIR}/${_name}.qm)
     SET(_cmd_${_name} ${QT_LRELEASE_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${_input} -qm ${_output})
     ADD_CUSTOM_TARGET(QT_INSTALL_TS_RESOURCES_${_name} ALL COMMAND ${_cmd_${_name}} DEPENDS ${_input})
