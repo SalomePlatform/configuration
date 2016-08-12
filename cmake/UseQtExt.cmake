@@ -21,26 +21,19 @@ IF (QT_VERSION VERSION_LESS "5.0")
   INCLUDE(${QT_USE_FILE})
 ENDIF()
 
-INSTALL(CODE "MACRO(QT_COMPILE_TS_ON_INSTALL MYLRELEASE MYTSFILE MYFULLDIR MYOUTQMFILE)
-  FILE(MAKE_DIRECTORY \${MYFULLDIR})
-  MESSAGE(STATUS \"Compiling \${MYTSFILE}\")
-  EXECUTE_PROCESS(COMMAND \${MYLRELEASE} \${MYTSFILE} -qm \${MYFULLDIR}/\${MYOUTQMFILE})
-ENDMACRO(QT_COMPILE_TS_ON_INSTALL)")
-
 # This MACRO uses the following vars
 # - QT_LRELEASE_EXECUTABLE : (given by default by FindQT.cmake)
 #
-# MYTSFILES containing all ts files to be compiled.
-# WHERETOINSTALL contains directory (relative to install_prefix) where to install files after compilation of ts files too qm.
-MACRO(QT_INSTALL_TS_RESOURCES MYTSFILES WHERETOINSTALL)
-  INSTALL(CODE "SET(INSTALL_TS_DIR ${WHERETOINSTALL})")
-  SET(MYSOURCES)
-  FOREACH(input ${MYTSFILES})
-    GET_FILENAME_COMPONENT(input2 ${input} NAME)
-    STRING(REGEX REPLACE ".ts" "" base ${input2})
-    SET(output "${base}.qm")
-    INSTALL(CODE "QT_COMPILE_TS_ON_INSTALL( \"${QT_LRELEASE_EXECUTABLE}\" \"${CMAKE_CURRENT_SOURCE_DIR}/${input}\" \"${CMAKE_INSTALL_PREFIX}/\${INSTALL_TS_DIR}\" ${output})")
-  ENDFOREACH(input ${MYIDLFILES})
+# tsfiles containing all ts files to be compiled.
+# installdir contains directory (relative to install_prefix) where to install files after compilation of ts files too qm.
+MACRO(QT_INSTALL_TS_RESOURCES tsfiles installdir)
+  FOREACH(_input ${tsfiles})
+    GET_FILENAME_COMPONENT(_name ${_input} NAME)
+    SET(_output ${CMAKE_CURRENT_BINARY_DIR}/${_name}.qm)
+    SET(_cmd_${_name} ${QT_LRELEASE_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${_input} -qm ${_output})
+    ADD_CUSTOM_TARGET(QT_INSTALL_TS_RESOURCES_${_name} ALL COMMAND ${_cmd_${_name}} DEPENDS ${_input})
+    INSTALL(FILES ${_output} DESTINATION ${installdir})
+  ENDFOREACH()
 ENDMACRO(QT_INSTALL_TS_RESOURCES)
 
 MACRO(QT_WRAP_MOC)
