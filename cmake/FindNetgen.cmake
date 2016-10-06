@@ -38,7 +38,7 @@ ENDIF()
 SET(NETGEN_ROOT_DIR $ENV{NETGEN_ROOT_DIR})
 
 IF(NETGEN_ROOT_DIR)
- LIST(APPEND CMAKE_PREFIX_PATH "${NETGEN_ROOT_DIR}")
+  LIST(APPEND CMAKE_PREFIX_PATH "${NETGEN_ROOT_DIR}")
 ENDIF(NETGEN_ROOT_DIR)
 
 FIND_PATH(_netgen_base_inc_dir nglib.h)
@@ -47,34 +47,14 @@ FIND_PATH(_netgen_add_inc_dir occgeom.hpp HINTS ${_netgen_base_inc_dir} PATH_SUF
 LIST(APPEND NETGEN_INCLUDE_DIRS ${_netgen_add_inc_dir})
 LIST(REMOVE_DUPLICATES NETGEN_INCLUDE_DIRS)
 
-FIND_LIBRARY(NETGEN_nglib NAMES nglib)
-IF(WIN32)
-  FIND_LIBRARY(NETGEN_csg NAMES csg)
-  FIND_LIBRARY(NETGEN_gen NAMES gen)
-  FIND_LIBRARY(NETGEN_geom2d NAMES geom2d)
-  FIND_LIBRARY(NETGEN_gprim NAMES gprim)
-  FIND_LIBRARY(NETGEN_interface NAMES interface)
-  FIND_LIBRARY(NETGEN_la NAMES la)
-  FIND_LIBRARY(NETGEN_mesh NAMES mesh)
-  FIND_LIBRARY(NETGEN_occ NAMES occ)
-  FIND_LIBRARY(NETGEN_stl NAMES stl)
-ENDIF(WIN32)
+FOREACH(_lib nglib csg gen geom2d gprim interface la mesh occ stl)
 
-SET(NETGEN_LIBRARIES ${NETGEN_nglib})
+  FIND_LIBRARY(NETGEN_${_lib} NAMES ${_lib})
+  IF(NETGEN_${_lib})
+    LIST(APPEND NETGEN_LIBRARIES ${NETGEN_${_lib}})
+  ENDIF()
 
-IF(WIN32)
-  SET(NETGEN_LIBRARIES ${NETGEN_LIBRARIES}
-      ${NETGEN_csg}
-      ${NETGEN_gen}
-      ${NETGEN_geom2d}
-      ${NETGEN_gprim}
-      ${NETGEN_interface}
-      ${NETGEN_la}
-      ${NETGEN_mesh}
-      ${NETGEN_occ}
-      ${NETGEN_stl}
-   )
-ENDIF(WIN32)
+ENDFOREACH()
 
 INCLUDE(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(NETGEN REQUIRED_VARS NETGEN_INCLUDE_DIRS NETGEN_LIBRARIES)
@@ -83,14 +63,14 @@ INCLUDE(CheckCXXSourceCompiles)
 
 IF(NETGEN_FOUND)
 
+  # Detect NETGEN V5
   SET(CMAKE_REQUIRED_INCLUDES "${CMAKE_REQUIRED_INCLUDES} ${NETGEN_INCLUDE_DIRS}")
   SET(CMAKE_REQUIRED_LIBRARIES "${NETGEN_LIBRARIES}")
   CHECK_CXX_SOURCE_COMPILES("
     #include <meshing.hpp>
-    
     int main()
     {
-      netgen::Mesh* ngMesh;
+      netgen::Mesh* ngMesh = 0;
       ngMesh->CalcLocalH(1.0);
     }
 " NETGEN_V5
