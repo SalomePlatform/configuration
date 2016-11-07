@@ -48,7 +48,9 @@ ENDIF()
 ## Specifics -- check matching version with Interpreter if already detected:
 IF (SALOMEPYTHONLIBS_FOUND AND SALOMEPYTHONINTERP_FOUND)
   # Now ensure versions are matching
-  IF("${PYTHONLIBS_VERSION_STRING}" STREQUAL "${PYTHON_VERSION_STRING}")
+  SALOME_EXTRACT_VERSION(${PYTHONLIBS_VERSION_STRING} maj_lib min_lib patch_lib)
+  SALOME_EXTRACT_VERSION(${PYTHON_VERSION_STRING} maj_inter min_inter patch_inter)
+  IF("${maj_lib}.${min_lib}.${patch_lib}" STREQUAL "${maj_inter}.${min_inter}.${patch_inter}")
     MESSAGE(STATUS "Python libs and interpreter versions are matching: ${PYTHONLIBS_VERSION_STRING}")
   ELSE()
     MESSAGE(FATAL_ERROR "Python libs and interpreter versions are NOT matching: ${PYTHONLIBS_VERSION_STRING} vs ${PYTHON_VERSION_STRING}")

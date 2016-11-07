@@ -955,3 +955,21 @@ MACRO(SALOME_CONFIGURE_PREPARE)
     ENDIF()
   ENDFOREACH()
 ENDMACRO(SALOME_CONFIGURE_PREPARE)
+
+#######################################################################
+#
+# From a version string like "2.7.12+" extract the major, minor and patch number
+# taking ONLY the numerical part.
+# This macro was created to treat Ubuntu Python version number where the libs are
+# version 2.7.12+ and the interp is 2.7.12 ...
+#
+MACRO(SALOME_EXTRACT_VERSION version_string major minor patch)
+  IF(${version_string} MATCHES "[0-9]+[^0-9]*\\.[0-9]+[^0-9]*\\.[0-9]+[^0-9]*")
+    STRING(REGEX REPLACE "^([0-9]+)[^0-9]*\\.[0-9]+[^0-9]*\\.[0-9]+[^0-9]*" "\\1" ${major} "${version_string}")
+    STRING(REGEX REPLACE "^[0-9]+[^0-9]*\\.([0-9]+)[^0-9]*\\.[0-9]+[^0-9]*" "\\1" ${minor} "${version_string}")
+    STRING(REGEX REPLACE "^[0-9]+[^0-9]*\\.[0-9]+[^0-9]*\\.([0-9]+)[^0-9]*" "\\1" ${patch} "${version_string}")
+  ELSE()
+    MESSAGE("MACRO(SALOME_EXTRACT_VERSION ${version_string} ${major} ${minor} ${patch}")
+    MESSAGE(FATAL_ERROR "Problem parsing version string, I can't parse it properly.")
+  ENDIF()
+ENDMACRO(SALOME_EXTRACT_VERSION)
