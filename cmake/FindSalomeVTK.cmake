@@ -37,6 +37,7 @@ SET(SalomeVTK_COMPONENTS
   vtkRenderingLabel
   vtkInteractionWidgets
   vtkInfovisCore
+  vtkInteractionStyle
 )
 
 #   Seting the following variable is equivalent to having passed the components
