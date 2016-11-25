@@ -41,8 +41,20 @@ IF(NETGEN_ROOT_DIR)
   LIST(APPEND CMAKE_PREFIX_PATH "${NETGEN_ROOT_DIR}")
 ENDIF(NETGEN_ROOT_DIR)
 
+# Windows specific stuff:
+# Since netgen-5.3.1 uses zlib, try to detect it
+IF(WIN32)
+  IF(EXISTS ${NETGEN_ROOT_DIR}/cmake/FindZlib.cmake)
+    FILE(TO_CMAKE_PATH ${NETGEN_ROOT_DIR}/cmake NETGEN_CMAKE_FILES)
+    LIST(APPEND CMAKE_MODULE_PATH ${NETGEN_CMAKE_FILES})
+    SET(ZLIB_ROOT_DIR $ENV{ZLIB_ROOT_DIR})
+    MESSAGE("RNV ${ZLIB_ROOT_DIR}")
+    INCLUDE(FindZlib)
+  ENDIF()
+ENDIF()
+
 FIND_PATH(_netgen_base_inc_dir nglib.h)
-SET(NETGEN_INCLUDE_DIRS ${_netgen_base_inc_dir})
+SET(NETGEN_INCLUDE_DIRS ${_netgen_base_inc_dir} ${ZLIB_INCLUDE_DIRS})
 FIND_PATH(_netgen_add_inc_dir occgeom.hpp HINTS ${_netgen_base_inc_dir} PATH_SUFFIXES share/netgen/include)
 LIST(APPEND NETGEN_INCLUDE_DIRS ${_netgen_add_inc_dir})
 LIST(REMOVE_DUPLICATES NETGEN_INCLUDE_DIRS)
