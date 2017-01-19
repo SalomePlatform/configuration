@@ -46,41 +46,15 @@ ELSE()
   SET(PYLOGLEVEL WARNING)
 ENDIF()
 
-## Make all warnings errors on non-windows platforms
-#  CURRENTLY DISABLED
+## Treat all warnings as errors
 IF(NOT (WIN32 OR APPLE))
-  SET(ADD_WERROR ON)
-  SET(NAMES ACCEPT_SALOME_WARNINGS ACCEPT_${MODULE}_WARNINGS I_AM_A_TROLL_I_DO_NOT_FIX_${MODULE}_WARNINGS)
-  FOREACH(name ${NAMES})
-    SET(VAL $ENV{${name}})
-    IF("${VAL}" STREQUAL "0")
-      SET(ADD_WERROR ON)
-    ENDIF()
-    IF("${VAL}" STREQUAL "1")
-      SET(ADD_WERROR OFF)
-    ENDIF()
-  ENDFOREACH()
-  
-  IF(ADD_WERROR)
-#    SET(CMAKE_C_FLAGS "-Werror")
-#    SET(CMAKE_CXX_FLAGS "-Werror")
+  OPTION(SALOME_DEBUG_WARNINGS "Treat warnings as errors" OFF)
+  MARK_AS_ADVANCED(SALOME_DEBUG_WARNINGS)
+  IF(SALOME_DEBUG_WARNINGS)
+    SET(CMAKE_C_FLAGS "-Werror")
+    SET(CMAKE_CXX_FLAGS "-Werror")
   ENDIF()
 ENDIF()
-
-## TODO: remove this ?
-#IF(WIN32)
-#    MARK_AS_ADVANCED(CLEAR CMAKE_CONFIGURATION_TYPES)
-#    SET(CMAKE_CONFIGURATION_TYPES ${CMAKE_BUILD_TYPE} CACHE STRING "compilation types" FORCE)
-#ELSE()
-#    IF(CMAKE_BUILD_TYPE STREQUAL Debug)
-#      SET(CMAKE_C_FLAGS_DEBUG "-g")
-#      SET(CMAKE_CXX_FLAGS_DEBUG "-g")
-#    ENDIF(CMAKE_BUILD_TYPE STREQUAL Debug)
-#    IF(CMAKE_BUILD_TYPE STREQUAL Release)
-#      SET(CMAKE_C_FLAGS_RELEASE "-O1 -DNDEBUG")
-#      SET(CMAKE_CXX_FLAGS_RELEASE "-O1 -DNDEBUG")
-#    ENDIF(CMAKE_BUILD_TYPE STREQUAL Release)
-#ENDIF()
 
 IF(WIN32)
   ## Windows specific:  
@@ -89,56 +63,18 @@ IF(WIN32)
   ADD_DEFINITIONS(-DWNT -DWIN32)
   ADD_DEFINITIONS(-D_WIN32_WINNT=0x0500)      # Windows 2000 or later API is required
   ADD_DEFINITIONS(-DPPRO_NT)                  # For medfile
-  #ADD_DEFINITIONS(-D_USE_MATH_DEFINES)        # for MEDMEM
-    
+
   SET(PLATFORM_LIBS Ws2_32.lib)
   LIST(APPEND PLATFORM_LIBS Userenv.lib)      # At least for GEOM suit
 
-################################################################################################
-#
-# RNV: In the SALOME sometimes operating with STL collections is done in not fully valid way. 
-#      To avoid run-time exception in Debug mode default values of the _SECURE_SCL, 
-#      _SECURE_SCL_THROWS and _HAS_ITERATOR_DEBUGGING macros were redefined. It solved a problem 
-#      then we used tne Microsoft Visual Studio 2008 to build SALOME on Windows platform.
-#      But in the Microsoft Visual Studio 2010 these macros affect on the size of STL collection 
-#      classes(in difference from the Microsoft Visual Studio 2008: in this version of MSVS size
-#      of the STL collection  classes does not depend on these macros).
-#      All pre-requisite products are built by MSVS 2010 in Debug mode with the default 
-#      values of the metioned above macros (namely _SECURE_SCL=1, _HAS_ITERATOR_DEBUGGING=1 and
-#      _SECURE_SCL_THROWS=1). So SALOME modules should be build in the same configuration.
-#
-################################################################################################
-#
-#  # Disable iterator debugging on WINDOWS to avoid runtime error during checking iterators
-#    # _SECURE_SCL
-#    #             If defined as 1, unsafe iterator use causes a runtime error. 
-#    #             If defined as 0, checked iterators are disabled.
-#    #             The default value for _SECURE_SCL is 1
-#    # _SECURE_SCL_THROWS
-#    #             If defined as 1, an out of range iterator use causes an exception at runtime.
-#    #             If defined as 0, the program is terminated by calling invalid_parameter. 
-#    #             The default value for _SECURE_SCL_THROWS is 0
-#  
-#  ADD_DEFINITIONS(-D_SECURE_SCL=0 -D_SECURE_SCL_THROWS=0)
-#
-#    # The symbol _HAS_ITERATOR_DEBUGGING can be used to turn off the iterator debugging feature in a debug build
-#    #             If defined as 1, iterator debugging is enabled. 
-#    #             If defined as 0, iterator debugging is disabled.
-#    #             The default value for _HAS_ITERATOR_DEBUGGING is 1
-#
-#  IF(NOT CMAKE_BUILD_TYPE STREQUAL "RELEASE" AND NOT CMAKE_BUILD_TYPE STREQUAL "Release")
-#    ADD_DEFINITIONS(-D_HAS_ITERATOR_DEBUGGING=0)  
-#  ENDIF(NOT CMAKE_BUILD_TYPE STREQUAL "RELEASE" AND NOT CMAKE_BUILD_TYPE STREQUAL "Release")
-################################################################################################
-  
   IF(MACHINE_IS_64)
-    SET(SIZE_OF_LONG 4)                          # set sizeof(long) to 4 byte
+    SET(SIZE_OF_LONG 4)                       # Set sizeof(long) to 4 bytes
   ELSE()
-    SET(SIZE_OF_LONG ${CMAKE_SIZEOF_VOID_P})     # set sizeof(long) the same as size of pointers
+    SET(SIZE_OF_LONG ${CMAKE_SIZEOF_VOID_P})  # Set sizeof(long) the same as size of pointers
   ENDIF()
 ELSE()
   ## Linux specific:
-  SET(PLATFORM_LIBS dl)    # Dynamic loading (dlopen, dlsym)
+  SET(PLATFORM_LIBS dl)                       # Dynamic loading (dlopen, dlsym)
   IF(MACHINE_IS_64) 
     ADD_DEFINITIONS(-DPCLINUX64)
   ENDIF(MACHINE_IS_64)
@@ -151,9 +87,13 @@ ENDIF()
 
 ## Apple specific:
 IF(APPLE)
-  SET(CMAKE_C_COMPILER gcc)
-  SET(CMAKE_CXX_COMPILER g++)
-  # because default is clang(llvm) with mountain lion at least
+  # Default is clang(llvm) with mountain lion at least
+  OPTION(SALOME_APPLE_USE_GCC "Use GCC compiler" OFF)
+  MARK_AS_ADVANCED(SALOME_APPLE_USE_GCC)
+  IF(SALOME_APPLE_USE_GCC)
+    SET(CMAKE_C_COMPILER gcc)
+    SET(CMAKE_CXX_COMPILER g++)
+  ENDIF()
 ENDIF()
 
 # Compiler flags for coverage testing
