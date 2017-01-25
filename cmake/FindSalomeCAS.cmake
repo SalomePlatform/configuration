@@ -51,6 +51,25 @@ ELSE()
   SET(CAS_BINPLUGIN TKBin)
 ENDIF()
 
+# Workaround: detect and add freetype to CAS_INCLUDE_DIRS
+# It will be suppressed after migration OCCT detection procedure to CONFIG mode
+# and the correction of the several bugs in the OCCT CMake configuration.
+SET(Freetype_DIR $ENV{FREETYPE_ROOT_DIR})
+# Standard CMake Findfreetype.cmake doesn't find ft2build.h, do it manually:
+# 1. Find custom freetype
+FIND_PATH( FREETYPE_INCLUDE_DIR_ft2build ft2build.h
+	   PATHS $ENV{FREETYPE_ROOT_DIR}
+	   PATH_SUFFIXES include/freetype2 include freetype2
+	   NO_DEFAULT_PATH )
+
+# 2. Find native freetype, if custom doesn't found:
+IF(NOT FREETYPE_INCLUDE_DIR_ft2build)
+  FIND_PATH( FREETYPE_INCLUDE_DIR_ft2build ft2build.h
+   	     PATH_SUFFIXES include/freetype2 include freetype2 )
+ENDIF()
+SET(CAS_INCLUDE_DIRS ${CAS_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIR_freetype2} ${FREETYPE_INCLUDE_DIR_ft2build})
+# End of workaround
+
 IF(CAS_FOUND)
   SALOME_ACCUMULATE_HEADERS(CAS_INCLUDE_DIRS)
   SALOME_ACCUMULATE_ENVIRONMENT(LD_LIBRARY_PATH ${CAS_TKernel})
