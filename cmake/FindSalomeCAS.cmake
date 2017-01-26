@@ -55,6 +55,8 @@ ENDIF()
 # It will be suppressed after migration OCCT detection procedure to CONFIG mode
 # and the correction of the several bugs in the OCCT CMake configuration.
 SET(Freetype_DIR $ENV{FREETYPE_ROOT_DIR})
+FIND_PACKAGE(Freetype)
+
 # Standard CMake Findfreetype.cmake doesn't find ft2build.h, do it manually:
 # 1. Find custom freetype
 FIND_PATH( FREETYPE_INCLUDE_DIR_ft2build ft2build.h
