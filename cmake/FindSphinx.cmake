@@ -27,8 +27,12 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-FIND_PROGRAM(SPHINX_EXECUTABLE sphinx-build PATH_SUFFIXES Scripts)
-FIND_PROGRAM(SPHINX_APIDOC_EXECUTABLE sphinx-apidoc PATH_SUFFIXES Scripts)
+FIND_PROGRAM(SPHINX_EXECUTABLE
+	     NAMES sphinx-build sphinx-build-${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}
+	     PATH_SUFFIXES Scripts)	     
+FIND_PROGRAM(SPHINX_APIDOC_EXECUTABLE
+             NAMES sphinx-apidoc sphinx-apidoc-${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}
+	     PATH_SUFFIXES Scripts)
 
 # Get root dir locally, going up two levels from the exec:
 GET_FILENAME_COMPONENT(_tmp_ROOT_DIR "${SPHINX_EXECUTABLE}" PATH)
