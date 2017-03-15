@@ -1,0 +1,11 @@
+diff -NaurwB paco++-0.5.5__0/src/kernel/PaCO++_InterfaceParallel_impl.cc paco++-0.5.5__1/src/kernel/PaCO++_InterfaceParallel_impl.cc
+--- paco++-0.5.5__0/src/kernel/PaCO++_InterfaceParallel_impl.cc	2009-03-27 11:35:04.000000000 +0300
++++ paco++-0.5.5__1/src/kernel/PaCO++_InterfaceParallel_impl.cc	2017-03-15 17:13:17.906662733 +0300
+@@ -16,6 +16,7 @@
+ //  
+ //  Author : André RIBES (EDF R&D)
+ 
++#include <unistd.h>
+ #include "PaCO++_InterfaceParallel_impl.h"
+ 
+ InterfaceParallel_impl::InterfaceParallel_impl(CORBA::ORB_ptr orb, 

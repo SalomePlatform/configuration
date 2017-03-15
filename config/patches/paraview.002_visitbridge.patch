@@ -1,0 +1,1822 @@
+--- ParaView-5.0.1_SRC.orig/Utilities/VisItBridge/databases/paraDIS/paraDIS_lib/paradis.C	2016-05-11 15:00:58.000000000 +0300
++++ ParaView-5.0.1_SRC.patch/Utilities/VisItBridge/databases/paraDIS/paraDIS_lib/paradis.C	2016-05-11 15:04:14.000000000 +0300
+@@ -203,28 +203,28 @@
+ 
+   rclib::Point<float> FullNode::mBoundsMin, FullNode::mBoundsMax, FullNode::mBoundsSize; 
+   string FullNode::mTraceFileBasename; 
+-  vector<uint32_t> FullNode::mTraceNodes; 
+-  std::map<uint32_t, FullNode *>  FullNode::mFullNodes;  
++  vector<boost::uint32_t> FullNode::mTraceNodes; 
++  std::map<boost::uint32_t, FullNode *>  FullNode::mFullNodes;  
+   vector<FullNode*> FullNode::mFullNodeVector; 
+-  uint32_t FullNode::mNextNodeID = 0; 
++  boost::uint32_t FullNode::mNextNodeID = 0; 
+ 
+-  std::map<uint32_t, ArmSegment *> ArmSegment::mArmSegments; 
++  std::map<boost::uint32_t, ArmSegment *> ArmSegment::mArmSegments; 
+   vector<ArmSegment*> ArmSegment::mArmSegmentVector; 
+ 
+-  uint32_t ArmSegment::mNextSegmentID = 0; 
++  boost::uint32_t ArmSegment::mNextSegmentID = 0; 
+   double ArmSegment::mSegLen = 0 ;
+-  uint32_t ArmSegment::mNumClassified = 0; 
+-  uint32_t ArmSegment::mNumWrapped = 0;
+-  uint32_t ArmSegment::mNumArmSegmentsMeasured=0; 
++  boost::uint32_t ArmSegment::mNumClassified = 0; 
++  boost::uint32_t ArmSegment::mNumWrapped = 0;
++  boost::uint32_t ArmSegment::mNumArmSegmentsMeasured=0; 
+   
+   vector<Arm *> Arm::mArms;
+-  vector<int32_t> Arm::mTraceArms; 
+-  uint8_t Arm::mTraceDepth; 
++  vector<boost::int32_t> Arm::mTraceArms; 
++  boost::uint8_t Arm::mTraceDepth; 
+   string Arm::mTraceFileBasename; 
+   double Arm::mLongestLength = 0.0; 
+   double Arm::mDecomposedLength = 0.0; 
+-  vector<int32_t> Arm::mNumDecomposed(7, 0); // statistics
+-  int32_t Arm::mNumDestroyedInDetachment = 0; 
++  vector<boost::int32_t> Arm::mNumDecomposed(7, 0); // statistics
++  boost::int32_t Arm::mNumDestroyedInDetachment = 0; 
+   double Arm::mTotalArmLengthBeforeDecomposition = 0.0;
+   double Arm::mTotalArmLengthAfterDecomposition = 0.0;  
+   double Arm::mThreshold = -1; 
+@@ -236,7 +236,7 @@
+ 
+   //===========================================================================
+ 
+-  void WriteTraceFiles(string filebase, string description, vector<Arm*>&arms, vector<uint32_t> &armdepths, vector<int> &action) {
++  void WriteTraceFiles(string filebase, string description, vector<Arm*>&arms, vector<boost::uint32_t> &armdepths, vector<int> &action) {
+     // ===================================
+     // FIRST, PRINT THE TEXT FILE
+     string filename = filebase + ".txt"; 
+@@ -249,8 +249,8 @@
+     }
+     textfile << "Tracefile for " << description << ", written by paraDIS_lib" << endl; 
+     textfile.flush(); 
+-    uint32_t level = 0; 
+-    for (uint32_t arm = 0; arm < arms.size(); arm++) {
++    boost::uint32_t level = 0; 
++    for (boost::uint32_t arm = 0; arm < arms.size(); arm++) {
+       if (armdepths[arm] == level) { // this is weird, don't worry
+         textfile << str(boost::format("\n****************\nARM LEVEL %1%\n****************\n\n")%level); 
+         textfile.flush(); 
+@@ -285,23 +285,23 @@
+   
+     // next, the points
+     vector<FullNode *>nodes; 
+-    vector<uint32_t>numArmNodes; 
+-    for (uint32_t arm = 0; arm < arms.size(); arm++) {
++    vector<boost::uint32_t>numArmNodes; 
++    for (boost::uint32_t arm = 0; arm < arms.size(); arm++) {
+       vector<FullNode *> armnodes = arms[arm]->GetNodes(); 
+       numArmNodes.push_back(armnodes.size()); 
+       nodes.insert(nodes.end(), armnodes.begin(), armnodes.end()); 
+     }
+-    uint32_t armnum = 0, armnode = 0; 
++    boost::uint32_t armnum = 0, armnode = 0; 
+     vector<float> previous; 
+     vtkfile << str(boost::format("POINTS %d float") % nodes.size()) << endl;
+-    for (uint32_t point = 0; point < nodes.size(); point++) {
++    for (boost::uint32_t point = 0; point < nodes.size(); point++) {
+       if (armnode == numArmNodes[armnum]) {
+         armnode = 0;         
+         armnum++; 
+       } 
+       vector<float> xyz = nodes[point]->GetLocation(); 
+       if (point > 0) {
+-        for (uint32_t i=0; i<3; i++) {
++        for (boost::uint32_t i=0; i<3; i++) {
+           if (xyz[i] - previous[i] > FullNode::mBoundsSize[i]/2){
+             xyz[i] -= FullNode::mBoundsSize[i]; 
+           } 
+@@ -323,10 +323,10 @@
+     // next the lines
+     int numlines = nodes.size() - arms.size(); 
+     vtkfile << str(boost::format("LINES %d %d") % numlines % (3*numlines)) << endl;
+-    uint32_t currentIndex = 0; 
+-    for (uint32_t arm = 0; arm < arms.size(); arm++) {
++    boost::uint32_t currentIndex = 0; 
++    for (boost::uint32_t arm = 0; arm < arms.size(); arm++) {
+       if (numArmNodes[arm]) {
+-        for (uint32_t nodenum = 0; nodenum < numArmNodes[arm]-1; nodenum++) {
++        for (boost::uint32_t nodenum = 0; nodenum < numArmNodes[arm]-1; nodenum++) {
+           vtkfile << str(boost::format("2 %d %d")% currentIndex % (currentIndex+1)) << endl;
+           currentIndex++; 
+         }
+@@ -340,12 +340,12 @@
+     vtkfile << "SCALARS armnum int" << endl;
+     vtkfile << "LOOKUP_TABLE default" << endl;
+     vtkfile.flush(); 
+-    for (uint32_t arm = 0; arm < arms.size(); arm++) {
++    for (boost::uint32_t arm = 0; arm < arms.size(); arm++) {
+       if (!numArmNodes[arm]) {
+         continue;
+       }
+-      uint32_t armnum = arms[arm]->mArmID;
+-      for (uint32_t nodenum = 0; nodenum < numArmNodes[arm]-1; nodenum++) {
++      boost::uint32_t armnum = arms[arm]->mArmID;
++      for (boost::uint32_t nodenum = 0; nodenum < numArmNodes[arm]-1; nodenum++) {
+         vtkfile << armnum << " " ; 
+         vtkfile.flush(); 
+       }        
+@@ -355,12 +355,12 @@
+     // next the burgers type for each line
+     vtkfile << "SCALARS burgers_type int" << endl;
+     vtkfile << "LOOKUP_TABLE default" << endl;
+-    for (uint32_t arm = 0; arm < arms.size(); arm++) {
++    for (boost::uint32_t arm = 0; arm < arms.size(); arm++) {
+       if (!numArmNodes[arm]) {
+         continue;
+       }
+-      uint32_t armtype = arms[arm]->GetBurgersType(); 
+-      for (uint32_t nodenum = 0; nodenum < numArmNodes[arm]-1; nodenum++) {
++      boost::uint32_t armtype = arms[arm]->GetBurgersType(); 
++      for (boost::uint32_t nodenum = 0; nodenum < numArmNodes[arm]-1; nodenum++) {
+         vtkfile << armtype << " " ; 
+         vtkfile.flush(); 
+       }
+@@ -371,11 +371,11 @@
+     // next the arm depths for each line
+     vtkfile << "SCALARS BFS_depth int" << endl;
+     vtkfile << "LOOKUP_TABLE default" << endl;
+-    for (uint32_t arm = 0; arm < arms.size(); arm++) {
++    for (boost::uint32_t arm = 0; arm < arms.size(); arm++) {
+       if (!numArmNodes[arm]) {
+         continue;
+       }
+-      for (uint32_t nodenum = 0; nodenum < numArmNodes[arm]-1; nodenum++) {
++      for (boost::uint32_t nodenum = 0; nodenum < numArmNodes[arm]-1; nodenum++) {
+         vtkfile << armdepths[arm] << " " ; 
+       }
+     }
+@@ -384,11 +384,11 @@
+     // next the "action" for each line
+     vtkfile << "SCALARS action int" << endl;
+     vtkfile << "LOOKUP_TABLE default" << endl;
+-    for (uint32_t arm = 0; arm < arms.size(); arm++) {
++    for (boost::uint32_t arm = 0; arm < arms.size(); arm++) {
+       if (!numArmNodes[arm]) {
+         continue;
+       }
+-      for (uint32_t nodenum = 0; nodenum < numArmNodes[arm]-1; nodenum++) {
++      for (boost::uint32_t nodenum = 0; nodenum < numArmNodes[arm]-1; nodenum++) {
+         vtkfile << action[arm] << " " ; 
+       }
+     }
+@@ -421,14 +421,14 @@
+     // next, the points
+     armnum = 0; armnode = 0; 
+     vtkfile << str(boost::format("POINTS %d float") % nodes.size()) << endl;
+-    for (uint32_t point = 0; point < nodes.size(); point++) {
++    for (boost::uint32_t point = 0; point < nodes.size(); point++) {
+       if (armnode == numArmNodes[armnum]) {
+         armnode = 0;         
+         armnum++; 
+       } 
+       vector<float> xyz = nodes[point]->GetLocation(); 
+       if (point > 0) {
+-        for (uint32_t i=0; i<3; i++) {
++        for (boost::uint32_t i=0; i<3; i++) {
+           if (xyz[i] - previous[i] > FullNode::mBoundsSize[i]/2){
+             xyz[i] -= FullNode::mBoundsSize[i]; 
+           } 
+@@ -449,7 +449,7 @@
+   
+     // now node vertices to allow node plotting
+     vtkfile << str(boost::format("VERTICES %d %d") % nodes.size() % (2*nodes.size())) << endl;
+-    for (uint32_t point = 0; point < nodes.size(); point++) {
++    for (boost::uint32_t point = 0; point < nodes.size(); point++) {
+       vtkfile << "1 " << point << endl; 
+       vtkfile.flush(); 
+     } 
+@@ -459,8 +459,8 @@
+     vtkfile << str(boost::format("CELL_DATA %d") % nodes.size()) << endl;
+     vtkfile << "SCALARS node_index int" << endl;
+     vtkfile << "LOOKUP_TABLE default" << endl;
+-    for (uint32_t point = 0; point < nodes.size(); point++) {
+-      uint32_t nodeID = nodes[point]->GetIndex(); 
++    for (boost::uint32_t point = 0; point < nodes.size(); point++) {
++      boost::uint32_t nodeID = nodes[point]->GetIndex(); 
+       vtkfile <<  nodeID << " "; 
+       vtkfile.flush(); 
+     } 
+@@ -558,7 +558,7 @@
+   
+   //===========================================================================
+   void FullNode::PrintAllNodeTraces(string stepname) {
+-    for (vector<uint32_t>::iterator nodeid = FullNode::mTraceNodes.begin(); 
++    for (vector<boost::uint32_t>::iterator nodeid = FullNode::mTraceNodes.begin(); 
+          nodeid != mTraceNodes.end(); nodeid++) {
+       if (FullNode::mFullNodes.find(*nodeid) == FullNode::mFullNodes.end()) {
+          if (*nodeid < FullNode::mFullNodes.size()) {
+@@ -582,7 +582,7 @@
+     dbprintf(5, "Node::WriteTraceFiles(node %d)\n", mNodeIndex); 
+     string filebase = str(boost::format("%s-%s-Node_%d") % mTraceFileBasename % stepname % mNodeIndex); 
+     vector<Arm *> arms; 
+-    vector<uint32_t> armdepths; 
++    vector<boost::uint32_t> armdepths; 
+     vector<int> action; 
+     
+     if (mNeighborArms.size() ) {
+@@ -672,7 +672,7 @@
+         s += "<NONE>"; 
+       } else {
+        s += "<"; 
+-       uint32_t i=0; while (i < mNeighborSegments.size()) {
++       boost::uint32_t i=0; while (i < mNeighborSegments.size()) {
+          if (mNeighborSegments[i]) {
+            s += intToString(mNeighborSegments[i]->GetID()); 
+          } else {
+@@ -688,7 +688,7 @@
+       }
+     } else {
+        s += "\n"; 
+-     uint32_t i=0; while (i < mNeighborSegments.size()) {
++     boost::uint32_t i=0; while (i < mNeighborSegments.size()) {
+         s += INDENT(indent) + "neighbor " + intToString(i) + ": "; 
+         if (mNeighborSegments[i]) {
+           s+= mNeighborSegments[i]->Stringify(indent+1);
+@@ -719,7 +719,7 @@
+       while (neighbor--) {
+         const ArmSegment *theSegment = 
+           dynamic_cast<const ArmSegment *>(mNeighborSegments[neighbor]);
+-        int8_t btype =  theSegment->GetBurgersType(); 
++        boost::int8_t btype =  theSegment->GetBurgersType(); 
+         if (btypes[btype] || btype < 0) {
+           continue; //not a monster, we're done
+         }
+@@ -765,12 +765,12 @@
+    vector<Arm*> armpair(2,NULL); 
+     vector<bool> matched(mNeighborSegments.size(), false); 
+     // first, identify looped cross arms
+-    for (uint32_t segnum = 0; segnum < mNeighborSegments.size()-1; segnum++) {
++    for (boost::uint32_t segnum = 0; segnum < mNeighborSegments.size()-1; segnum++) {
+       if (!matched[segnum] &&
+           mNeighborSegments[segnum]->mParentArm->mTerminalNodes.size() == 1) {
+         dbprintf(4, str(boost::format("FullNode::IdentifyCrossArms(): node(%1%): found crossing loop arm %2%.\n") % GetNodeIDString() % mNeighborSegments[segnum]->mParentArm->mArmID).c_str()); 
+         armpair[0] = NULL;
+-        for (uint32_t match = segnum+1; match < mNeighborSegments.size(); ++match) {
++        for (boost::uint32_t match = segnum+1; match < mNeighborSegments.size(); ++match) {
+           if (!matched[match] && 
+               mNeighborSegments[match]->mParentArm == mNeighborSegments[segnum]->mParentArm ) {
+             matched[segnum] = true; 
+@@ -792,10 +792,10 @@
+     
+     
+     // next, identify non-looped cross arms
+-    for (uint32_t segnum = 0; segnum < mNeighborSegments.size()-1; ++segnum) {
+-      int8_t btype = mNeighborSegments[segnum]->GetBurgersType(); 
++    for (boost::uint32_t segnum = 0; segnum < mNeighborSegments.size()-1; ++segnum) {
++      boost::int8_t btype = mNeighborSegments[segnum]->GetBurgersType(); 
+       if (!matched[segnum]) {
+-        for (uint32_t match = segnum+1; match < mNeighborSegments.size(); ++match) {
++        for (boost::uint32_t match = segnum+1; match < mNeighborSegments.size(); ++match) {
+           if (!matched[match] && 
+               mNeighborSegments[match]->GetBurgersType() == btype) {
+             matched[match] = matched[segnum] = true; 
+@@ -821,7 +821,7 @@
+   void FullNode::DetachCrossArms(void) {
+     
+     vector <vector<Arm *> >crossarms = IdentifyCrossArms(); 
+-    for (uint32_t armpair = 0; armpair < crossarms.size(); ++armpair) {
++    for (boost::uint32_t armpair = 0; armpair < crossarms.size(); ++armpair) {
+       crossarms[armpair][0]->mExtendOrDetach = false; 
+       if (crossarms[armpair][1] == NULL) {
+         crossarms[armpair][0]->DetachLoopFromNode(this); 
+@@ -844,7 +844,7 @@
+     } else {
+       s += "(NONE)\n"; 
+     }
+-    uint32_t epnum = 0; 
++    boost::uint32_t epnum = 0; 
+     while (epnum < 2) {
+       s+= INDENT(indent+1) + "ep "+intToString(epnum)+": "; 
+       if (mEndpoints[epnum]) s+= mEndpoints[epnum]->Stringify(0); 
+@@ -985,17 +985,17 @@
+ 
+ 
+  //===========================================================================
+-  int8_t ArmSegment::GetMNType(void) const { 
++  boost::int8_t ArmSegment::GetMNType(void) const { 
+     return mParentArm->mArmType; 
+   } 
+ 
+  //===========================================================================
+-  uint32_t ArmSegment::GetArmID(void) {    
++  boost::uint32_t ArmSegment::GetArmID(void) {    
+     return mParentArm->mArmID;
+   }
+ 
+   //===========================================================================
+-  uint32_t ArmSegment::GetMetaArmID(void) {
++  boost::uint32_t ArmSegment::GetMetaArmID(void) {
+     if (!mParentArm) {
+       dbprintf(0, "ERROR: GetMetaArmID() called on parentless segment.\n"); 
+       return METAARM_UNKNOWN; 
+@@ -1004,7 +1004,7 @@
+   }
+ 
+   //===========================================================================
+-  uint8_t ArmSegment::GetMetaArmType(void) {
++  boost::uint8_t ArmSegment::GetMetaArmType(void) {
+     if (!mParentArm) {
+       dbprintf(0, "ERROR: GetMetaArmType() called on parentless segment.\n"); 
+       return METAARM_UNKNOWN; 
+@@ -1021,7 +1021,7 @@
+    */ 
+   void Arm::WriteTraceFiles(string stepname) {
+     bool trace = false; 
+-    for (uint32_t n = 0; n<mTraceArms.size(); n++) {
++    for (boost::uint32_t n = 0; n<mTraceArms.size(); n++) {
+       if (mArmID == mTraceArms[n]) 
+         trace = true; 
+     }
+@@ -1031,7 +1031,7 @@
+     string filebase = str(boost::format("%s-%s-arm_%d") % mTraceFileBasename % stepname % mArmID); 
+     
+     vector<Arm *> arms; 
+-    vector<uint32_t> armdepths; 
++    vector<boost::uint32_t> armdepths; 
+     vector<int> action; 
+     FindBFSNeighbors(arms, armdepths, action); 
+     string description = str(boost::format("arm %1%")%mArmID); 
+@@ -1040,21 +1040,21 @@
+   }
+ 
+   //===========================================================================
+-  void Arm::FindBFSNeighbors(vector<Arm *> &arms, vector<uint32_t> &armdepths, vector<int> &action) {
++  void Arm::FindBFSNeighbors(vector<Arm *> &arms, vector<boost::uint32_t> &armdepths, vector<int> &action) {
+     arms.push_back(this); 
+     armdepths.push_back(0);
+     action.push_back(2); 
+     
+     // first, collect the list of arms in BFS order:
+-    uint32_t armnum = 0;
+-    uint32_t depth = 0; 
++    boost::uint32_t armnum = 0;
++    boost::uint32_t depth = 0; 
+     while (depth++ < mTraceDepth && armnum < arms.size()) {
+-      uint32_t lastInLevel = arms.size(); 
++      boost::uint32_t lastInLevel = arms.size(); 
+       for (; armnum < lastInLevel; armnum++) {
+        // append arm's neighbors onto arms
+         Arm *arm = arms[armnum]; 
+         arm->mSeen = true; 
+-        uint32_t numneighbors = arm->GetNumNeighborArms(); 
++        boost::uint32_t numneighbors = arm->GetNumNeighborArms(); 
+         dbprintf(5, "Arm::WriteTraceFiles(arm %d): arm %d, depth %d: looking at %d neighbor arms\n", mArmID, arm->mArmID, depth, numneighbors); 
+        while (numneighbors--) {
+           Arm *nei = arm->GetNeighborArm(numneighbors); 
+@@ -1072,7 +1072,7 @@
+         }
+       }
+     } 
+-    for (uint32_t arm = 0; arm < arms.size(); arm++) {
++    for (boost::uint32_t arm = 0; arm < arms.size(); arm++) {
+       arms[arm]->mSeen = false; 
+     }
+     return ;
+@@ -1176,7 +1176,7 @@
+     
+ 
+  //===========================================================================
+-  uint32_t Arm::GetMetaArmID(void) {
++  boost::uint32_t Arm::GetMetaArmID(void) {
+     if (!mParentMetaArm) {
+       dbprintf(0, "Error: GetMetaArmID() called on parentless arm.\n");
+       return METAARM_UNKNOWN; 
+@@ -1185,7 +1185,7 @@
+   }
+ 
+  //===========================================================================
+-  uint8_t Arm::GetMetaArmType(void) {
++  boost::uint8_t Arm::GetMetaArmType(void) {
+     if (!mParentMetaArm) {
+       dbprintf(0, "Error: GetMetaArmType() called on parentless arm.\n");
+       return METAARM_UNKNOWN; 
+@@ -1317,7 +1317,7 @@
+       startNode = mTerminalNodes[0];       
+     }
+ 
+-    uint32_t startnodenum = 0; 
++    boost::uint32_t startnodenum = 0; 
+     for (startnodenum = 0; startnodenum < mTerminalNodes.size(); startnodenum++) {
+       if (startNode == mTerminalNodes[startnodenum]) {
+         break;
+@@ -1750,7 +1750,7 @@
+     int btype = GetBurgersType(); 
+     FullNode *sourceNode = sharedNode; // for iterating through source arm 
+     dbprintf(6, "ExtendBySegments(%d): iterating through %d source segments\n", mArmID, sourceSegments.size()); 
+-    uint32_t seg = 0; 
++    boost::uint32_t seg = 0; 
+     while (seg < sourceSegments.size()) {
+       sourceNode = sourceSegments[seg]->GetOtherEndpoint(sourceNode);
+       
+@@ -1864,7 +1864,7 @@
+   */
+   bool Arm::Decompose(int energy) {
+     
+-    int8_t burgtype = GetBurgersType();
++    boost::int8_t burgtype = GetBurgersType();
+     if (burgtype/10 != energy) 
+       return false; // not yet
+ 
+@@ -1880,7 +1880,7 @@
+     // This will be the one with the least number of neighbors.  If two terminal nodes have the same number of neighbors, use the one that has the lowest maximum energy level.  
+     // I believe this greedy algorithm results in the global minimum decomposition too.  
+ 
+-    uint32_t numTermNodes = mTerminalNodes.size();
++    boost::uint32_t numTermNodes = mTerminalNodes.size();
+     vector<int> maxEnergies; // we'll analyze this later. 
+     vector<int> numneighbors; 
+     vector<int> extendedArmIDs; 
+@@ -1903,7 +1903,7 @@
+     WriteTraceFiles("1-before-detachment"); 
+       
+     // Actually perform detachment
+-    for (uint32_t n = 0; n<mTerminalNodes.size(); n++) {
++    for (boost::uint32_t n = 0; n<mTerminalNodes.size(); n++) {
+       mTerminalNodes[n]->DetachCrossArms(); 
+     }
+ 
+@@ -1915,7 +1915,7 @@
+ 
+     WriteTraceFiles("2-before-decomposition"); 
+     int sharedNodeNum = -1; 
+-    for (uint32_t termnode = 0; termnode < numTermNodes; termnode++) {
++    for (boost::uint32_t termnode = 0; termnode < numTermNodes; termnode++) {
+       numneighbors.push_back(mTerminalNodes[termnode]->mNeighborArms.size()); 
+       maxEnergies.push_back(0); 
+       int neighbor = 0;
+@@ -1972,7 +1972,7 @@
+     double decomposedLength = 0; 
+     neighbornum = neighborArms.size();
+     vector<ArmSegment*> sourceSegments = this->GetSegments(sharedNode); 
+-    uint32_t decomposed = 0;
++    boost::uint32_t decomposed = 0;
+     while (neighbornum--) {
+       Arm *neighborArm = neighborArms[neighbornum]; 
+       if (neighborArm != this) { 
+@@ -2084,7 +2084,7 @@
+   string MetaArm::Stringify(int indent) {
+     int atype = mMetaArmType;
+     string s = INDENT(indent) + str(boost::format("(MetaArm): mLength: %1%, mMetaArmType: %2% (%3%), mMetaArmID: %4%\n\n")%mLength % atype % MetaArmTypeNames(mMetaArmType) % mMetaArmID); 
+-    uint32_t i = 0; 
++    boost::uint32_t i = 0; 
+     while (i<mTerminalNodes.size()) {
+       string s2 = mTerminalNodes[i]->Stringify(indent+1);
+       s += INDENT(indent+1);
+@@ -2155,7 +2155,7 @@
+     else {
+       dbprintf(4, "Candidate is type 200 and we shall try to recurse..\n", mMetaArmID);
+     }
+-    uint32_t nodenum = candidate->mTerminalNodes.size(); 
++    boost::uint32_t nodenum = candidate->mTerminalNodes.size(); 
+     if (nodenum < 2) {
+       dbprintf(0, "Error:  Found candidate with %d terminal node(s), but we already tested for loops. \n", mMetaArmID, nodenum); 
+       errexit1; 
+@@ -2175,7 +2175,7 @@
+         return true; 
+       }
+ 
+-      uint32_t neighbornum = node->mNeighborArms.size(); 
++      boost::uint32_t neighbornum = node->mNeighborArms.size(); 
+       dbprintf(4, "FindEndpoint(metaarm %d): Candidate has N node on other end. Recursing on %d neighbors.\n", mMetaArmID, neighbornum); 
+       Arm *foundseed = NULL; 
+       while (neighbornum--) {
+@@ -2280,11 +2280,11 @@
+     // Best algorithm: 
+     
+     // A metaarm can continue in up to two directions, call them paths.  
+-    //uint32_t pathsTaken = 0; 
++    //boost::uint32_t pathsTaken = 0; 
+     
+     // First, check each terminal node of the arm.  If it's a monster, add it as a meta arm terminal node and mark off a path.  If it's not, then recurse on it to extend the arm.  
+     dbprintf(4, "FindEndpoints(metaarm %d) (seed %d): Checking terminal nodes of seed arm.\n", mMetaArmID, seed->mArmID); 
+-    uint32_t nodenum = 0; // seed->mTerminalNodes.size(); 
++    boost::uint32_t nodenum = 0; // seed->mTerminalNodes.size(); 
+     bool seedIsTerminal = false; 
+     while (nodenum <  seed->mTerminalNodes.size() && mMetaArmType != METAARM_LOOP_111) {
+       FullNode * node = seed->mTerminalNodes[nodenum]; 
+@@ -2444,7 +2444,7 @@
+     vector<rclib::Point<float> > points; 
+     if (mMetaArmType == METAARM_LOOP_111 || mMetaArmType == METAARM_LOOP_HIGH_ENERGY) {
+       vector<FullNode *>nodes = GetNodes(); 
+-      uint32_t  p = 0; 
++      boost::uint32_t  p = 0; 
+       while (p < nodes.size()-1) {
+         vector<float> f = nodes[p]->GetLocation();
+         points.push_back(f);
+@@ -2507,11 +2507,11 @@
+     double armLengths[11] = {0}, totalArmLength=0; 
+     
+    
+-    uint32_t numArms[11] = {0};  // number of arms of each type
+-    uint32_t totalArms=0;
++    boost::uint32_t numArms[11] = {0};  // number of arms of each type
++    boost::uint32_t totalArms=0;
+ #if LINKED_LOOPS
+     double linkedLoopLength = 0; 
+-    uint32_t numLinkedLoops = 0; 
++    boost::uint32_t numLinkedLoops = 0; 
+ #endif
+     
+     double *armLengthBins = NULL; 
+@@ -2532,7 +2532,7 @@
+     };
+     
+     double shortLengths[16] = {0}, longLengths[16]={0}; 
+-    uint32_t numShortArms[16]={0}, numLongArms[16]={0}; 
++    boost::uint32_t numShortArms[16]={0}, numLongArms[16]={0}; 
+ 
+     vector<Arm *>::iterator armpos = Arm::mArms.begin(), armend = Arm::mArms.end(); 
+     while (armpos != armend) { 
+@@ -2543,7 +2543,7 @@
+         continue; 
+       }
+       if (mThreshold >= 0) {
+-        int8_t btype = (*armpos)->GetBurgersType(); 
++        boost::int8_t btype = (*armpos)->GetBurgersType(); 
+         if (!btype) {
+           printf("Error:  armpos has no terminal segments!\n"); 
+         }
+@@ -2683,9 +2683,9 @@
+     fprintf(thefile, "========================================\n\n\n"); 
+ #ifdef DEBUG_SEGMENTS
+     // check against segment lengths: 
+-    uint32_t numSegments[11] = {0}, totalSegments=0, culledSegments=0;  // number of arms of each type
++    boost::uint32_t numSegments[11] = {0}, totalSegments=0, culledSegments=0;  // number of arms of each type
+     double segmentLengths[11] = {0}, totalSegmentLength=0, culledLength=0; 
+-    for (std::map<uint32_t, ArmSegment *>::iterator segpos = ArmSegments.begin(); segpos != mArmSegments.end(); ++segpos) {
++    for (std::map<boost::uint32_t, ArmSegment *>::iterator segpos = ArmSegments.begin(); segpos != mArmSegments.end(); ++segpos) {
+       ArmSegment *seg = segpos->second; 
+       double length = seg->GetLength(); 
+       // Cull out half the wrapped segments in such a way that for each culled, there is an identical one remaining:
+@@ -2849,7 +2849,7 @@
+   }
+   
+   //====================================================================== 
+-  void DataSet::CopyNodeFromFile(uint32_t &lineno, map<uint64_t, FullNode*> &nodehash, std::ifstream &datafile, std::ofstream &tagfile) {
++  void DataSet::CopyNodeFromFile(boost::uint32_t &lineno, map<boost::uint64_t, FullNode*> &nodehash, std::ifstream &datafile, std::ofstream &tagfile) {
+     // read the first line of the next node in the file: 
+     char comma;
+     int domainID, nodeID; 
+@@ -2923,7 +2923,7 @@
+   }
+ 
+   //====================================================================== 
+-  void DataSet::ReadMinimalNodeFromFile(uint32_t &lineno, std::ifstream &datafile) {
++  void DataSet::ReadMinimalNodeFromFile(boost::uint32_t &lineno, std::ifstream &datafile) {
+     MinimalNode theNode;
+     char comma;
+     int domainID, nodeID; 
+@@ -2997,8 +2997,8 @@
+     STARTPROGRESS();
+     dbprintf(2, "Size of a minimal_node is %d bytes\n",  sizeof(MinimalNode));
+     char linebuf[2048]="";
+-    uint32_t nodenum = 0;
+-    uint32_t lineno = 1; 
++    boost::uint32_t nodenum = 0;
++    boost::uint32_t lineno = 1; 
+     ReadBounds(); 
+     try {
+       ifstream datafile(mDataFilename.c_str()); 
+@@ -3127,7 +3127,7 @@
+     debugfile << "subspace bounds: " << mSubspaceMin.Stringify() << ", " << mSubspaceMax.Stringify() << endl; 
+     std::vector<MinimalNode>::iterator pos = MinimalNode::mMinimalNodes.begin(),
+       endpos = MinimalNode::mMinimalNodes.end(); 
+-    uint32_t nodenum = 0; 
++    boost::uint32_t nodenum = 0; 
+     while (pos != endpos) {
+       debugfile << "MinimalNode " << nodenum++ <<":\n"<< pos->Stringify(false) << endl;
+       debugfile << "***************************************************" << endl << endl; 
+@@ -3412,7 +3412,7 @@
+     theTimer.start(); 
+     dbprintf(2, "Size of a full node is %d bytes, so expect to use %d megabytes\n",  sizeof(FullNode), MinimalNode::mMinimalNodes.size()*sizeof(FullNode)/1000000);
+     char linebuf[2048]="";
+-    uint32_t nodenum = 0;
++    boost::uint32_t nodenum = 0;
+     try {
+       ifstream datafile(mDataFilename.c_str()); 
+       if (!datafile.good()){
+@@ -3435,7 +3435,7 @@
+         throw string( "Error: cannot find first node in data file");
+       }
+       STARTPROGRESS(); 
+-      uint32_t nodelimit = MinimalNode::mMinimalNodes.size(); 
++      boost::uint32_t nodelimit = MinimalNode::mMinimalNodes.size(); 
+       std::vector<MinimalNode>::reverse_iterator rpos = MinimalNode::mMinimalNodes.rbegin(), rend = MinimalNode::mMinimalNodes.rend(); 
+       //dbprintf(2, "\n"); 
+       while (datafile.good() && nodenum < nodelimit && rpos != rend) {
+@@ -3462,10 +3462,10 @@
+   //===========================================================================
+   void DataSet::WrapBoundarySegments(void) {
+     STARTPROGRESS();
+-    uint32_t segnum = 0, totalsegs = ArmSegment::mArmSegments.size(); 
++    boost::uint32_t segnum = 0, totalsegs = ArmSegment::mArmSegments.size(); 
+     ArmSegment *newSegment = NULL; 
+     FullNode *newnode0, *newnode1; 
+-    for (map <uint32_t, ArmSegment *>::const_iterator segpos = ArmSegment::mArmSegments.begin(); segpos != ArmSegment::mArmSegments.end(); segpos++, segnum++) {      
++    for (map <boost::uint32_t, ArmSegment *>::const_iterator segpos = ArmSegment::mArmSegments.begin(); segpos != ArmSegment::mArmSegments.end(); segpos++, segnum++) {      
+       ArmSegment *seg = segpos->second; 
+       if (seg && seg->Wrap(mDataSize, newSegment, newnode0, newnode1)) {
+         newnode0->SetWrappedCopy(true); 
+@@ -3483,11 +3483,11 @@
+ 
+   //===========================================================================
+   string DataSet::GetMonsterNodeSummary(void) {
+-    vector<uint32_t> monsterTypes(1); 
+-    for (std::map<uint32_t, FullNode*>::iterator nodepos = FullNode::mFullNodes.begin(); nodepos !=  FullNode::mFullNodes.end(); nodepos++) {
++    vector<boost::uint32_t> monsterTypes(1); 
++    for (std::map<boost::uint32_t, FullNode*>::iterator nodepos = FullNode::mFullNodes.begin(); nodepos !=  FullNode::mFullNodes.end(); nodepos++) {
+       FullNode *node = nodepos->second; 
+       if (node && node->GetNodeType() < 0 && !node->IsWrappedCopy()) {
+-        uint8_t theType = - node->GetNodeType(); 
++        boost::uint8_t theType = - node->GetNodeType(); 
+         if (theType >= monsterTypes.size()) {
+           monsterTypes.resize(theType+1); 
+         }
+@@ -3497,7 +3497,7 @@
+     }    
+     string s; 
+     s += str(boost::format("Total monster nodes: %1%\n") %monsterTypes[0]); 
+-    for (uint8_t t = 1; t < monsterTypes.size(); t++) {
++    for (boost::uint8_t t = 1; t < monsterTypes.size(); t++) {
+       if (monsterTypes[t]) {
+         s += str(boost::format("Type -%1% monster nodes: %2%\n") % (int)t % monsterTypes[t]); 
+       }
+@@ -3524,8 +3524,8 @@
+     debugfile << "=================================================" << endl; 
+     debugfile << endl << endl; 
+ 
+-    for (std::map<uint32_t, FullNode*>::iterator nodepos = FullNode::mFullNodes.begin(); nodepos != FullNode::mFullNodes.end(); nodepos++) {
+-      uint32_t key = nodepos->first; 
++    for (std::map<boost::uint32_t, FullNode*>::iterator nodepos = FullNode::mFullNodes.begin(); nodepos != FullNode::mFullNodes.end(); nodepos++) {
++      boost::uint32_t key = nodepos->first; 
+       FullNode *node = nodepos->second; 
+       debugfile << "mFullNodes[" << key <<"]: " << node->Stringify(false ) << endl; 
+       debugfile << "**************************************************************" << endl << endl; 
+@@ -3582,7 +3582,7 @@
+ 
+     STARTPROGRESS(); 
+ 
+-    uint32_t armnum = 0; 
++    boost::uint32_t armnum = 0; 
+     /*! 
+       For now, just look at every inbounds node and if it has not been looked at, make an arm out of it.  
+     */ 
+@@ -3592,7 +3592,7 @@
+       If you start from an out of bounds node, you will often trace out arms that have no nodes in them!  That would be segfault fodder. 
+     */ 
+     try {
+-      for (map<uint32_t, FullNode*>::iterator nodepos = FullNode::mFullNodes.begin(); nodepos != FullNode::mFullNodes.end(); ++nodepos, ++nodenum) {
++      for (map<boost::uint32_t, FullNode*>::iterator nodepos = FullNode::mFullNodes.begin(); nodepos != FullNode::mFullNodes.end(); ++nodepos, ++nodenum) {
+         FullNode *node = nodepos->second; 
+         if (!node->InBounds()) {
+           continue;
+@@ -3664,10 +3664,10 @@
+ 
+   //===========================================================================
+   void DataSet::DecomposeArms(void) {    
+-    uint32_t armnum = 0; 
++    boost::uint32_t armnum = 0; 
+     vector<Arm*> newArms; 
+     int energyLevel = 7, numarms=Arm::mArms.size();
+-    vector<int32_t> numDecomposed(7, 0); 
++    vector<boost::int32_t> numDecomposed(7, 0); 
+     while (energyLevel-- > 1) {
+       if (energyLevel == 1 && !Arm::mTraceArms.size()) {
+         // skip level 1; the only reason to do level 1 is to trace arms 
+@@ -3710,7 +3710,7 @@
+ 
+     debugfile <<"There are " << Arm::mArms.size() << " arms." << endl; 
+     vector<Arm*>::iterator pos = Arm::mArms.begin(), endpos = Arm::mArms.end(); 
+-    uint32_t armnum = 0, empty=0; 
++    boost::uint32_t armnum = 0, empty=0; 
+     while (pos != endpos) {
+       debugfile << "Arm #" << armnum << ": " << (*pos)->Stringify(0) << endl; 
+       debugfile << "******************************************************" << endl << endl; 
+@@ -3745,7 +3745,7 @@
+ 
+     debugfile <<"There are " << mMetaArms.size() << " MetaArms." << endl; 
+     vector<boost::shared_ptr<MetaArm> >::iterator pos = mMetaArms.begin(), endpos = mMetaArms.end(); 
+-    uint32_t armnum = 0; 
++    boost::uint32_t armnum = 0; 
+     while (pos != endpos) {
+       debugfile << "MetaArm #" << armnum << ": " << (*pos)->Stringify(0) << endl; 
+       debugfile.flush(); 
+@@ -3797,11 +3797,11 @@
+     // =======================================================
+     // SEGMENT FILES 
+     // We go by arm by arm to save writing duplicate points everywhere. 
+-    uint32_t numsegfiles = ArmSegment::mArmSegments.size()/mElementsPerVTKFile + 1; 
++    boost::uint32_t numsegfiles = ArmSegment::mArmSegments.size()/mElementsPerVTKFile + 1; 
+     dbecho(0, str(boost::format("DataSet::WriteVTKFiles() will write %d segment files. \n")% numsegfiles));
+     vector<FILE *> segfiles;
+     vector<string> segfilenames; 
+-    for (uint32_t fileno = 0; fileno < numsegfiles; fileno++) {
++    for (boost::uint32_t fileno = 0; fileno < numsegfiles; fileno++) {
+       string filename = str(boost::format("%s/%s-segments-%04d.vtk")%mOutputDir%mOutputBasename%fileno); 
+       FILE * fp = fopen(filename.c_str(), "w"); 
+       if (!fp) {
+@@ -3815,14 +3815,14 @@
+     // ----------------------------------------------------------
+     // WRITE THE SEGMENT FILES
+     float armsperfile = (float)(Arm::mArms.size())/segfiles.size(); 
+-    for (uint32_t fileno = 0; fileno < segfiles.size(); fileno++) {
++    for (boost::uint32_t fileno = 0; fileno < segfiles.size(); fileno++) {
+       FILE *segfile = segfiles[fileno]; 
+       string filename = segfilenames[fileno]; 
+-      uint32_t firstarm =  armsperfile * fileno;
+-      uint32_t lastarm = armsperfile *(fileno + 1) - 1; 
++      boost::uint32_t firstarm =  armsperfile * fileno;
++      boost::uint32_t lastarm = armsperfile *(fileno + 1) - 1; 
+       if (fileno == segfiles.size()-1) 
+         lastarm = Arm::mArms.size() - 1; 
+-      uint32_t numarms = lastarm-firstarm+1; 
++      boost::uint32_t numarms = lastarm-firstarm+1; 
+       // ----------------------------------------------------------
+       // 1. Segment file: the header
+       fprintf(segfile,"# vtk DataFile Version 3.0\n" );
+@@ -3836,13 +3836,13 @@
+       //   cause us to write too many duplicate points.  This of course 
+       //   comes at a minor expense in imperfect load balancing due to 
+       //   unequal unpredictable arm lengths.  <Shrug>  
+-      uint32_t numnodes = 0, numsegs = 0;
+-      for (uint32_t armnum = 0; armnum < numarms; armnum++) {
++      boost::uint32_t numnodes = 0, numsegs = 0;
++      for (boost::uint32_t armnum = 0; armnum < numarms; armnum++) {
+         numnodes += Arm::mArms[armnum+firstarm]->GetNumNodes(); 
+       }
+       fprintf(segfile, "\nPOINTS %d float\n", numnodes);
+-      vector<uint32_t> nodecounts; 
+-      for (uint32_t armnum = 0; armnum < numarms; armnum++) {
++      vector<boost::uint32_t> nodecounts; 
++      for (boost::uint32_t armnum = 0; armnum < numarms; armnum++) {
+         vector<FullNode*> nodes = Arm::mArms[armnum+firstarm]->GetNodes(); 
+         nodecounts.push_back(0); 
+         FullNode *previous = NULL; 
+@@ -3864,12 +3864,12 @@
+       // 3. Segment file: Segments (connectivity)
+       fprintf(segfile, "\nLINES %d %d\n", numsegs, 3*numsegs); 
+       
+-      uint32_t nodenum = 0, previousnodenum = 0; 
+-      for (uint32_t armnum = 0; armnum < numarms; armnum++) {
++      boost::uint32_t nodenum = 0, previousnodenum = 0; 
++      for (boost::uint32_t armnum = 0; armnum < numarms; armnum++) {
+         Arm *theArm = Arm::mArms[armnum+firstarm]; 
+         if (!theArm->mNumSegments) continue; 
+ 
+-        uint32_t armsegs = 0; 
++        boost::uint32_t armsegs = 0; 
+         if (theArm->mNumWrappedSegments) {          
+           vector<FullNode *> nodes = theArm->GetNodes(); 
+           FullNode *previous = NULL; 
+@@ -3890,7 +3890,7 @@
+         } 
+         else {
+           // no wrapped segments
+-          for (uint32_t segnum = 0; segnum < theArm->mNumSegments; segnum++) {
++          for (boost::uint32_t segnum = 0; segnum < theArm->mNumSegments; segnum++) {
+             fprintf(segfile, "2 %d %d\n", nodenum, nodenum+1); 
+             ++nodenum; 
+             armsegs ++; 
+@@ -3911,10 +3911,10 @@
+       fprintf(segfile, "\nCELL_DATA %d\n", numsegs); 
+       fprintf(segfile, "SCALARS armnum int\n"); 
+       fprintf(segfile, "LOOKUP_TABLE default\n");   
+-      uint32_t testsegs = 0; 
+-      for (uint32_t armnum = 0; armnum < numarms; armnum++) {
++      boost::uint32_t testsegs = 0; 
++      for (boost::uint32_t armnum = 0; armnum < numarms; armnum++) {
+         Arm *theArm = Arm::mArms[armnum+firstarm]; 
+-        for (uint32_t segnum = 0; segnum < theArm->mNumSegments; segnum++) {
++        for (boost::uint32_t segnum = 0; segnum < theArm->mNumSegments; segnum++) {
+           fprintf(segfile, "%d ", armnum); 
+           ++testsegs;         
+         }
+@@ -3927,10 +3927,10 @@
+       // 5. Segment file: Segment Burgers type
+       fprintf(segfile, "SCALARS burgers_type int\n"); 
+       fprintf(segfile, "LOOKUP_TABLE default\n");   
+-      for (uint32_t armnum = 0; armnum < numarms; armnum++) {
++      for (boost::uint32_t armnum = 0; armnum < numarms; armnum++) {
+         Arm *theArm = Arm::mArms[armnum+firstarm]; 
+-        uint32_t burgertype = theArm->GetBurgersType(); 
+-        for (uint32_t segnum = 0; segnum < theArm->mNumSegments; segnum++) {
++        boost::uint32_t burgertype = theArm->GetBurgersType(); 
++        for (boost::uint32_t segnum = 0; segnum < theArm->mNumSegments; segnum++) {
+           fprintf(segfile, "%d ", burgertype); 
+           ++testsegs; 
+         }        
+@@ -3942,10 +3942,10 @@
+       // ----------------------------------------------------------
+       fprintf(segfile, "SCALARS metaarm_type int\n"); 
+       fprintf(segfile, "LOOKUP_TABLE default\n");   
+-      for (uint32_t armnum = 0; armnum < numarms; armnum++) {
++      for (boost::uint32_t armnum = 0; armnum < numarms; armnum++) {
+         Arm *theArm = Arm::mArms[armnum+firstarm]; 
+-        uint32_t matype = theArm->GetMetaArmType(); 
+-        for (uint32_t segnum = 0; segnum < theArm->mNumSegments; segnum++) {
++        boost::uint32_t matype = theArm->GetMetaArmType(); 
++        for (boost::uint32_t segnum = 0; segnum < theArm->mNumSegments; segnum++) {
+           fprintf(segfile, "%d ", matype); 
+           ++testsegs; 
+         }        
+@@ -3957,9 +3957,9 @@
+       // ----------------------------------------------------------
+       fprintf(segfile, "SCALARS block_number int\n"); 
+       fprintf(segfile, "LOOKUP_TABLE default\n");   
+-      for (uint32_t armnum = 0; armnum < numarms; armnum++) {
++      for (boost::uint32_t armnum = 0; armnum < numarms; armnum++) {
+         Arm *theArm = Arm::mArms[armnum+firstarm]; 
+-        for (uint32_t segnum = 0; segnum < theArm->mNumSegments; segnum++) {
++        for (boost::uint32_t segnum = 0; segnum < theArm->mNumSegments; segnum++) {
+           fprintf(segfile, "%d ", fileno); 
+           ++testsegs; 
+         }        
+@@ -3976,7 +3976,7 @@
+     string visitsegfilename = str(boost::format("%s/%s-segments.visit")%mOutputDir%mOutputBasename); 
+     FILE *visitsegfile = fopen(visitsegfilename.c_str(), "w"); 
+     fprintf(visitsegfile, "!NBLOCKS %d\n", (int)segfiles.size()); 
+-    for (uint32_t fileno = 0; fileno < segfiles.size(); fileno++) {
++    for (boost::uint32_t fileno = 0; fileno < segfiles.size(); fileno++) {
+       fprintf(visitsegfile, "%s\n", Basename(segfilenames[fileno]).c_str()); 
+     }
+     fclose(visitsegfile); 
+@@ -3986,11 +3986,11 @@
+     // ============================================================
+     // NODE FILES 
+     // We use mElementsPerVTKFile to limit our node file size too.
+-    uint32_t numnodefiles = FullNode::mFullNodes.size()/mElementsPerVTKFile + 1; 
++    boost::uint32_t numnodefiles = FullNode::mFullNodes.size()/mElementsPerVTKFile + 1; 
+     dbecho(0, str(boost::format("DataSet::WriteVTKFiles() will write %d node files. \n")% numnodefiles));
+     vector<FILE *> nodefiles;
+     vector<string> nodefilenames; 
+-    for (uint32_t fileno = 0; fileno < numnodefiles; fileno++) {
++    for (boost::uint32_t fileno = 0; fileno < numnodefiles; fileno++) {
+       string filename = str(boost::format("%s/%s-nodes-%04d.vtk")%mOutputDir%mOutputBasename%fileno); 
+       FILE * fp = fopen(filename.c_str(), "w"); 
+       if (!fp) {
+@@ -4003,20 +4003,20 @@
+     
+    // ----------------------------------------------------------
+     // WRITE THE NODE FILES
+-    map<uint32_t, FullNode *>::iterator nodepos = FullNode::mFullNodes.begin(),
++    map<boost::uint32_t, FullNode *>::iterator nodepos = FullNode::mFullNodes.begin(),
+       nodeend =  FullNode::mFullNodes.end(); 
+     float nodesperfile = (float)(FullNode::mFullNodes.size())/numnodefiles; 
+-    uint32_t firstnode = 0; 
++    boost::uint32_t firstnode = 0; 
+ 
+-    for (uint32_t fileno = 0; fileno < nodefiles.size(); fileno++) {
++    for (boost::uint32_t fileno = 0; fileno < nodefiles.size(); fileno++) {
+       FILE *nodefile = nodefiles[fileno]; 
+       string filename = nodefilenames[fileno]; 
+-      uint32_t lastnode = nodesperfile *(fileno + 1.0) - 1; 
++      boost::uint32_t lastnode = nodesperfile *(fileno + 1.0) - 1; 
+       if (fileno == nodefiles.size()-1) 
+         lastnode = FullNode::mFullNodes.size()-1;
+-      uint32_t numnodes = lastnode - firstnode + 1; 
++      boost::uint32_t numnodes = lastnode - firstnode + 1; 
+       
+-      map<uint32_t, FullNode *>::iterator firstnodepos = nodepos;  
++      map<boost::uint32_t, FullNode *>::iterator firstnodepos = nodepos;  
+       
+       // ----------------------------------------------------------
+       // 1. Node file: the header
+@@ -4028,7 +4028,7 @@
+       // ----------------------------------------------------------
+       // 2. Node file: Points.  
+       fprintf(nodefile, "\nPOINTS %d float\n", numnodes); 
+-      uint32_t nodecount = 0; 
++      boost::uint32_t nodecount = 0; 
+       for (nodecount = 0; 
+            nodecount < numnodes && nodepos != nodeend; 
+            nodecount++, nodepos++) {
+@@ -4041,14 +4041,14 @@
+       
+       // ----------------------------------------------------------
+       // 2. Node file: Vertices  
+-      for (uint32_t nodenum = 0; nodenum < numnodes; nodenum++) {
++      for (boost::uint32_t nodenum = 0; nodenum < numnodes; nodenum++) {
+         fprintf(nodefile, "1 %d\n", nodenum); 
+       }
+       
+       // ----------------------------------------------------------
+       // Node file: Node Index
+       nodepos = firstnodepos; 
+-      for (uint32_t nodenum = 0;  nodenum < numnodes; nodenum++, nodepos++) {
++      for (boost::uint32_t nodenum = 0;  nodenum < numnodes; nodenum++, nodepos++) {
+         fprintf(nodefile, "1 %d\n", nodepos->second->GetIndex()); 
+       }
+       // ----------------------------------------------------------
+@@ -4071,8 +4071,8 @@
+   // Write a file containing all tagged nodes with their tag values. 
+   void DataSet::WriteTagFile(void) {
+     // First, create a fast searchable map for lookups, as our global map is ordered by global Node Index, which is not necessarily in file order any more at this point. 
+-    map<uint64_t, FullNode*> nodehash; 
+-    for (map<uint32_t, FullNode*>::iterator pos = FullNode::mFullNodes.begin(); 
++    map<boost::uint64_t, FullNode*> nodehash; 
++    for (map<boost::uint32_t, FullNode*>::iterator pos = FullNode::mFullNodes.begin(); 
+          pos != FullNode::mFullNodes.end(); pos++) {
+       nodehash[pos->second->Hash()] = pos->second; 
+     }
+@@ -4081,8 +4081,8 @@
+     dbecho(1, str(boost::format("DataSet::WriteTagFile: Writing node tags to file %s... ")% tagfilename)); 
+ 
+     
+-    uint32_t nodenum = 0;
+-    uint32_t lineno = 1; 
++    boost::uint32_t nodenum = 0;
++    boost::uint32_t lineno = 1; 
+     char linebuf[2048]="";
+     STARTPROGRESS();
+ 
+@@ -4135,7 +4135,7 @@
+     string metaArmFile = mOutputDir + "/" + mOutputBasename + ".metaarms"; 
+     dbecho(0, str(boost::format("Writing metaarms to metaarm file %s... ")% metaArmFile));
+     
+-    uint32_t a = Arm::mArms.size(); 
++    boost::uint32_t a = Arm::mArms.size(); 
+     while (a--) {
+       Arm::mArms[a]->mSeen = false; 
+     }
+@@ -4148,9 +4148,9 @@
+     fprintf(armfile, "DISCUSSION: \n%s\n", doctext.c_str()); 
+     
+     vector<boost::shared_ptr<MetaArm> >::iterator pos = mMetaArms.begin(), endpos = mMetaArms.end(); 
+-    uint32_t armnum = 0, metaarmcounts[7]={0}; 
++    boost::uint32_t armnum = 0, metaarmcounts[7]={0}; 
+     double metaarmtypelengths[7] = {0.0}, totalEPDist = 0.0; 
+-    uint32_t numarms = 0; 
++    boost::uint32_t numarms = 0; 
+     while (pos != endpos) {
+       if ((*pos)->mTerminalNodes.size() == 2) {
+         totalEPDist += (*pos)->mTerminalNodes[0]->Distance(*( (*pos)->mTerminalNodes[1]), true); 
+@@ -4239,7 +4239,7 @@
+         dbprintf(0,  "WARNING: arm # %d has %d terminal arms\n", armnum, numtermnodes);
+         dbprintf(0,  (*pos)->Stringify(0).c_str()); 
+       } else {
+-        uint32_t i = numtermnodes, numarms = (*pos)->mAllArms.size(); 
++        boost::uint32_t i = numtermnodes, numarms = (*pos)->mAllArms.size(); 
+         while (i--) {
+           (*pos)->mTerminalNodes[i]->GetLocation(loc[i]);
+           ntypes[i] = (*pos)->mTerminalNodes[i]->GetNodeType();
+@@ -4307,7 +4307,7 @@
+             "EP1-ID", "EP1-Type", "EP1-Nbrs", "EP1-X", "EP1-Y", "EP1-Z", 
+             "EP2-ID", "EP2-Type", "EP2-Nbrs", "EP2-X", "EP2-Y", "EP2-Z");
+     vector<Arm*>::iterator pos = Arm::mArms.begin(), endpos = Arm::mArms.end(); 
+-    uint32_t armnum = 0; 
++    boost::uint32_t armnum = 0; 
+     while (pos != endpos) {   
+       if ((*pos)->mArmType == ARM_EMPTY) {
+         ++pos; 
+@@ -4466,14 +4466,14 @@
+ 
+   //=========================================================================
+   void DataSet::CreateNodeSegmentVectors(void) {  
+-    uint32_t index = 0; 
+-    for (map<uint32_t, FullNode *>::iterator pos = FullNode::mFullNodes.begin(); pos != FullNode::mFullNodes.end(); pos++, index++) {
++    boost::uint32_t index = 0; 
++    for (map<boost::uint32_t, FullNode *>::iterator pos = FullNode::mFullNodes.begin(); pos != FullNode::mFullNodes.end(); pos++, index++) {
+       pos->second->SetIndex(index); 
+       FullNode::mFullNodeVector.push_back(pos->second); 
+     }
+ 
+     index = 0; 
+-    for (map<uint32_t, ArmSegment *>::iterator pos = ArmSegment::mArmSegments.begin(); pos != ArmSegment::mArmSegments.end(); pos++, index++) {
++    for (map<boost::uint32_t, ArmSegment *>::iterator pos = ArmSegment::mArmSegments.begin(); pos != ArmSegment::mArmSegments.end(); pos++, index++) {
+       pos->second->SetIndex(index); 
+       ArmSegment::mArmSegmentVector.push_back(pos->second); 
+     }
+@@ -4483,7 +4483,7 @@
+ 
+   //=========================================================================
+   void DataSet::ComputeNodeTypes(void) {
+-    for (map<uint32_t, FullNode*>::iterator pos = FullNode::mFullNodes.begin(); pos !=  FullNode::mFullNodes.end(); pos++) {
++    for (map<boost::uint32_t, FullNode*>::iterator pos = FullNode::mFullNodes.begin(); pos !=  FullNode::mFullNodes.end(); pos++) {
+       pos->second->ComputeNodeType(); 
+     }
+   }
+@@ -4494,7 +4494,7 @@
+       (*currentArm)->mSeen = false; 
+     }
+ 
+-    uint32_t numMetaArms = 0, numArms = 0, totalArms = Arm::mArms.size(); 
++    boost::uint32_t numMetaArms = 0, numArms = 0, totalArms = Arm::mArms.size(); 
+     STARTPROGRESS(); 
+     dbprintf(4, "FindMetaArms: %s\n", datestring()); 
+     for (vector<Arm*>::iterator currentArm = Arm::mArms.begin(); currentArm != Arm::mArms.end(); ++currentArm, ++numArms) {
+@@ -4545,7 +4545,7 @@
+ 
+     for (vector<Arm*>::iterator currentArm = Arm::mArms.begin(); currentArm != Arm::mArms.end(); ++currentArm) {
+       if (!(*currentArm)->mSeen && (*currentArm)->mArmType != ARM_EMPTY) {
+-        uint32_t id = (*currentArm)->mArmID;
++        boost::uint32_t id = (*currentArm)->mArmID;
+         dbprintf(0, "\n\nError: arm %d has not been seen!\n", id); 
+         errexit; 
+       }
+@@ -4559,11 +4559,11 @@
+   bool DataSet::Test(void) {
+     dbprintf(0, "DataSet::Test(): called\n"); 
+     
+-    vector<uint32_t>segsperarm(Arm::mArms.size(), 0), segspermetaarm(mMetaArms.size(), 0);
++    vector<boost::uint32_t>segsperarm(Arm::mArms.size(), 0), segspermetaarm(mMetaArms.size(), 0);
+     
+      //================================================================
+    dbprintf(0, "DataSet::Test(): enumerating segsperarm\n"); 
+-   for (map<uint32_t, ArmSegment*>::iterator segpos = ArmSegment::mArmSegments.begin(); segpos != ArmSegment::mArmSegments.end(); ++segpos) {   
++   for (map<boost::uint32_t, ArmSegment*>::iterator segpos = ArmSegment::mArmSegments.begin(); segpos != ArmSegment::mArmSegments.end(); ++segpos) {   
+       ArmSegment * seg = segpos->second; 
+       if (!seg->mParentArm) {
+         dbprintf(0, "DataSet::Test(): seg %d has NULL parent \n", seg->mSegmentID); 
+@@ -4581,7 +4581,7 @@
+     //================================================================
+     dbprintf(0, "DataSet::Test(): checking arms \n"); 
+     bool success = true; 
+-    uint32_t numArms = 0, numsegs = 0, numnodes = 0; 
++    boost::uint32_t numArms = 0, numsegs = 0, numnodes = 0; 
+     for (vector<Arm*>::iterator arm = Arm::mArms.begin(); arm != Arm::mArms.end(); ++arm, ++numArms) {
+       vector<ArmSegment*> segs = (*arm)->GetSegments(); 
+       numsegs += segs.size(); 
+@@ -4593,7 +4593,7 @@
+           for (vector<ArmSegment*>::iterator seg = segs.begin(); seg != segs.end(); seg++, ++segnum) {
+             dbprintf(0, "armseg %d: %s\n", segnum, (*seg)->Stringify(0).c_str()); 
+           }
+-          for (map<uint32_t, ArmSegment*>::iterator seg = ArmSegment::mArmSegments.begin(); seg != ArmSegment::mArmSegments.end(); ++seg) {   
++          for (map<boost::uint32_t, ArmSegment*>::iterator seg = ArmSegment::mArmSegments.begin(); seg != ArmSegment::mArmSegments.end(); ++seg) {   
+             if (seg->second->mParentArm == *arm) {
+               vector<ArmSegment*>::iterator pos = find(segs.begin(), segs.end(), seg->second); 
+               if (pos == segs.end()) {
+@@ -4628,11 +4628,11 @@
+       Checking metaarm segments counts is wrong -- for VisIt, a 'MetaArm' always has only a single segment, connecting its endpoints.  The entire metaarm is returned only if it is a LOOP. 
+     
+     dbprintf(0, "DataSet::Test(): checking meta-arms \n"); 
+-     uint32_t manum = 0;
++     boost::uint32_t manum = 0;
+     numsegs = 0; 
+     for (vector<boost::shared_ptr<MetaArm> >::iterator metaarm = mMetaArms.begin(); metaarm != mMetaArms.end(); ++metaarm, ++manum) {
+-      uint32_t masegs = (*metaarm)->GetNumSegments(false); 
+-      uint32_t shouldbe = segspermetaarm[(*metaarm)->GetMetaArmID()]; 
++      boost::uint32_t masegs = (*metaarm)->GetNumSegments(false); 
++      boost::uint32_t shouldbe = segspermetaarm[(*metaarm)->GetMetaArmID()]; 
+       if (masegs != shouldbe) {
+         dbprintf(0, "DataSet::Test(): numsegs %d != segspermetaarm[%d] %d \n", masegs, (*metaarm)->GetMetaArmID(), shouldbe); 
+         return false; 
+@@ -4649,7 +4649,7 @@
+     dbprintf(0, "DataSet::Test(): checking arm segments \n"); 
+     if (numnodes != FullNode::mFullNodes.size()) {
+       dbprintf(0, "DataSet::Test(): numnodes %d != FullNode::mFullNodes.size() %d.  Searching for extra node...\n", numnodes, FullNode::mFullNodes.size()); 
+-      for (map<uint32_t, FullNode*>::iterator node = FullNode::mFullNodes.begin(); node != FullNode::mFullNodes.end(); ++node) {           
++      for (map<boost::uint32_t, FullNode*>::iterator node = FullNode::mFullNodes.begin(); node != FullNode::mFullNodes.end(); ++node) {           
+         if (!node->second->mSeen) {
+           dbprintf(0, "DataSet::Test(): unseen node: %s\n", node->second->Stringify(0, false).c_str());
+         }
+--- ParaView-5.0.1_SRC.orig/Utilities/VisItBridge/databases/paraDIS/paraDIS_lib/paradis.h	2016-05-11 13:07:50.000000000 +0300
++++ ParaView-5.0.1_SRC.patch/Utilities/VisItBridge/databases/paraDIS/paraDIS_lib/paradis.h	2016-05-11 15:03:40.000000000 +0300
+@@ -1,3 +1,4 @@
++
+ /*! 
+   \file paradis.h 
+ 
+@@ -30,13 +31,13 @@
+ 
+ /* now for the API */  
+ #include <boost/cstdint.hpp>
+-using boost::int8_t;
+-using boost::int16_t;
+-using boost::int32_t;
+-using boost::uint8_t;
+-using boost::uint16_t;
+-using boost::uint32_t;
+-using boost::uint64_t;
++//using boost::int8_t;
++//using boost::int16_t;
++//using boost::int32_t;
++//using boost::uint8_t;
++//using boost::uint16_t;
++//using boost::uint32_t;
++//using boost::uint64_t;
+ #include <boost/shared_ptr.hpp>
+ #include <boost/format.hpp>
+ 
+@@ -141,12 +142,12 @@
+       mNodeID = other.mNodeID;
+     }
+     // -------------------------------------------------
+-    NodeID(int16_t domain, int32_t node) {
++    NodeID(boost::int16_t domain, boost::int32_t node) {
+       mDomainID = domain; 
+       mNodeID = node; 
+     }
+     // -------------------------------------------------
+-    uint64_t Hash(void) const {
++    boost::uint64_t Hash(void) const {
+       if (mNodeID >= 1000*1000) {
+         cerr << "Warning: Hash() is no longer unique" << endl; 
+       }
+@@ -157,8 +158,8 @@
+       return INDENT(indent) + str(boost::format("NodeID: (%1%,%2%)")% mDomainID % mNodeID);
+     }
+     
+-    uint32_t mDomainID; 
+-    uint64_t mNodeID; 
++    boost::uint32_t mDomainID; 
++    boost::uint64_t mNodeID; 
+   };
+   
+   /*! 
+@@ -203,7 +204,7 @@
+     }
+     
+     // return a hash based on NodeID
+-    uint64_t Hash(void) const {
++    boost::uint64_t Hash(void) const {
+       return mID.Hash(); 
+     }
+ 
+@@ -229,9 +230,9 @@
+     */ 
+     const NodeID &GetNodeID(void) const  { return mID; }
+ 
+-    int32_t GetNodeSimulationDomain(void) const { return mID.mDomainID; }
++    boost::int32_t GetNodeSimulationDomain(void) const { return mID.mDomainID; }
+ 
+-    int32_t GetNodeSimulationID(void) const { return mID.mNodeID; }
++    boost::int32_t GetNodeSimulationID(void) const { return mID.mNodeID; }
+ 
+     /*! 
+       conversion of Node to string
+@@ -360,12 +361,12 @@
+     /*!
+       Accessor
+     */ 
+-    uint32_t GetFileOrderIndex(void) const { return mFileOrderIndex; }
++    boost::uint32_t GetFileOrderIndex(void) const { return mFileOrderIndex; }
+ 
+     /*!
+       Accessor
+     */ 
+-    void SetFileOrderIndex(uint32_t index) { mFileOrderIndex = index; }
++    void SetFileOrderIndex(boost::uint32_t index) { mFileOrderIndex = index; }
+ 
+     /*!
+       For sorting by file order
+@@ -381,7 +382,7 @@
+     virtual std::string Stringify(int indent, bool shortform=true) const {
+       std::string s =std::string("MinimalNode: ")+Node::Stringify(0) + string("\nClassification: ") + string(mKeep?"KEEP":"DON'T KEEP") + string("\n");  
+       s += (intToString(mNeighbors.size()) + " neighbors --------------:\n");
+-      uint32_t n = 0; 
++      boost::uint32_t n = 0; 
+       if (!shortform) {
+         while (n < mNeighbors.size()) {
+           s += "neighbor " + intToString(n) + ": "; 
+@@ -402,7 +403,7 @@
+     /*! 
+       Accessor function --  returns const due to the fact that neighbors are stored in a set in the data set.  But you can always create a copy of what you get, or use const_cast<> on it. 
+     */ 
+-    /*  const Neighbor *GetNeighbor(uint32_t num)  const { 
++    /*  const Neighbor *GetNeighbor(boost::uint32_t num)  const { 
+       if (num >= mNeighbors.size())
+         throw std::string("subscript out of range in BaseNode::GtNeighbor"); 
+       return mNeighbors[num]; 
+@@ -436,7 +437,7 @@
+     /*!
+       Nodes must be sorted to find while classifying, then resorted in "file order" to most quickly load the full nodes later.  So we keep an index into the file.  
+     */ 
+-    uint32_t mFileOrderIndex; 
++    boost::uint32_t mFileOrderIndex; 
+ 
+     /*! 
+       The neighbors for this particular node
+@@ -466,7 +467,7 @@
+     */ 
+     FullNode(const FullNode &other, bool skipneighbors=false) {
+       init(); 
+-      uint32_t saved = mNodeIndex; 
++      boost::uint32_t saved = mNodeIndex; 
+       *this = other; 
+       mNodeIndex = saved; 
+       if (skipneighbors) {
+@@ -490,7 +491,7 @@
+       ===========================================
+       constructor
+     */ 
+-    FullNode(int16_t domain, int32_t nodeID) {
++    FullNode(boost::int16_t domain, boost::int32_t nodeID) {
+       init(); 
+       mID = NodeID(domain, nodeID); 
+     }
+@@ -499,7 +500,7 @@
+       Clear all nodes
+     */ 
+     static void Clear(void) {
+-      for (map<uint32_t, FullNode *>::iterator nodepos = mFullNodes.begin(); nodepos != mFullNodes.end(); nodepos++) {
++      for (map<boost::uint32_t, FullNode *>::iterator nodepos = mFullNodes.begin(); nodepos != mFullNodes.end(); nodepos++) {
+         delete nodepos->second;
+       }
+       mFullNodes.clear(); 
+@@ -547,7 +548,7 @@
+       Add the given arm to the list of arms to trace. 
+       See WriteTraceFiles()
+     */ 
+-    static void TraceNode(int32_t nodeID){
++    static void TraceNode(boost::int32_t nodeID){
+       mTraceNodes.push_back(nodeID);       
+     }
+ 
+@@ -630,7 +631,7 @@
+    /*!
+       Accessor function set the node type.  
+     */ 
+-    void SetNodeType(int8_t itype) { 
++    void SetNodeType(boost::int8_t itype) { 
+       mNodeType = itype; 
+       return; 
+     }
+@@ -638,7 +639,7 @@
+     /*!
+       Accessor function
+     */ 
+-    int8_t GetNodeType(void) { return mNodeType; }
++    boost::int8_t GetNodeType(void) { return mNodeType; }
+     
+     
+     /*!
+@@ -746,13 +747,13 @@
+     /*! 
+       Accessor function 
+     */ 
+-    ArmSegment *GetNeighborSegment(uint32_t num)  const { 
++    ArmSegment *GetNeighborSegment(boost::uint32_t num)  const { 
+       if (num >= mNeighborSegments.size()) 
+         throw std::string("subscript out of range in GetNeighborSegment"); 
+       return mNeighborSegments[num]; 
+     }
+ 
+-    struct Arm *GetNeighborArm(uint32_t num)  const { 
++    struct Arm *GetNeighborArm(boost::uint32_t num)  const { 
+       if (num >= mNeighborArms.size()) 
+         throw std::string("subscript out of range in GetNeighborArm"); 
+       return mNeighborArms[num]; 
+@@ -798,14 +799,14 @@
+    /*!
+       Accessor function
+     */
+-    int32_t GetIndex(void) { return mNodeIndex; }
++    boost::int32_t GetIndex(void) { return mNodeIndex; }
+  
+     string GetNodeIDString(void) { return GetNodeID().Stringify(0); }
+ 
+     /*!
+       Accessor
+     */ 
+-    void SetIndex(int32_t index) { 
++    void SetIndex(boost::int32_t index) { 
+       mNodeIndex = index; 
+     }
+     
+@@ -828,10 +829,10 @@
+     /*! 
+       all fullnodes in the data set.  DO NOT SORT THIS -- each node has an Index which is its position in this array when created -- used to find its counterpart in the wrapped nodes for tracing along arms to find their endpoints and lengths.  
+     */ 
+-    static std::map<uint32_t, FullNode *> mFullNodes; 
++    static std::map<boost::uint32_t, FullNode *> mFullNodes; 
+     static std::vector<FullNode *> mFullNodeVector; 
+ 
+-    static uint32_t mNextNodeID; 
++    static boost::uint32_t mNextNodeID; 
+     
+     /*!
+       Static member to keep track of subspace bounds for checking if we are in bounds or not
+@@ -848,7 +849,7 @@
+     /*!
+       Node Type is whether we are a butterfly, monster, or normal node (or a placeholder in a segment)
+     */ 
+-    int8_t mNodeType; 
++    boost::int8_t mNodeType; 
+     
+     bool mIsLoopNode; 
+ 
+@@ -857,7 +858,7 @@
+     /*!
+       This is needed for things like Visit, where nodes are accessed by node ID, whereas this library uses pointers.  Since it is also our index inthe global array of nodes, it turns out to be a good way to get the "real" counterpart of a wrapped node.  
+     */ 
+-    int32_t mNodeIndex; 
++    boost::int32_t mNodeIndex; 
+ 
+     /*!
+       Connectivity to our neighboring nodes encapsulated in ArmSegments
+@@ -865,10 +866,10 @@
+     std::vector< ArmSegment *> mNeighborSegments; 
+ 
+     static string mTraceFileBasename; 
+-    static vector<uint32_t> mTraceNodes; 
++    static vector<boost::uint32_t> mTraceNodes; 
+ 
+     // statistics:
+-    std::vector<uint32_t> mNumMonsterNodes; 
++    std::vector<boost::uint32_t> mNumMonsterNodes; 
+ 
+   }; /* end FullNode */  
+   
+@@ -886,7 +887,7 @@
+     }
+     ArmSegment(const ArmSegment &other){
+       init(); 
+-      uint32_t saved = mSegmentID; 
++      boost::uint32_t saved = mSegmentID; 
+       *this = other; 
+       mSegmentID = saved; 
+     }
+@@ -921,7 +922,7 @@
+     
+     static void Clear(void) {
+ 
+-      for (map<uint32_t, ArmSegment *>::iterator pos = mArmSegments.begin(); pos != mArmSegments.end(); ++pos) {
++      for (map<boost::uint32_t, ArmSegment *>::iterator pos = mArmSegments.begin(); pos != mArmSegments.end(); ++pos) {
+         delete pos->second; 
+       }
+       mArmSegments.clear(); 
+@@ -952,14 +953,14 @@
+     /*!
+       Accessor function
+     */
+-    /*static ArmSegment *GetArmSegment(uint32_t segnum) { 
++    /*static ArmSegment *GetArmSegment(boost::uint32_t segnum) { 
+       return mArmSegments[segnum]; 
+       }*/ 
+ 
+     /*! 
+       Accessor function. 
+     */ 
+-    /* static uint32_t GetNumArmSegments(void)  { 
++    /* static boost::uint32_t GetNumArmSegments(void)  { 
+       return mArmSegments.size(); 
+     }
+     */
+@@ -1001,7 +1002,7 @@
+     }
+ 
+     
+-    int8_t GetBurgersType(void) const { return mBurgersType; } 
++    boost::int8_t GetBurgersType(void) const { return mBurgersType; } 
+ 
+    /*!
+       Return the distance between the endpoints
+@@ -1013,42 +1014,42 @@
+     /*!
+       Accessor function
+     */ 
+-    int32_t GetNodeIndex(int num) {
++    boost::int32_t GetNodeIndex(int num) {
+       return mEndpoints[num]->GetIndex(); 
+     } 
+ 
+     /*! 
+       Set the segment id to the next available global ID
+     */ 
+-    void SetIndex(uint32_t id) {
++    void SetIndex(boost::uint32_t id) {
+       mSegmentID = id; 
+       return; 
+     }
+     /*!
+       accessor -- noop if not debug mode
+     */ 
+-    uint32_t GetID(void) {
++    boost::uint32_t GetID(void) {
+       return mSegmentID; 
+     }
+ 
+     /* Get the metaarm ID for the parent of this segment */ 
+-    uint32_t GetMetaArmID(void); 
++    boost::uint32_t GetMetaArmID(void); 
+ 
+     /* Get the metaarm Type for the parent of this segment */ 
+-    uint8_t GetMetaArmType(void);
++    boost::uint8_t GetMetaArmType(void);
+     
+     /*! 
+       Accessor for MN type
+     */ 
+-    int8_t GetMNType(void) const;
++    boost::int8_t GetMNType(void) const;
+ 
+      /* Get the arm ID for the parent of this segment */ 
+-    uint32_t GetArmID(void);
++    boost::uint32_t GetArmID(void);
+     
+     /*!
+       Accessor function
+     */ 
+-    void GetNodeIndices(uint32_t indices[2]) {
++    void GetNodeIndices(boost::uint32_t indices[2]) {
+       indices[0] = mEndpoints[0]->GetIndex(); 
+       indices[1] = mEndpoints[1]->GetIndex(); 
+     }
+@@ -1079,7 +1080,7 @@
+     /*!
+       SetEndpoint -- given an actual new FullNode and ID information for an as-yet uncreated neighborNode, we set the endpoints to be the address of the actualNode and the address of an internal placeholder, a copy of neighborNode.  We will delete the placeholder FullNode later, either when the actual FullNode is created, or when our destructor is called.
+     */ 
+-    void SetEndpoints(FullNode *actualNode, int16_t neighborDomain, int32_t neighborNodeID) {
++    void SetEndpoints(FullNode *actualNode, boost::int16_t neighborDomain, boost::int32_t neighborNodeID) {
+       FullNode *placeholder = new FullNode(neighborDomain, neighborNodeID); 
+       placeholder->SetNodeType(PLACEHOLDER_NODE); //mark as a dummy node; 
+       SetEndpoints(actualNode, placeholder); 
+@@ -1211,7 +1212,7 @@
+     /*!
+       purely for debugging
+     */ 
+-    int32_t mSegmentID; 
++    boost::int32_t mSegmentID; 
+ 
+     /*!
+       to find out if wrapped
+@@ -1225,23 +1226,23 @@
+ 
+ 
+     static double mSegLen;
+-    static uint32_t mNumClassified, mNumWrapped, mNumArmSegmentsMeasured; 
+-    static uint32_t mNextSegmentID; 
++    static boost::uint32_t mNumClassified, mNumWrapped, mNumArmSegmentsMeasured; 
++    static boost::uint32_t mNextSegmentID; 
+ 
+   protected:
+ 
+      /*!
+       The burgers-type is defined above.  
+     */ 
+-    int8_t mBurgersType; 
++    boost::int8_t mBurgersType; 
+     
+     /*! 
+       The MN_type of the segment is set by its parent arm.  See Arm struct for definitions, but it describes whether the segment is 200 or 111 and whether its parent arm has any monsters at either end. 
+     */ 
+-    //int8_t mMNType; 
++    //boost::int8_t mMNType; 
+      
+     /* The metaArm type that it belongs to.  */ 
+-    int8_t mMetaArmType; 
++    boost::int8_t mMetaArmType; 
+ 
+     /*!
+       Marker used for "once-through" operations like building arms that must look at every segment, but which will usually discover echo particular segment more than once. 
+@@ -1258,7 +1259,7 @@
+     /*!
+       The global list of valid arm segments
+     */ 
+-    static std::map<uint32_t, ArmSegment *> mArmSegments; 
++    static std::map<boost::uint32_t, ArmSegment *> mArmSegments; 
+     static vector<ArmSegment *> mArmSegmentVector; 
+ 
+     struct Arm *mParentArm; 
+@@ -1321,7 +1322,7 @@
+       return 1000*(id0.GetDomainID() + id1.GetDomainID()) + id0.GetNodeID() + id1.GetNodeID(); 
+     }
+   private:
+-    uint32_t mDenominator;
++    boost::uint32_t mDenominator;
+   };
+   */
+   //==============================================
+@@ -1384,7 +1385,7 @@
+     */ 
+     void MakeAncestor(Arm *sourceArm) {
+       mAncestorArms.push_back(sourceArm->mArmID); 
+-      for  (uint32_t a = 0; a < sourceArm->mAncestorArms.size(); a++) {
++      for  (boost::uint32_t a = 0; a < sourceArm->mAncestorArms.size(); a++) {
+         mAncestorArms.push_back(sourceArm->mAncestorArms[a]); 
+       }
+       return;
+@@ -1432,7 +1433,7 @@
+       Give the exact Burgers type of its segments. 
+       Return 0 is no terminal segments. 
+     */
+-    int8_t GetBurgersType(void) const {
++    boost::int8_t GetBurgersType(void) const {
+       if (!mTerminalSegments.size() || !mTerminalSegments[0])  {        
+         return BURGERS_UNKNOWN; 
+       }
+@@ -1441,10 +1442,10 @@
+ 
+ 
+     /* Get the metaarm ID for the parent of this arm */ 
+-    uint32_t GetMetaArmID(void);
++    boost::uint32_t GetMetaArmID(void);
+ 
+     /* Get the metaarm Type for the parent of this arm */ 
+-    uint8_t GetMetaArmType(void);
++    boost::uint8_t GetMetaArmType(void);
+ 
+   #if LINKED_LOOPS
+    /*! 
+@@ -1465,7 +1466,7 @@
+     */ 
+     vector<FullNode*> GetNodes(FullNode *startNode = NULL) const;
+ 
+-    uint32_t GetNumNodes(void) { 
++    boost::uint32_t GetNumNodes(void) { 
+       // The math here is a bit odd, due to wrapping: 
+       if (!mNumSegments) return 0; 
+       return mNumSegments + 1 + mNumWrappedSegments; 
+@@ -1534,9 +1535,9 @@
+     }
+ 
+     FullNode *GetCommonNode(Arm *other) {
+-      uint32_t myNode = mTerminalNodes.size();
++      boost::uint32_t myNode = mTerminalNodes.size();
+       while (myNode--) {
+-        uint32_t otherNode = other->mTerminalNodes.size();
++        boost::uint32_t otherNode = other->mTerminalNodes.size();
+         while (otherNode--) {
+           if (mTerminalNodes[myNode] == other->mTerminalNodes[otherNode]) {
+             return mTerminalNodes[myNode];
+@@ -1549,10 +1550,10 @@
+     /*!
+       Return number of neighbor arms, not including this arm, but including duplicates
+     */ 
+-    uint32_t GetNumNeighborArms(void) {
+-      uint32_t num = 0; 
+-      for  (uint32_t node = 0; node < mTerminalNodes.size(); node++) {
+-        for (uint32_t arm=0; arm < mTerminalNodes[node]->mNeighborArms.size(); arm++) {
++    boost::uint32_t GetNumNeighborArms(void) {
++      boost::uint32_t num = 0; 
++      for  (boost::uint32_t node = 0; node < mTerminalNodes.size(); node++) {
++        for (boost::uint32_t arm=0; arm < mTerminalNodes[node]->mNeighborArms.size(); arm++) {
+           if (mTerminalNodes[node]->mNeighborArms[arm] != this) {
+             num++;
+           }
+@@ -1565,8 +1566,8 @@
+       Return nth neighbor arm, not including this but including duplicates
+     */ 
+     Arm *GetNeighborArm (int num) {
+-      for  (uint32_t node = 0; node < mTerminalNodes.size(); node++) {
+-        for (uint32_t arm=0; arm < mTerminalNodes[node]->mNeighborArms.size(); arm++) {
++      for  (boost::uint32_t node = 0; node < mTerminalNodes.size(); node++) {
++        for (boost::uint32_t arm=0; arm < mTerminalNodes[node]->mNeighborArms.size(); arm++) {
+           if (mTerminalNodes[node]->mNeighborArms[arm] != this) {
+             if (!num)
+               return mTerminalNodes[node]->mNeighborArms[arm]; 
+@@ -1585,7 +1586,7 @@
+       return mArmLength; 
+     }
+ 
+-    uint8_t GetArmType(void) const { return mArmType; }
++    boost::uint8_t GetArmType(void) const { return mArmType; }
+ 
+     struct MetaArm *GetParentMetaArm(void) const { return mParentMetaArm; }
+ 
+@@ -1603,13 +1604,13 @@
+     /*! 
+       Helper function for Arm::WriteTraceFiles and FullNode::WriteTraceFiles
+     */ 
+-    void FindBFSNeighbors(vector<Arm *> &arms, vector<uint32_t> &armdepths, vector<int> &action);
++    void FindBFSNeighbors(vector<Arm *> &arms, vector<boost::uint32_t> &armdepths, vector<int> &action);
+ 
+     /*!
+       Add the given arm to the list of arms to trace. 
+       See WriteTraceFiles()
+     */ 
+-    static void TraceArm(int32_t armID){
++    static void TraceArm(boost::int32_t armID){
+       mTraceArms.push_back(armID);       
+     }
+ 
+@@ -1617,7 +1618,7 @@
+       Set the tracing depth for all traced arms.  
+       See WriteTraceFiles()
+     */ 
+-    static void SetTraceDepth(uint32_t depth) {
++    static void SetTraceDepth(boost::uint32_t depth) {
+       mTraceDepth = depth; 
+     }
+ 
+@@ -1642,8 +1643,8 @@
+     vector < ArmSegment *> mTerminalSegments; // At least one, but not more than two
+     vector <FullNode *> mTerminalNodes;  // At least one, but not more than two
+ 
+-    int8_t mArmType;
+-    int8_t mMetaArmType; // of its parent if it exists
++    boost::int8_t mArmType;
++    boost::int8_t mMetaArmType; // of its parent if it exists
+     double mArmLength; 
+     /*!
+       This is useless to the user, only used for classification 
+@@ -1651,8 +1652,8 @@
+     static std::vector<Arm *> mArms; 
+     static double mThreshold; // shorter than this and an arm is "short"
+     static double mDecomposedLength; // statistics
+-    static vector<int32_t> mNumDecomposed; // statistics
+-    static int32_t mNumDestroyedInDetachment; // statistics
++    static vector<boost::int32_t> mNumDecomposed; // statistics
++    static boost::int32_t mNumDestroyedInDetachment; // statistics
+     static double mTotalArmLengthBeforeDecomposition, 
+       mTotalArmLengthAfterDecomposition;  
+     bool mDecomposing, mExtendOrDetach; 
+@@ -1664,27 +1665,27 @@
+    /*!
+       number of segments in arm
+     */ 
+-    uint32_t mNumSegments; 
++    boost::uint32_t mNumSegments; 
+    /*!
+       number of segments that got wrapped (affects node and segments counts)
+     */ 
+-    uint8_t mNumWrappedSegments; 
++    boost::uint8_t mNumWrappedSegments; 
+     /*! 
+       purely for debugging
+     */ 
+-    int32_t mArmID; 
++    boost::int32_t mArmID; 
+ 
+ 
+     /*!
+       An ancestor of this arm was one which was assimilated into this arm,
+       during decomposition.  Useful for history tracing. 
+     */ 
+-    vector<int32_t> mAncestorArms; 
++    vector<boost::int32_t> mAncestorArms; 
+ 
+     /*! 
+       To trace out arms in a text and vtk file, add them to this vector
+     */ 
+-    static vector<int32_t> mTraceArms; 
++    static vector<boost::int32_t> mTraceArms; 
+ 
+     /*!
+       uniquify files from this run
+@@ -1695,7 +1696,7 @@
+       When tracing arms, how deep to BFS for neighbors? 
+       0 is no neighbors. 1 is immediate neighbors, etc. 
+     */ 
+-    static uint8_t mTraceDepth; 
++    static boost::uint8_t mTraceDepth; 
+ 
+     private: 
+     struct MetaArm * mParentMetaArm; 
+@@ -1734,7 +1735,7 @@
+  
+     vector<rclib::Point<float> > GetNodeLocations(bool wrapEndpoints);    
+  
+-    uint32_t GetNumSegments(bool wrapEndpoints) { 
++    boost::uint32_t GetNumSegments(bool wrapEndpoints) { 
+       if (!mNumSegments) {
+         dbprintf(1, "WARNING: MetaArm::GetNumSegments(): mNumSegments is 0.  You should call GetNodeLocations() before GetNumSegments() to avoid a permormance penalty.\n"); 
+         GetNodeLocations(wrapEndpoints); 
+@@ -1758,7 +1759,7 @@
+     }
+     // ======================
+     inline void AddTerminalNode(FullNode *node) {
+-      uint16_t nodenum = mTerminalNodes.size(); 
++      boost::uint16_t nodenum = mTerminalNodes.size(); 
+       while (nodenum--) {
+         if (mTerminalNodes[nodenum] == node) {
+           dbprintf(4, "Warning: node not added as it is a duplicate.\n"); 
+@@ -1770,7 +1771,7 @@
+     }
+     // ======================
+     inline void AddTerminalArm(Arm *arm) {
+-      uint16_t armnum = mTerminalArms.size(); 
++      boost::uint16_t armnum = mTerminalArms.size(); 
+       while (armnum--) {
+         if (mTerminalArms[armnum] == arm) {
+           dbprintf(4, "Warning: arm not added as it is a duplicate.\n"); 
+@@ -1785,7 +1786,7 @@
+       if (doreverse) {
+         reverse(mFoundArms.begin(), mFoundArms.end());
+       }
+-      uint32_t i = 0; 
++      boost::uint32_t i = 0; 
+       while (i < mFoundArms.size()) {
+         dbprintf(4, "Capture Path: add arm %d\n", mFoundArms[i]->mArmID); 
+         i++; 
+@@ -1795,16 +1796,16 @@
+       return; 
+     }
+     
+-    int8_t GetMetaArmType(void) { return mMetaArmType; }
+-    int32_t GetMetaArmID(void) { return mMetaArmID; }
++    boost::int8_t GetMetaArmType(void) { return mMetaArmType; }
++    boost::int32_t GetMetaArmID(void) { return mMetaArmID; }
+ 
+      
+    vector<FullNode *>mTerminalNodes; // 
+     vector<Arm*> mTerminalArms; // one or two arms
+     double mLength; 
+-    int8_t mMetaArmType; 
+-    uint32_t mMetaArmID; 
+-    uint32_t mNumSegments, mNumNodes; 
++    boost::int8_t mMetaArmType; 
++    boost::uint32_t mMetaArmID; 
++    boost::uint32_t mNumSegments, mNumNodes; 
+     static rclib::Point<float> mWrappedNode; // Used in GetNodeLocations -- used to indicate a gap in the point list from a MetaArm where a segment is skipped due to wrapping.  
+     bool mCombo; 
+     bool mFound111; // if we see a 111 on our search
+@@ -1922,21 +1923,21 @@
+     /*!
+       Trace decomposition of the given arm to the given depth.  
+     */ 
+-    void TraceNode(int32_t nodeID){
++    void TraceNode(boost::int32_t nodeID){
+       FullNode::TraceNode(nodeID); 
+     }
+     
+     /*!
+       Trace decomposition of the given arm to the given depth.  
+     */ 
+-    void TraceArm(int32_t armID){
++    void TraceArm(boost::int32_t armID){
+       Arm::TraceArm(armID);
+     }
+     
+     /*! 
+       Set trace depth for arm tracing
+     */ 
+-    void SetTraceDepth(uint32_t depth) {
++    void SetTraceDepth(boost::uint32_t depth) {
+       Arm::SetTraceDepth(depth); 
+     }
+ 
+@@ -2044,7 +2045,7 @@
+     /*!
+       Accessor function.
+     */ 
+-    uint32_t GetNumNodes(void) { return FullNode::mFullNodeVector.size(); }
++    boost::uint32_t GetNumNodes(void) { return FullNode::mFullNodeVector.size(); }
+     /*!
+       Accessor returns begin of node vector. 
+     */ 
+@@ -2063,7 +2064,7 @@
+    /*! 
+       Accessor function. 
+     */ 
+-    FullNode * GetNode(uint32_t nodenum) { 
++    FullNode * GetNode(boost::uint32_t nodenum) { 
+       if (nodenum >= FullNode::mFullNodeVector.size()) {
+         cerr << "ERROR: GetNode() -- out of bounds index" << endl; 
+         return NULL; 
+@@ -2104,19 +2105,19 @@
+      /*!
+       Accessor function
+     */
+-    uint32_t GetNumMetaArms(void) { return mMetaArms.size(); }
++    boost::uint32_t GetNumMetaArms(void) { return mMetaArms.size(); }
+     
+     /*!
+       Accessor function
+     */
+-    boost::shared_ptr<MetaArm> GetMetaArm(uint32_t metaArmNum) {
++    boost::shared_ptr<MetaArm> GetMetaArm(boost::uint32_t metaArmNum) {
+       return mMetaArms[metaArmNum]; 
+     }
+ 
+     /*!
+       Accessor function
+     */
+-    ArmSegment *GetArmSegment(uint32_t segnum) { 
++    ArmSegment *GetArmSegment(boost::uint32_t segnum) { 
+       if (segnum >= ArmSegment::mArmSegmentVector.size()) {
+         cerr << "" << endl; 
+         return NULL; 
+@@ -2127,7 +2128,7 @@
+     /*! 
+       Accessor function. 
+     */ 
+-    uint32_t GetNumArmSegments(void)  { 
++    boost::uint32_t GetNumArmSegments(void)  { 
+       return  ArmSegment::mArmSegmentVector.size(); 
+     }
+ 
+@@ -2200,11 +2201,11 @@
+     /*!
+       Read a node from the input file and write it out with its tag to the tagfile
+     */
+-    void CopyNodeFromFile(uint32_t &lineno, map<uint64_t, FullNode*> &nodehash, std::ifstream &datafile, std::ofstream &tagfile);
++    void CopyNodeFromFile(boost::uint32_t &lineno, map<boost::uint64_t, FullNode*> &nodehash, std::ifstream &datafile, std::ofstream &tagfile);
+     /*! 
+       Read a node and its neighbors from a file.  This has to be done in DataSet because we avoid duplicate neighbor structs by using pointers into a global neighbor array.
+     */ 
+-    void ReadMinimalNodeFromFile(uint32_t &lineno, std::ifstream &datafile);
++    void ReadMinimalNodeFromFile(boost::uint32_t &lineno, std::ifstream &datafile);
+     /*!
+       Make a first pass through the file:  load all as MinimalNodes, with minimal info: {domain and ID, whether out of bounds, neighbor IDs}
+     */ 
+@@ -2317,12 +2318,12 @@
+       When writing out VTK files, this is how many to put per block max.
+       Aids in speedy visualization. 
+     */ 
+-    uint32_t mElementsPerVTKFile; 
++    boost::uint32_t mElementsPerVTKFile; 
+ 
+     /*! 
+       Number of nodes in full dump data
+     */ 
+-    uint32_t mTotalDumpNodes; 
++    boost::uint32_t mTotalDumpNodes; 
+ 
+     /*!
+       if this is true, then complete dumps of all data are done, 

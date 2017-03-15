@@ -1,0 +1,11 @@
+diff -Naur a/qtwebengine/examples/webenginewidgets/simplebrowser/webview.cpp b/qtwebengine/examples/webenginewidgets/simplebrowser/webview.cpp
+--- a/qtwebengine/examples/webenginewidgets/simplebrowser/webview.cpp	2016-05-26 21:01:25.000000000 +0300
++++ b/qtwebengine/examples/webenginewidgets/simplebrowser/webview.cpp	2016-06-22 11:19:20.000000000 +0300
+@@ -49,6 +49,7 @@
+ #include <QMessageBox>
+ #include <QNetworkReply>
+ #include <QTimer>
++#include <QDebug>
+ 
+ WebView::WebView(QWidget *parent)
+     : QWebEngineView(parent)

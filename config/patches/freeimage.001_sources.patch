@@ -1,0 +1,25 @@
+diff -Naur --exclude=CVS freeimage-3.16.0_orig/Source/LibWebP/src/utils/bit_writer.c freeimage-3.16.0_patch/Source/LibWebP/src/utils/bit_writer.c
+--- freeimage-3.16.0_orig/Source/LibWebP/src/utils/bit_writer.c
++++ freeimage-3.16.0_patch/Source/LibWebP/src/utils/bit_writer.c
+@@ -226,6 +226,21 @@
+ #define htole16(x) (x)
+ #else     // pretty much all linux and/or glibc
+ #include <endian.h>
++#if !defined(htole32)
++# include <byteswap.h>
++# ifdef __USE_BSD
++/* Conversion interfaces.  */
++#if __BYTE_ORDER == __LITTLE_ENDIAN
++#define htole16(x) (x)
++#define htole32(x) (x)
++#define htole64(x) (x)
++#else
++#define htole16(x) __bswap_16 (x)
++#define htole32(x) __bswap_32 (x)
++#define htole64(x) __bswap_64 (x)
++#endif
++#endif
++#endif
+ #endif
+ 
+ // Returns 1 on success.

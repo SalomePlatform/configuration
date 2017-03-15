@@ -1,0 +1,12 @@
+diff -NaurwB /tmp/qt/qt-5.6.1__0/qtbase/src/network/kernel/qnetworkproxy_libproxy.cpp /tmp/qt/qt-5.6.1__1/qtbase/src/network/kernel/qnetworkproxy_libproxy.cpp
+--- /tmp/qt/qt-5.6.1__0/qtbase/src/network/kernel/qnetworkproxy_libproxy.cpp	2016-05-25 18:46:17.000000000 +0300
++++ /tmp/qt/qt-5.6.1__1/qtbase/src/network/kernel/qnetworkproxy_libproxy.cpp	2017-03-15 17:51:11.051090499 +0300
+@@ -74,7 +74,7 @@
+     QList<QUrl> ret;
+ 
+     if (factory) {
+-        char **proxies = px_proxy_factory_get_proxies(factory, url.toEncoded());
++        char **proxies = px_proxy_factory_get_proxies(factory, url.toEncoded().data());
+         if (proxies) {
+             for (int i = 0; proxies[i]; i++) {
+                 ret.append(QUrl::fromEncoded(proxies[i]));

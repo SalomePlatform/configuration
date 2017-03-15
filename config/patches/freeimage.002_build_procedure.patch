@@ -1,0 +1,62 @@
+diff -NaurwB freeimage-3.16.0__0/Makefile.fip freeimage-3.16.0__1/Makefile.fip
+--- freeimage-3.16.0__0/Makefile.fip	2014-03-15 19:35:28.000000000 +0400
++++ freeimage-3.16.0__1/Makefile.fip	2017-03-15 15:05:20.396869687 +0300
+@@ -4,9 +4,9 @@
+ include fipMakefile.srcs
+ 
+ # General configuration variables:
+-DESTDIR ?= /
+-INCDIR ?= $(DESTDIR)/usr/include
+-INSTALLDIR ?= $(DESTDIR)/usr/lib
++DESTDIR ?= /usr
++INCDIR ?= $(DESTDIR)/include
++INSTALLDIR ?= $(DESTDIR)/lib
+ 
+ # Converts cr/lf to just lf
+ DOS2UNIX = dos2unix
+@@ -71,10 +71,12 @@
+ 
+ install:
+ 	install -d $(INCDIR) $(INSTALLDIR)
+-	install -m 644 -o root -g root $(HEADER) $(INCDIR)
+-	install -m 644 -o root -g root $(HEADERFIP) $(INCDIR)
+-	install -m 644 -o root -g root $(STATICLIB) $(INSTALLDIR)
+-	install -m 755 -o root -g root $(SHAREDLIB) $(INSTALLDIR)
++	install -m 644 $(HEADER) $(INCDIR)
++	install -m 644 $(HEADERFIP) $(INCDIR)
++	install -m 644 $(STATICLIB) $(INSTALLDIR)
++	install -m 755 $(SHAREDLIB) $(INSTALLDIR)
++	ln -sf $(SHAREDLIB) $(INSTALLDIR)/$(VERLIBNAME)
++	ln -sf $(VERLIBNAME) $(INSTALLDIR)/$(LIBNAME)
+ 
+ clean:
+ 	rm -f core Dist/*.* u2dtmp* $(MODULES) $(STATICLIB) $(SHAREDLIB) $(LIBNAME)
+diff -NaurwB freeimage-3.16.0__0/Makefile.gnu freeimage-3.16.0__1/Makefile.gnu
+--- freeimage-3.16.0__0/Makefile.gnu	2014-03-16 00:02:08.000000000 +0400
++++ freeimage-3.16.0__1/Makefile.gnu	2017-03-15 15:05:20.384869623 +0300
+@@ -4,9 +4,9 @@
+ include Makefile.srcs
+ 
+ # General configuration variables:
+-DESTDIR ?= /
+-INCDIR ?= $(DESTDIR)/usr/include
+-INSTALLDIR ?= $(DESTDIR)/usr/lib
++DESTDIR ?= /usr
++INCDIR ?= $(DESTDIR)/include
++INSTALLDIR ?= $(DESTDIR)/lib
+ 
+ # Converts cr/lf to just lf
+ DOS2UNIX = dos2unix
+@@ -70,9 +70,9 @@
+ 
+ install:
+ 	install -d $(INCDIR) $(INSTALLDIR)
+-	install -m 644 -o root -g root $(HEADER) $(INCDIR)
+-	install -m 644 -o root -g root $(STATICLIB) $(INSTALLDIR)
+-	install -m 755 -o root -g root $(SHAREDLIB) $(INSTALLDIR)
++	install -m 644 $(HEADER) $(INCDIR)
++	install -m 644 $(STATICLIB) $(INSTALLDIR)
++	install -m 755 $(SHAREDLIB) $(INSTALLDIR)
+ 	ln -sf $(SHAREDLIB) $(INSTALLDIR)/$(VERLIBNAME)
+ 	ln -sf $(VERLIBNAME) $(INSTALLDIR)/$(LIBNAME)	
+ #	ldconfig
