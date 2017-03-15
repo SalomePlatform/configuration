@@ -39,10 +39,17 @@ FIND_PATH(OMNIORB_PYTHON_BACKEND
   PATH_SUFFIXES "/lib/python${_py_version}/site-packages/omniidl_be" "/lib/omniidl/omniidl_be" "/lib/python/omniidl_be"
   DOC "Path to python-backend directory (omniidl_be) including python.py file")
 
+FIND_PATH(OMNIORBPY_INCLUDE_DIR
+  NAMES omniORBpy.h
+  PATHS "${OMNIORBPY_ROOT_DIR}" "/usr"
+  PATHS_SUFFIXES "/include"
+  DOC "Path to omniORBpy include directory")
+
 ##############################################################################
 # Cook our stuff
 ##############################################################################
 MARK_AS_ADVANCED(OMNIORB_PYTHON_BACKEND)
+MARK_AS_ADVANCED(OMNIORBPY_INCLUDE_DIR)
   
 SET(OMNIORB_IDLPYFLAGS)
 IF (OMNIORB_PYTHON_BACKEND) 
@@ -54,4 +61,4 @@ GET_FILENAME_COMPONENT(OMNIORBPY_PYTHONPATH "${OMNIORB_PYTHON_BACKEND}" PATH)
 
 # Handle standard arguments:
 INCLUDE(FindPackageHandleStandardArgs)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(OmniORBPy REQUIRED_VARS OMNIORB_PYTHON_BACKEND)
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(OmniORBPy REQUIRED_VARS OMNIORB_PYTHON_BACKEND OMNIORBPY_INCLUDE_DIR)
