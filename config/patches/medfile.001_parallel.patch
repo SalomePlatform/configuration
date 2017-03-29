@@ -1,0 +1,63 @@
+diff -NaurwB med-3.2.1__1/config/cmake_files/FindMedfileMPI.cmake med-3.2.1__0/config/cmake_files/FindMedfileMPI.cmake
+--- med-3.2.1__0/config/cmake_files/FindMedfileMPI.cmake	2017-03-15 14:49:45.411703541 +0300
++++ med-3.2.1__1/config/cmake_files/FindMedfileMPI.cmake	2017-03-15 14:50:25.683932187 +0300
+@@ -83,6 +83,8 @@
+ 
+   SET(MED_DEFINE_MED_HAVE_MPI "#define MED_HAVE_MPI")
+ 
++  SET(MED_DEFINE_MED_HAVE_MPI "#define MED_HAVE_MPI")
++
+ ELSE(MPI_FOUND OR MPIEXEC)
+   MESSAGE(STATUS "MPI was not found.")  
+ ENDIF(MPI_FOUND OR MPIEXEC)
+diff -NaurwB med-3.2.1__1/python/CMakeLists.txt med-3.2.1__0/python/CMakeLists.txt
+--- med-3.2.1__1/python/CMakeLists.txt	2017-03-15 14:49:45.643704857 +0300
++++ med-3.2.1__0/python/CMakeLists.txt	2017-03-15 14:50:25.675932142 +0300
+@@ -6,6 +6,7 @@
+   ${PROJECT_BINARY_DIR}/include
+   ${HDF5_INCLUDE_DIRS}
+   ${MPI_INCLUDE_DIRS}
++  ${MPI_INCLUDE_DIRS}
+   )
+ 
+ SET(_swig_files 
+diff -NaurwB med-3.2.1__1/src/cfi/CMakeLists.txt med-3.2.1__0/src/cfi/CMakeLists.txt
+--- med-3.2.1__1/src/cfi/CMakeLists.txt	2017-03-15 14:49:45.679705061 +0300
++++ med-3.2.1__0/src/cfi/CMakeLists.txt	2017-03-15 14:50:25.695932256 +0300
+@@ -21,6 +21,10 @@
+   LIST(APPEND cfi_SOURCES parfilecf.c)
+ ENDIF(MEDFILE_USE_MPI)
+ 
++IF(MEDFILE_USE_MPI)
++  LIST(APPEND cfi_SOURCES parfilecf.c)
++ENDIF(MEDFILE_USE_MPI)
++
+ ADD_DEFINITIONS(-DNOGDI)
+   
+ # Intermediary target
+diff -NaurwB med-3.2.1__1/src/fi/CMakeLists.txt med-3.2.1__0/src/fi/CMakeLists.txt
+--- med-3.2.1__1/src/fi/CMakeLists.txt	2017-03-15 14:49:45.679705061 +0300
++++ med-3.2.1__0/src/fi/CMakeLists.txt	2017-03-15 14:50:25.699932278 +0300
+@@ -20,4 +20,8 @@
+ LIST(APPEND fi_SOURCES medparfile.f)
+ ENDIF(MEDFILE_USE_MPI)
+ 
++IF(MEDFILE_USE_MPI)
++LIST(APPEND fi_SOURCES medparfile.f)
++ENDIF(MEDFILE_USE_MPI)
++
+ ADD_LIBRARY(_fi        OBJECT ${fi_SOURCES})
+diff -NaurwB med-3.2.1__1/src/hdfi/CMakeLists.txt med-3.2.1__0/src/hdfi/CMakeLists.txt
+--- med-3.2.1__1/src/hdfi/CMakeLists.txt	2017-03-15 14:49:45.671705017 +0300
++++ med-3.2.1__0/src/hdfi/CMakeLists.txt	2017-03-15 14:50:25.707932324 +0300
+@@ -66,6 +66,10 @@
+ IF(MEDFILE_USE_MPI)
+   LIST(APPEND hdfi_SOURCES _MEDparFileOpen.c _MEDparFileCreate.c)
+ ENDIF(MEDFILE_USE_MPI)
++
++IF(MEDFILE_USE_MPI)
++  LIST(APPEND hdfi_SOURCES _MEDparFileOpen.c _MEDparFileCreate.c)
++ENDIF(MEDFILE_USE_MPI)
+   
+ ADD_LIBRARY(_hdfi OBJECT ${hdfi_SOURCES})
+  

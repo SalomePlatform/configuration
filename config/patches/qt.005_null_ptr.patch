@@ -1,0 +1,12 @@
+diff -Naur a/qtmultimedia/src/gsttools/qgstreamerbushelper.cpp b/qtmultimedia/src/gsttools/qgstreamerbushelper.cpp
+--- a/qtmultimedia/src/gsttools/qgstreamerbushelper.cpp	2016-05-31 13:23:00.000000000 +0300
++++ b/qtmultimedia/src/gsttools/qgstreamerbushelper.cpp	2016-06-22 12:03:49.000000000 +0300
+@@ -52,7 +52,7 @@
+         m_tag(0),
+         m_bus(bus),
+         m_helper(parent),
+-        m_intervalTimer(nullptr)
++        m_intervalTimer(NULL)
+     {
+         // glib event loop can be disabled either by env variable or QT_NO_GLIB define, so check the dispacher
+         QAbstractEventDispatcher *dispatcher = QCoreApplication::eventDispatcher();

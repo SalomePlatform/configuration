@@ -1,0 +1,50 @@
+diff -Naur '--exclude=CVS' '--exclude=.git' solvespace-2.1.orig/CMakeLists.txt solvespace-2.1.p1/CMakeLists.txt
+--- solvespace-2.1.orig/CMakeLists.txt	2015-09-28 17:55:15.000000000 +0300
++++ solvespace-2.1.p1/CMakeLists.txt	2015-09-28 18:05:50.000000000 +0300
+@@ -28,6 +28,10 @@
+     set(GUI gtk2 CACHE STRING "GUI toolkit to use (one of: gtk2 gtk3)")
+ endif()
+ 
++# options
++
++option(BUILD_GUI "Build only the library part" ON)
++
+ # compiler
+ 
+ if(WIN32)
+@@ -54,6 +58,8 @@
+ 
+ CHECK_INCLUDE_FILE("stdint.h" HAVE_STDINT_H)
+ 
++if(BUILD_GUI)
++
+ find_package(OpenGL REQUIRED)
+ 
+ find_package(Perl)
+@@ -125,6 +131,8 @@
+     endif()
+ endif()
+ 
++endif(BUILD_GUI)
++
+ # components
+ 
+ if(WIN32)
+diff -Naur '--exclude=CVS' '--exclude=.git' solvespace-2.1.orig/src/CMakeLists.txt solvespace-2.1.p1/src/CMakeLists.txt
+--- solvespace-2.1.orig/src/CMakeLists.txt	2015-09-28 17:55:15.000000000 +0300
++++ solvespace-2.1.p1/src/CMakeLists.txt	2015-09-28 18:07:31.000000000 +0300
+@@ -79,6 +79,8 @@
+ 
+ # generated files
+ 
++if(BUILD_GUI)
++
+ file(GLOB icons "${CMAKE_CURRENT_SOURCE_DIR}/icons/*.png")
+ 
+ if(PERL_FOUND AND PERLMODULES_FOUND)
+@@ -384,3 +386,5 @@
+         --malloc-fill=0xac
+         --free-fill=0xde
+         $<TARGET_FILE:solvespace>)
++
++endif(BUILD_GUI)

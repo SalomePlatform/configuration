@@ -1,0 +1,12 @@
+diff -Naur ParaView-5.0.0_SRC_orig/CMake/pvForwardingExecutable.cmake ParaView-5.0.0_SRC_modif/CMake/pvForwardingExecutable.cmake
+--- ParaView-5.0.0_SRC_orig/CMake/pvForwardingExecutable.cmake	2015-12-16 20:09:48.000000000 +0300
++++ ParaView-5.0.0_SRC_modif/CMake/pvForwardingExecutable.cmake	2016-01-15 18:01:57.000000000 +0300
+@@ -81,7 +81,7 @@
+       add_executable(${exe_name}${PV_EXE_SUFFIX}
+         ${CMAKE_CURRENT_BINARY_DIR}/${exe_name}-forward.c)
+       set_target_properties(${exe_name}${PV_EXE_SUFFIX} PROPERTIES
+-        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/launcher)
++        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/launcher COMPILE_FLAGS -O2)
+       set_target_properties(${exe_name}${PV_EXE_SUFFIX} PROPERTIES
+         OUTPUT_NAME ${exe_name})
+       add_dependencies(${exe_name}${PV_EXE_SUFFIX} ${exe_name})

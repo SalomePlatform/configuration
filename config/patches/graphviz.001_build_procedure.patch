@@ -1,0 +1,21 @@
+diff -NaurwB graphviz-2.38.0__1/configure graphviz-2.38.0__0/configure
+--- graphviz-2.38.0__0/configure	2017-03-15 14:22:15.286297951 +0300
++++ graphviz-2.38.0__1/configure	2017-03-15 14:23:12.054621051 +0300
+@@ -22415,7 +22415,7 @@
+       else
+         PYTHON_PREFIX=`$PYTHON -c "import sys; print sys.prefix"`
+         PYTHON_INCLUDES=-I$PYTHON_PREFIX/include/python$PYTHON_VERSION_SHORT
+-        PYTHON_LIBS="-lpython$PYTHON_VERSION_SHORT"
++        PYTHON_LIBS="-L$PYTHON_PREFIX/lib -lpython$PYTHON_VERSION_SHORT"
+         PYTHON_INSTALL_DIR="`$PYTHON $srcdir/config/config_python.py archsitelib`"
+         save_CPPFLAGS=$CPPFLAGS
+         CPPFLAGS="$CPPFLAGS $PYTHON_INCLUDES"
+@@ -23797,7 +23797,7 @@
+ fi
+ 
+ if test "x$use_tcl" = "x"; then
+-  TCL_VERSION_FOUND=`echo 'puts [info tclversion]' | $TCLSH`
++  TCL_VERSION_FOUND=`echo 'puts [info tclversion]' | $TCLSH 2>/dev/null | grep -E '^[0-9.]+$'`
+ 
+   # can't assume ksh on all architectures
+   # TCLSH_EXEC_PREFIX=${TCLSH%%/bin/tclsh.*}
