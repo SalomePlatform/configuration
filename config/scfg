@@ -68,9 +68,9 @@ def verbose():
 
 def debug(*args):
     if verbose():
-        print "[DEBUG]",
-        for a in args: print a,
-        print
+        print("[DEBUG]", end=' ')
+        for a in args: print(a, end=' ')
+        print()
     pass
 
 ##
@@ -83,7 +83,7 @@ def debug(*args):
 ##
 
 def error_exit(msg):
-    print "%s: %s" % (get_tool_name(), msg)
+    print("%s: %s" % (get_tool_name(), msg))
     sys.exit(1)
     pass
 
@@ -215,9 +215,8 @@ def format_string(s, width):
 def format_commands():
     commands = get_commands()
     # filter out tool itself
-    commands = filter(lambda a: a != "", commands)
+    commands = sorted([a for a in commands if a != ""])
     # sort commands alphabetically
-    commands.sort()
     # get max command's length
     max_length = max([ len(i) for i in commands])
     # generate formatting string
@@ -248,7 +247,7 @@ def format_commands():
 
 def format_list_options(cmd):
     opts = get_opts(cmd)
-    return "".join([" [%s]" % i for i in opts.keys()])
+    return "".join([" [%s]" % i for i in opts])
 
 ##
 # function: format_options
@@ -263,7 +262,7 @@ def format_list_options(cmd):
 
 def format_options(cmd):
     opts = get_opts(cmd)
-    opts_names = opts.keys()
+    opts_names = list(opts.keys())
     if not opts: return ""
     # get max command's length
     max_length = max([ len(i) for i in opts_names])
@@ -302,7 +301,7 @@ def usage(cmd=None):
     fmt[ "opt_list" ] = format_options(cmd)
     help_string = get_help(cmd)
     help_string = help_string.replace("\t", "  ")
-    print help_string.format(**fmt)
+    print(help_string.format(**fmt))
     sys.exit(0)
     pass
 
@@ -326,7 +325,7 @@ def parse_cmd_line(args):
             # empty option
             error_exit("empty option is not allowed")
         if a.startswith("-"):
-            allowed_opts = get_opts(cmd).keys()
+            allowed_opts = list(get_opts(cmd).keys())
             allowed_opts = dict([(i[1], len(i)>2) for i in allowed_opts])
             processed_opts = tool_opts if cmd is None else cmd_opts
             cmd_descr = "" if cmd is None else " for command '%s'" % cmd
@@ -337,7 +336,7 @@ def parse_cmd_line(args):
                 if o == "-":
                     # "--" format is not supported
                     error_exit("invalid format of option")
-                elif o in allowed_opts.keys():
+                elif o in allowed_opts:
                     if allowed_opts[o]:
                         # supported option; requires parameter
                         if opts:
@@ -474,7 +473,7 @@ def main():
     try:
         # check if custom source file is specified
         
-        src_file = opts["s"] if opts.has_key("s") else None
+        src_file = opts["s"] if "s" in opts else None
         debug("source file:", src_file)
         
         # create config tool
@@ -496,9 +495,9 @@ def main():
                 error_exit("%s: can't read more than one parameter at once!" % cmd)
             def _toString(v):
                 if v is None: return ""
-                elif type(v) is list: return " ".join(v)
+                elif isinstance(v, list): return " ".join(v)
                 else: return v
-            print _toString(cfg_tool.get(tgt, params[0]))
+            print(_toString(cfg_tool.get(tgt, params[0])))
             pass
         elif cmd == "set":
             if not tgt:
@@ -525,7 +524,7 @@ def main():
             errors = []
             if cfg_tool.verify(tgt, errors):
                 msg = " (no products found)" if not cfg_tool.get("cfg", "products") else ""
-                print "Configuration is valid%s." % msg
+                print("Configuration is valid%s." % msg)
             else:
                 raise Exception("Configuration is invalid:\n"+ "\n".join(errors))
             pass
@@ -542,7 +541,7 @@ def main():
             error_exit("unknown command: %s" % cmd)
             pass
         pass
-    except Exception, e:
+    except Exception as e:
         error_exit(e)
     pass
     
