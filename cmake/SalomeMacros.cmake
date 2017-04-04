@@ -996,7 +996,7 @@ MACRO(SWIG_CHECK_GENERATION swig_module)
 ( (call ) >> @SWIG_GEN_FILE_NAME@ ) 2>null && (
   echo The file @SWIG_GEN_FILE_NAME@ was created. & goto :eof
 ) || (
-  echo The file @SWIG_GEN_FILE_NAME@ is still being created !!! & timeout /t 1 > null & goto :check
+  echo The file @SWIG_GEN_FILE_NAME@ is still being created !!! & goto :check
 )
 :eof")
     LIST(LENGTH swig_generated_sources NB_GEN_FILES)
