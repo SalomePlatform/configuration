@@ -438,7 +438,7 @@ ENDMACRO()
 
 
 ####################################################################
-# SALOME_FIND_PACKAGE_DETECT_CONFLICTS(pkg referenceVariable upCount)
+# SALOME_FIND_PACKAGE_AND_DETECT_CONFLICTS(pkg referenceVariable upCount)
 #    pkg              : name of the system package to be detected
 #    referenceVariable: variable containing a path that can be browsed up to 
 # retrieve the package root directory (xxx_ROOT_DIR)
