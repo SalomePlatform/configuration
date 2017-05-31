@@ -986,3 +986,42 @@ MACRO(SALOME_EXTRACT_VERSION version_string major minor patch)
     MESSAGE(FATAL_ERROR "Problem parsing version string, I can't parse it properly.")
   ENDIF()
 ENDMACRO(SALOME_EXTRACT_VERSION)
+
+#######################################################################
+#
+# This macro checks that swig files were generated.
+# It is requared under Windows platform, because sometimes under Windows platform
+# the genetarion of the swig wrappings tooks long time. And seems swig opens 
+# file at the begining of generation process and after that swig 
+# begins the generation of the content. In its turn Microsoft Visual Studio
+# tryes to compile file immediately after creation and as a result compilation breaks.
+MACRO(SWIG_CHECK_GENERATION swig_module)
+  IF(WIN32)
+    SET(SCRIPT 
+"@echo off
+:check
+( (call ) >> @SWIG_GEN_FILE_NAME@ ) 2>null && (
+  echo The file @SWIG_GEN_FILE_NAME@ was created. & goto :eof
+) || (
+  echo The file @SWIG_GEN_FILE_NAME@ is still being created !!! & goto :check
+)
+:eof")
+    LIST(LENGTH swig_generated_sources NB_GEN_FILES)
+    IF(${NB_GEN_FILES})
+      LIST(GET swig_generated_sources 0 SWIG_GEN_FILE_NAME)
+      STRING(CONFIGURE ${SCRIPT} SCRIPT)
+      GET_FILENAME_COMPONENT(SWIG_GEN_FILE_NAME_DIR ${SWIG_GEN_FILE_NAME} DIRECTORY)
+      GET_FILENAME_COMPONENT(SWIG_GEN_FILE_NAME_WE ${SWIG_GEN_FILE_NAME} NAME_WE)
+      SET(SCRIPT_FILE_NAME ${SWIG_GEN_FILE_NAME_DIR}/${SWIG_GEN_FILE_NAME_WE}.bat)
+      FILE(WRITE ${SCRIPT_FILE_NAME} ${SCRIPT})
+      ADD_CUSTOM_TARGET(${SWIG_MODULE_${swig_module}_REAL_NAME}_ready
+                        DEPENDS ${SWIG_GEN_FILE_NAME}
+                        COMMAND ${SCRIPT_FILE_NAME}
+                        COMMENT "Waiting for swig wrappings !!!")
+      ADD_DEPENDENCIES(${SWIG_MODULE_${swig_module}_REAL_NAME} ${SWIG_MODULE_${swig_module}_REAL_NAME}_ready)
+    ELSE()
+       MESSAGE(FATAL "swig sources for targer ${swig_module} are not found !!!")
+     ENDIF()
+  ENDIF()
+ENDMACRO(SWIG_CHECK_GENERATION)
+
