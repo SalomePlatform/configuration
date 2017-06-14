@@ -1,44 +1,32 @@
-diff -crB matplotlib-1.4.3/setup.py matplotlib-1.4.3p1/setup.py
-*** matplotlib-1.4.3/setup.py	2015-02-16 04:46:36.000000000 +0100
---- matplotlib-1.4.3p1/setup.py	2015-03-24 14:24:46.000000000 +0100
-***************
-*** 91,109 ****
-      # These backends are listed in order of preference, the first
-      # being the most preferred.  The first one that looks like it will
-      # work will be selected as the default backend.
-!     setupext.BackendMacOSX(),
-      setupext.BackendQt5(),
-      setupext.BackendQt4(),
-      setupext.BackendPySide(),
-!     setupext.BackendGtk3Agg(),
-!     setupext.BackendGtk3Cairo(),
-!     setupext.BackendGtkAgg(),
-!     setupext.BackendTkAgg(),
-!     setupext.BackendWxAgg(),
-!     setupext.BackendGtk(),
-      setupext.BackendAgg(),
-!     setupext.BackendCairo(),
-!     setupext.Windowing(),
-      'Optional LaTeX dependencies',
-      setupext.DviPng(),
-      setupext.Ghostscript(),
---- 91,109 ----
-      # These backends are listed in order of preference, the first
-      # being the most preferred.  The first one that looks like it will
-      # work will be selected as the default backend.
-!     #setupext.BackendMacOSX(),
-      setupext.BackendQt5(),
-      setupext.BackendQt4(),
-      setupext.BackendPySide(),
-!     #setupext.BackendGtk3Agg(),
-!     #setupext.BackendGtk3Cairo(),
-!     #setupext.BackendGtkAgg(),
-!     #setupext.BackendTkAgg(),
-!     #setupext.BackendWxAgg(),
-!     #setupext.BackendGtk(),
-      setupext.BackendAgg(),
-!     #setupext.BackendCairo(),
-!     #setupext.Windowing(),
-      'Optional LaTeX dependencies',
-      setupext.DviPng(),
-      setupext.Ghostscript(),
+diff -NaurwB a/setup.py b/setup.py
+--- a/setup.py	2015-02-16 04:46:36.000000000 +0100
++++ b/setup.py	2017-06-14 17:28:25.170778052 +0200
+@@ -91,19 +91,19 @@
+     # These backends are listed in order of preference, the first
+     # being the most preferred.  The first one that looks like it will
+     # work will be selected as the default backend.
+-    setupext.BackendMacOSX(),
++    #setupext.BackendMacOSX(),
+     setupext.BackendQt5(),
+     setupext.BackendQt4(),
+     setupext.BackendPySide(),
+-    setupext.BackendGtk3Agg(),
+-    setupext.BackendGtk3Cairo(),
+-    setupext.BackendGtkAgg(),
+-    setupext.BackendTkAgg(),
+-    setupext.BackendWxAgg(),
+-    setupext.BackendGtk(),
++    #setupext.BackendGtk3Agg(),
++    #setupext.BackendGtk3Cairo(),
++    #setupext.BackendGtkAgg(),
++    #setupext.BackendTkAgg(),
++    #setupext.BackendWxAgg(),
++    #setupext.BackendGtk(),
+     setupext.BackendAgg(),
+-    setupext.BackendCairo(),
+-    setupext.Windowing(),
++    #setupext.BackendCairo(),
++    #setupext.Windowing(),
+     'Optional LaTeX dependencies',
+     setupext.DviPng(),
+     setupext.Ghostscript(),
