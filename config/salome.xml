@@ -134,6 +134,9 @@
   <product name="tclx" version="8.4.1" />
   <product name="tbb" version="4.2.4" />
   <product name="eigen" version="3.2.7" />
+    <patches>
+      <patch comment="Replace nullptr with 0" name="eigen.001_replace_nullptr.patch" />
+    </patches>
   <product name="planegcs" version="0.16" />
   <product comment="SALOME Geometry module" name="geom" version="V8_3_0" />
   <product comment="SALOME GUI module" name="gui" version="V8_3_0" />
