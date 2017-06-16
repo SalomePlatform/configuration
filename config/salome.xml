@@ -89,14 +89,7 @@
       <patch comment="Gcc 4.4 compatibility" name="paco++.001_gcc44_compat.patch" />
     </patches>
   </product>
-  <product name="paraview" version="5.1.2-35c5231cb6">
-    <patches>
-      <patch comment="Fix problem with installation of VTKTargets.cmake" name="paraview.001_vtk_targets.patch" />
-      <patch comment="Fix compilation of VisItBridge utility" name="paraview.002_visitbridge.patch" />
-      <patch comment="Fix hangup on generation of docs in SurfaceLIC plugin" name="paraview.003_surfacelic.patch" />
-      <patch comment="Fix problem with forwarding executables on some platforms" name="paraview.004_forwarding.patch" />
-    </patches>
-  </product>
+  <product name="paraview" version="5.4.0-9b8e8a0233" />
   <product name="pkgconfig" version="1.1.0" />
   <product name="pygments" version="2.0.2" />
   <product name="pyparsing" version="2.0.3" />
