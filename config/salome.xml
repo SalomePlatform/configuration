@@ -28,6 +28,7 @@
   <product name="gl2ps" version="1.3.9-svn-20160620">
     <patches>
       <patch comment="Fix problem with missing additional libraries" name="gl2ps.001_libs.patch" />
+      <patch comment="Fix compilation with paraview 5.4" name="gl2ps.002_for_pv.patch" />
     </patches>
   </product>
   <product name="graphviz" version="2.38.0">
