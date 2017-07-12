@@ -1,0 +1,70 @@
+What copyright notice to put on each file in SALOME sources.
+
+a) For new file being added, choose beetween of one of these files:
+- CEA_EDF.txt
+- EDF.txt
+- CEA.txt
+and put appropriate year(s) in the first line of the header.
+
+CEA/EDF modules:
+  ATOMGEN
+  ATOMIC
+  ATOMSOLV
+  BLSURFPLUGIN
+  CALCULATOR
+  COMPONENT
+  CONFIGURATION
+  DOCUMENTATION
+  GDE
+  GEOM
+  GHS3DPLUGIN
+  GHS3DPRLPLUGIN
+  GUI
+  HELLO
+  HEXABLOCK
+  HEXABLOCKPLUGIN
+  HOMARD
+  HYBRIDPLUGIN
+  HexoticPLUGIN
+  JOBMANAGER
+  KERNEL
+  LIBBATCH
+  MEDCOUPLING
+  MED
+  NETGENPLUGIN
+  PARAVIS
+  PYCALCULATOR
+  PYHELLO
+  SAMPLES
+  SHAPER
+  SMESH
+  TUTORIAL
+  XDATA
+  YACS
+
+EDF modules:
+  ADAO
+  EFICAS
+  GENERICSOLVER
+  GMSHPLUGIN
+  HYDRO
+  PARAMETRIC
+  YACSGEN
+
+CEA modules:
+  URANIE
+
+OPEN CASCADE modules:
+  ACISPLUGIN
+  CANRECPLUGIN
+  DXFPLUGIN
+  LIGHT
+  PYLIGHT
+  RANDOMIZER
+  SIERPINSKY
+  XTPLUGIN
+
+b) For existing file:
+
+- Normally, there is already a copyright notice in the file's header, so developers have nothing to do.
+- Copyrights are regularly updated (once a year) to change the date of the licence within dedicated procedure.
