@@ -17,6 +17,8 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
+INCLUDE(CheckCXXCompilerFlag)
+
 ## Detect architecture
 IF(WIN32)
   SET(MACHINE WINDOWS)
@@ -106,9 +108,14 @@ IF(NOT WIN32)
   ENDIF()
 ENDIF()
 
+# Compiler flag to disable treating alternative C++ tokens (compatibility with MSVS)
+CHECK_CXX_COMPILER_FLAG("-fno-operator-names" COMPILER_SUPPORTS_NO_OPERATOR_NAMES)
+IF(COMPILER_SUPPORTS_NO_OPERATOR_NAMES)
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-operator-names")
+ENDIF()
+
 IF(NOT NO_CXX11_SUPPORT)
   # C++11 support
-  INCLUDE(CheckCXXCompilerFlag)
   CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
   CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
   IF(COMPILER_SUPPORTS_CXX11)
