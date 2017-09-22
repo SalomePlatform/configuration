@@ -240,14 +240,31 @@ def autodetect_format(filename):
         'shell': ('sh', 'bash', 'csh', 'cmake', 'txt', 'cfg', 'ini', 'm4'),
         'python': ('py',),
         }
+    rev_extensions = {e: k for k, exts in extensions.items() for e in exts}
     if filename and os.path.isfile(filename):
         extension = os.path.splitext(filename)[1][1:].lower()
         if extension in ('in',):
             name = os.path.splitext(filename)[0]
             extension = os.path.splitext(name)[1][1:].lower()
-        for file_format in extensions:
-            if extension in extensions[file_format]:
-                return format
+        if extension in rev_extensions:
+            return rev_extensions[extension]
+
+    try:
+        import magic
+        m = magic.open(magic.MAGIC_MIME_TYPE)
+        m.load()
+        file_formats = {
+            'cpp': ('text/x-c', 'text/x-c++'),
+            'shell': ('text/x-shellscript',),
+            'python': ('text/x-python',),
+            }
+        rev_file_formats = {f: k for k, ff in file_formats.items() for f in ff}
+        file_format = m.file(filename)
+        if file_format in rev_file_formats:
+            return rev_file_formats[file_format]
+    except ImportError:
+        pass
+
     return None
 
 
