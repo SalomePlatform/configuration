@@ -333,7 +333,7 @@ def main():
                         dest="format", default=file_format,
                         help=help_string.format(file_format=file_format,
                                                 choices="|".join(formats())))
-    parser.add_argument('files', nargs='*')
+    parser.add_argument('files', nargs='+', metavar='FILE')
 
     args = parser.parse_args(sys.argv[1:])
 
@@ -341,9 +341,6 @@ def main():
     year = args.year
     file_format = args.format
     files = args.files
-
-    if not files:
-        error_exit('file is not specified')
 
     for filename in files:
         insert_copyright(filename, owner, year, file_format)
