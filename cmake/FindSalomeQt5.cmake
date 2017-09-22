@@ -32,6 +32,7 @@ SET(QT_DEFINITIONS)
 SET(QT_LIBRARIES)
 # Find Qt5Core to get Qt version
 SET(Qt5_FIND_COMPONENTS QtCore)
+SET(Qt5_OPTIONAL_COMPONENTS)
 SALOME_FIND_PACKAGE_AND_DETECT_CONFLICTS(Qt5Core Qt5Core_INCLUDE_DIRS 1 ENVVAR QT5_ROOT_DIR)
 IF(Qt5Core_FOUND)
   LIST(APPEND QT_INCLUDES    ${Qt5Core_INCLUDE_DIRS})
@@ -40,15 +41,21 @@ IF(Qt5Core_FOUND)
   SET(QT_VERSION "${Qt5Core_VERSION}")
 ENDIF()
 
-SET(Qt5_FIND_COMPONENTS Gui Widgets Network Xml OpenGL PrintSupport Help Test Sql Sensors Positioning Quick Qml Multimedia MultimediaWidgets WebChannel UiTools)
+# Add mandatory Qt 5 components below
+SET(Qt5_FIND_COMPONENTS Gui Widgets Network Xml OpenGL PrintSupport Help Test)
+# Add optional Qt 5 components below
+SET(Qt5_OPTIONAL_COMPONENTS)
 
 IF ("${QT_VERSION}" VERSION_LESS "5.6.0")
+  # QtWebKit package is used with Qt < 5.6
   LIST(APPEND Qt5_FIND_COMPONENTS WebKit WebKitWidgets)
 ELSE()
+  # QtWebEngine package is (optionally) used with Qt >= 5.6
   LIST(APPEND Qt5_OPTIONAL_COMPONENTS WebEngine WebEngineWidgets)
 ENDIF()
 
 IF(NOT WIN32)
+  ## QtX11Extras package is used on Linux only
   LIST(APPEND Qt5_FIND_COMPONENTS X11Extras)
 ENDIF()
 
