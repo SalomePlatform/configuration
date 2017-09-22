@@ -205,8 +205,14 @@ def autodetect_owner(filename):
         while directory != '/':
             config_file = os.path.join(directory, '.git', 'config')
             if os.path.exists(config_file):
-                from ConfigParser import ConfigParser
-                from StringIO import StringIO
+                try:
+                    from ConfigParser import ConfigParser
+                except ImportError:
+                    from configparser import ConfigParser
+                try:
+                    from StringIO import StringIO
+                except ImportError:
+                    from io import StringIO
                 with open(config_file) as fid:
                     gitcfg = fid.readlines()
                     cfg = ConfigParser()
