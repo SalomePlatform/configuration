@@ -93,7 +93,7 @@ ENDMACRO(PARSE_ARGUMENTS)
 #----------------------------------------------------------------------------
 # SALOME_INSTALL_SCRIPTS is a macro useful for installing scripts.
 #
-# USAGE: SALOME_INSTALL_SCRIPTS(file_list path [WORKING_DIRECTORY dir] [DEF_PERMS])
+# USAGE: SALOME_INSTALL_SCRIPTS(file_list path [WORKING_DIRECTORY dir] [DEF_PERMS] [TARGET_NAME name])
 #
 # ARGUMENTS:
 # file_list: IN : list of files to be installed. This list should be quoted.
@@ -101,10 +101,14 @@ ENDMACRO(PARSE_ARGUMENTS)
 # 
 # By default files to be installed as executable scripts.
 # If DEF_PERMS option is provided, than permissions for installed files are
-# only OWNER_WRITE, OWNER_READ, GROUP_READ, and WORLD_READ. 
+# only OWNER_WRITE, OWNER_READ, GROUP_READ, and WORLD_READ.
+# WORKING_DIRECTORY option may be used to specify the relative or absolute
+# path to the directory containing source files listed in file_list argument.
+# If TARGET_NAME option is specified, the name of the target being created
+# with this macro is returned via the given variable.
 #----------------------------------------------------------------------------
 MACRO(SALOME_INSTALL_SCRIPTS file_list path)
-  PARSE_ARGUMENTS(SALOME_INSTALL_SCRIPTS "WORKING_DIRECTORY" "DEF_PERMS" ${ARGN})
+  PARSE_ARGUMENTS(SALOME_INSTALL_SCRIPTS "WORKING_DIRECTORY;TARGET_NAME" "DEF_PERMS" ${ARGN})
   SET(PERMS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
   IF(NOT SALOME_INSTALL_SCRIPTS_DEF_PERMS)
     SET(PERMS ${PERMS} OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE)
@@ -168,7 +172,11 @@ MACRO(SALOME_INSTALL_SCRIPTS file_list path)
      WHILE(TARGET "PYCOMPILE${unique_name}_${_cnt}")
        MATH(EXPR _cnt ${_cnt}+1)
      ENDWHILE()
-     ADD_CUSTOM_TARGET("PYCOMPILE${unique_name}_${_cnt}" ALL DEPENDS ${_all_pyc} ${_all_pyo})
+     SET(_target_name "PYCOMPILE${unique_name}_${_cnt}")
+     ADD_CUSTOM_TARGET(${_target_name} ALL DEPENDS ${_all_pyc} ${_all_pyo})
+     IF(SALOME_INSTALL_SCRIPTS_TARGET_NAME)
+       SET(${SALOME_INSTALL_SCRIPTS_TARGET_NAME} ${_target_name})
+     ENDIF(SALOME_INSTALL_SCRIPTS_TARGET_NAME)
   ENDIF()
 ENDMACRO(SALOME_INSTALL_SCRIPTS)
 
