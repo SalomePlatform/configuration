@@ -42,17 +42,9 @@ IF(Qt5Core_FOUND)
 ENDIF()
 
 # Add mandatory Qt 5 components below
-SET(Qt5_FIND_COMPONENTS Gui Widgets Network Xml OpenGL PrintSupport Help Test)
+SET(Qt5_FIND_COMPONENTS Gui Widgets Network Xml OpenGL PrintSupport Help Test WebKit WebKitWidgets)
 # Add optional Qt 5 components below
 SET(Qt5_OPTIONAL_COMPONENTS)
-
-IF ("${QT_VERSION}" VERSION_LESS "5.6.0")
-  # QtWebKit package is used with Qt < 5.6
-  LIST(APPEND Qt5_FIND_COMPONENTS WebKit WebKitWidgets)
-ELSE()
-  # QtWebEngine package is (optionally) used with Qt >= 5.6
-  LIST(APPEND Qt5_OPTIONAL_COMPONENTS WebEngine WebEngineWidgets)
-ENDIF()
 
 IF(NOT WIN32)
   ## QtX11Extras package is used on Linux only
