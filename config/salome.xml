@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE config>
-<config comment="SALOME 8.3" name="V8_3_0">
+<config comment="SALOME 8.4" name="V8_4_0">
   <product name="alabaster" version="0.7.6" />
   <product name="babel" version="2.0" />
   <product name="boost" version="1.52.0">
@@ -9,8 +9,9 @@
       <patch comment="Fix problem with compiling formatter.cpp on some platforms" name="boost.002_icu_formatter.patch" />
     </patches>
   </product>
-  <product name="cgnslib" version="3.1.3" />
-  <product name="cmake" version="3.3.0" />
+  <product name="cgnslib" version="3.3.1" />
+  <product name="cmake" version="3.6.2" />
+  <product name="cppunit" version="1.12.1" />
   <product name="cython" version="0.23.2" />
   <product name="dateutils" version="2.4.2" />
   <product name="distribute" version="0.7.3" />
@@ -25,6 +26,7 @@
     </patches>
   </product>
   <product name="freetype" version="2.4.11" />
+  <product name="gmsh" version="3.0.5" />
   <product name="gl2ps" version="1.3.9-svn-20160620">
     <patches>
       <patch comment="Fix problem with missing additional libraries" name="gl2ps.001_libs.patch" />
@@ -37,7 +39,7 @@
     </patches>
   </product>
   <product name="hdf5" version="1.8.14" />
-  <product name="homardtool" version="11.8" />
+  <product name="homardtool" version="11.10" />
   <product name="h5py" version="2.5.0" />
   <product name="jinja2" version="2.7.3" />
   <product name="lapack" version="3.5.0" />
@@ -52,13 +54,13 @@
       <patch comment="Fix build procedure: create configuration file properly" name="matplotlib.001_build_procedure.patch" />
     </patches>
   </product>
-  <product name="medfile" version="3.2.1">
+  <product name="medfile" version="3.3.1">
     <patches>
       <patch comment="Fix problem when builiding parallel support" name="medfile.001_parallel.patch" />
       <patch comment="Compatibility with gcc6" name="medfile.002_gcc6.patch" />
     </patches>
   </product>
-  <product name="meshgems" version="2.4-5" />
+  <product name="meshgems" version="2.5-7" />
   <product name="metis" version="5.1.0" />
   <product name="mpich2" version="1.4.1p1" />
   <product name="mpi4py" version="1.3.1" />
@@ -69,8 +71,8 @@
   </product>
   <product name="nose" version="1.3.7" />
   <product name="numpy" version="1.9.2" />
-  <product name="occt" version="1780d6cc299f1d06eb106f5cfc27731cdaf97a56" />
-  <product name="omninotify" version="4.1.6">
+  <product name="occt" version="88af3920" />
+  <product name="omniorb" version="4.1.6">
     <patches>
       <patch comment="Fix compilation issues" name="omninotify.001_compilation.patch" />
       <patch comment="Fix for 64 bits platforms" name="omninotify.002_64bits.patch" />
@@ -89,14 +91,21 @@
       <patch comment="Gcc 4.4 compatibility" name="paco++.001_gcc44_compat.patch" />
     </patches>
   </product>
-  <product name="paraview" version="5.4.0-9b8e8a0233" />
+  <product name="paraview" version="5.4.0-463c0633">
+    <patches>
+      <patch comment="Fix problem with installation of VTKTargets.cmake" name="paraview.001_vtk_targets.patch" />
+      <patch comment="Fix compilation of VisItBridge utility" name="paraview.002_visitbridge.patch" />
+      <patch comment="Fix hangup on generation of docs in SurfaceLIC plugin" name="paraview.003_surfacelic.patch" />
+      <patch comment="Fix problem with forwarding executables on some platforms" name="paraview.004_forwarding.patch" />
+    </patches>
+  </product>
   <product name="pkgconfig" version="1.1.0" />
   <product name="pygments" version="2.0.2" />
   <product name="pyparsing" version="2.0.3" />
-  <product name="pyqt" version="5.6.0" />
+  <product name="pyqt" version="5.9.0" />
   <product name="python" version="2.7.10" />
   <product name="pytz" version="2015.4" />
-  <product name="qt" version="5.6.1">
+  <product name="qt" version="5.9.1">
     <patches>
       <patch comment="Fix problem with proxy factory (WebKit)." name="qt.001_proxy_factory.patch" />
       <patch comment="Fix problem with compiling webview" name="qt.002_webview_include.patch" />
@@ -112,8 +121,8 @@
       <patch comment="Fix problem with linking to pthreads" name="scotch.001_pthreads.patch" />
     </patches>
   </product>
-  <product name="setuptools" version="18.3.2" />
-  <product name="sip" version="4.18" />
+  <product name="setuptools" version="0.6c11" />
+  <product name="sip" version="4.19.3" />
   <product name="six" version="1.9.0" />
   <product name="snowballstemmer" version="1.2.0" />
   <product name="solvespace" version="2.1">
@@ -133,41 +142,42 @@
     </patches>
   </product>
   <product name="planegcs" version="0.16" />
-  <product comment="SALOME Geometry module" name="geom" version="V8_3_0" />
-  <product comment="SALOME GUI module" name="gui" version="V8_3_0" />
-  <product comment="SALOME HexaBlock module" name="hexablock" version="V8_3_0" />
-  <product comment="SALOME Homard module" name="homard" version="V8_3_0" />
-  <product comment="SALOME JobManager module" name="jobmanager" version="V8_3_0" />
-  <product comment="SALOME Kernel module" name="kernel" version="V8_3_0" />
-  <product comment="SALOME Med module" name="med" version="V8_3_0" />
-  <product comment="SALOME ParaVis module" name="paravis" version="V8_3_0" />
-  <product comment="SALOME Mesh module" name="smesh" version="V8_3_0" />
-  <product comment="SALOME YACS module" name="yacs" version="V8_3_0" />
-  <product comment="SALOME MG-CadSurf meshing plugin" name="blsurfplugin" version="V8_3_0" />
-  <product comment="SALOME MG-Tetra meshing plugin" name="ghs3dplugin" version="V8_3_0" />
-  <product comment="SALOME MG-Tetra_HPC meshing plugin" name="ghs3dprlplugin" version="V8_3_0" />
-  <product comment="SALOME MG-Hexa meshing plugin" name="hexoticplugin" version="V8_3_0" />
-  <product comment="SALOME HexaBlock meshing plugin" name="hexablockplugin" version="V8_3_0" />
-  <product comment="SALOME MG-Hybrid meshing plugin" name="hybridplugin" version="V8_3_0" />
-  <product comment="SALOME Netgen meshing plugin" name="netgenplugin" version="V8_3_0" />
-  <product comment="SALOME Documentation tool" name="documentation" version="V8_3_0" />
-  <product comment="SALOME Hxx2salome tool" name="hxx2salome" version="V8_3_0" />
-  <product comment="libBatch library" name="libbatch" version="V8_3_0" />
-  <product comment="SALOME MedCoupling library" name="medcoupling" version="V8_3_0" />
-  <product comment="SALOME Tutorial" name="tutorial" version="V8_3_0" />
-  <product comment="SALOME YacsGen tool" name="yacsgen" version="V8_3_0" />
-  <product comment="SALOME AtomGen sample module" name="atomgen" version="V8_3_0" />
-  <product comment="SALOME Atomic sample module" name="atomic" version="V8_3_0" />
-  <product comment="SALOME AtomSolv sample module" name="atomsolv" version="V8_3_0" />
-  <product comment="SALOME Calculator sample module" name="calculator" version="V8_3_0" />
-  <product comment="SALOME Component sample module" name="component" version="V8_3_0" />
-  <product comment="SALOME data files" name="samples" version="V8_3_0" />
-  <product comment="SALOME DscCode sample module" name="dsccode" version="V8_3_0" />
-  <product comment="SALOME Hello sample module" name="hello" version="V8_3_0" />
-  <product comment="SALOME Light sample module" name="light" version="V8_3_0" />
-  <product comment="SALOME PyCalculator sample module" name="pycalculator" version="V8_3_0" />
-  <product comment="SALOME PyHello sample module" name="pyhello" version="V8_3_0" />
-  <product comment="SALOME PyLight sample module" name="pylight" version="V8_3_0" />
-  <product comment="SALOME Randomizer sample module" name="randomizer" version="V8_3_0" />
-  <product comment="SALOME Sierpinsky sample module" name="sierpinsky" version="V8_3_0" />
+  <product comment="SALOME Geometry module" name="geom" version="V8_4_0" />
+  <product comment="SALOME GUI module" name="gui" version="V8_4_0" />
+  <product comment="SALOME HexaBlock module" name="hexablock" version="V8_4_0" />
+  <product comment="SALOME Homard module" name="homard" version="V8_4_0" />
+  <product comment="SALOME JobManager module" name="jobmanager" version="V8_4_0" />
+  <product comment="SALOME Kernel module" name="kernel" version="V8_4_0" />
+  <product comment="SALOME Med module" name="med" version="V8_4_0" />
+  <product comment="SALOME ParaVis module" name="paravis" version="V8_4_0" />
+  <product comment="SALOME Mesh module" name="smesh" version="V8_4_0" />
+  <product comment="SALOME YACS module" name="yacs" version="V8_4_0" />
+  <product comment="SALOME MG-CadSurf meshing plugin" name="blsurfplugin" version="V8_4_0" />
+  <product comment="SALOME MG-Tetra meshing plugin" name="ghs3dplugin" version="V8_4_0" />
+  <product comment="SALOME MG-Tetra_HPC meshing plugin" name="ghs3dprlplugin" version="V8_4_0" />
+  <product comment="SALOME MG-Hexa meshing plugin" name="hexoticplugin" version="V8_4_0" />
+  <product comment="SALOME HexaBlock meshing plugin" name="hexablockplugin" version="V8_4_0" />
+  <product comment="SALOME MG-Hybrid meshing plugin" name="hybridplugin" version="V8_4_0" />
+  <product comment="SALOME Netgen meshing plugin" name="netgenplugin" version="V8_4_0" />
+  <product comment="SALOME Gmsh meshing plugin" name="gmshplugin" version="V8_4_0" />
+  <product comment="SALOME Documentation tool" name="documentation" version="V8_4_0" />
+  <product comment="SALOME Hxx2salome tool" name="hxx2salome" version="V8_4_0" />
+  <product comment="libBatch library" name="libbatch" version="V2_3_2" />
+  <product comment="SALOME MedCoupling library" name="medcoupling" version="V8_4_0" />
+  <product comment="SALOME Tutorial" name="tutorial" version="V8_4_0" />
+  <product comment="SALOME YacsGen tool" name="yacsgen" version="V8_4_0" />
+  <product comment="SALOME AtomGen sample module" name="atomgen" version="V8_4_0" />
+  <product comment="SALOME Atomic sample module" name="atomic" version="V8_4_0" />
+  <product comment="SALOME AtomSolv sample module" name="atomsolv" version="V8_4_0" />
+  <product comment="SALOME Calculator sample module" name="calculator" version="V8_4_0" />
+  <product comment="SALOME Component sample module" name="component" version="V8_4_0" />
+  <product comment="SALOME data files" name="samples" version="V8_4_0" />
+  <product comment="SALOME DscCode sample module" name="dsccode" version="V8_4_0" />
+  <product comment="SALOME Hello sample module" name="hello" version="V8_4_0" />
+  <product comment="SALOME Light sample module" name="light" version="V8_4_0" />
+  <product comment="SALOME PyCalculator sample module" name="pycalculator" version="V8_4_0" />
+  <product comment="SALOME PyHello sample module" name="pyhello" version="V8_4_0" />
+  <product comment="SALOME PyLight sample module" name="pylight" version="V8_4_0" />
+  <product comment="SALOME Randomizer sample module" name="randomizer" version="V8_4_0" />
+  <product comment="SALOME Sierpinsky sample module" name="sierpinsky" version="V8_4_0" />
 </config>

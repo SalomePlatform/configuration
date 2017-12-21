@@ -66,37 +66,27 @@ ENDFUNCTION()
 # 
 ####################################################################
 MACRO(PYQT_WRAP_UIC outfiles)
-  SET(_output)
-  SET(_options)
-  SET(_pyuic_files)
-  SET(_get_options "0")
-  FOREACH(_input ${ARGN})
-    IF(${_input} STREQUAL "OPTIONS")
-      SET(_get_options "1")
-    ELSE()
-      IF(${_get_options} STREQUAL "1")
-        SET(_options ${_options} ${_input})
-      ELSE()
-        SET(_pyuic_files ${_pyuic_files} ${_input})
-      ENDIF()
-  ENDIF()
-  ENDFOREACH()
+ SET(_output)
+
+ PARSE_ARGUMENTS(PYQT_WRAP_UIC "TARGET_NAME;OPTIONS" "" ${ARGN})
 
  IF(NOT WIN32)
-
-  FOREACH(_input ${_pyuic_files})
+  FOREACH(_input ${PYQT_WRAP_UIC_DEFAULT_ARGS})
     GET_FILENAME_COMPONENT(_input_name ${_input} NAME)
     STRING(REPLACE ".ui" "_ui.py" _input_name ${_input_name})
     SET(_output ${CMAKE_CURRENT_BINARY_DIR}/${_input_name})
     ADD_CUSTOM_COMMAND(
       OUTPUT ${_output}
-      COMMAND ${PYQT_PYUIC_PATH} ${_options} -o ${_output} ${CMAKE_CURRENT_SOURCE_DIR}/${_input}
+      COMMAND ${PYQT_PYUIC_PATH} ${PYQT_WRAP_UIC_OPTIONS} -o ${_output} ${CMAKE_CURRENT_SOURCE_DIR}/${_input}
       MAIN_DEPENDENCY ${_input}
       )
     SET(${outfiles} ${${outfiles}} ${_output})
   ENDFOREACH()
   _PYQT_WRAP_GET_UNIQUE_TARGET_NAME(BUILD_UI_PY_FILES _uniqueTargetName)
   ADD_CUSTOM_TARGET(${_uniqueTargetName} ALL DEPENDS ${${outfiles}})
+  IF(PYQT_WRAP_UIC_TARGET_NAME)
+    SET(${PYQT_WRAP_UIC_TARGET_NAME} ${_uniqueTargetName})
+  ENDIF(PYQT_WRAP_UIC_TARGET_NAME)
 
  ELSE(NOT WIN32)
 
@@ -111,8 +101,11 @@ MACRO(PYQT_WRAP_UIC outfiles)
   SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
   _PYQT_WRAP_GET_UNIQUE_TARGET_NAME(BUILD_UI_PY_FILES _uniqueTargetName)
   ADD_CUSTOM_TARGET(${_uniqueTargetName} ALL)
+  IF(PYQT_WRAP_UIC_TARGET_NAME)
+    SET(${PYQT_WRAP_UIC_TARGET_NAME} ${_uniqueTargetName})
+  ENDIF(PYQT_WRAP_UIC_TARGET_NAME)
   SET_TARGET_PROPERTIES(${_uniqueTargetName} PROPERTIES FOLDER PYQT_WRAP_UIC_TARGETS)
-  FOREACH(_input ${ARGN})
+  FOREACH(_input ${PYQT_WRAP_UIC_DEFAULT_ARGS})
     GET_FILENAME_COMPONENT(_input_name ${_input} NAME)
     STRING(REPLACE ".ui" "_ui.py" _input_name ${_input_name})
     SET(_output ${CMAKE_CURRENT_BINARY_DIR}/${_input_name})
