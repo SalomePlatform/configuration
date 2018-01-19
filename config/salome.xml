@@ -5,8 +5,8 @@
   <product name="babel" version="2.0" />
   <product name="boost" version="1.52.0">
     <patches>
-      <patch comment="Fix problem with compiling fcontext.cpp on some platforms" name="boost.001_fcontext.patch" />
-      <patch comment="Fix problem with compiling formatter.cpp on some platforms" name="boost.002_icu_formatter.patch" />
+      <patch comment="Fix problem with compiling fcontext.cpp on some platforms" name="boost.001_fcontext.patch" sha1="d4c2de261f478d5892a4a38b38f5f2e62d5ca5b2" />
+      <patch comment="Fix problem with compiling formatter.cpp on some platforms" name="boost.002_icu_formatter.patch" sha1="08ae37016e1a588dda72381210621b007c8c8721" />
     </patches>
   </product>
   <product name="cgnslib" version="3.3.1" />
@@ -19,23 +19,22 @@
   <product name="doxygen" version="1.8.3.1" />
   <product name="freeimage" version="3.16.0">
     <patches>
-      <patch comment="Fix compilation problems" name="freeimage.001_sources.patch" />
-      <patch comment="Fix build procedure" name="freeimage.002_build_procedure.patch" />
-      <patch comment="Gcc 4.7 compatibility" name="freeimage.003_gcc47_compat.patch" />
-      <patch comment="Gcc 6 compatibility" name="freeimage.004_gcc66.patch" />
+      <patch comment="Fix compilation problems" name="freeimage.001_sources.patch" sha1="d6272a9ac10f9bbbbe6e395185dda2abc11b1d1e" />
+      <patch comment="Fix build procedure" name="freeimage.002_build_procedure.patch" sha1="afc5a81fe423bc229a05bb11c41f81cf29b56d23" />
+      <patch comment="Gcc 4.7 compatibility" name="freeimage.003_gcc47_compat.patch" sha1="cce05f6c38ab6b8e16a1a5765278848fc09b0955" />
+      <patch comment="Gcc 6 compatibility" name="freeimage.004_gcc66.patch" sha1="16a744c44edd656313518a2c4395faf3c2231b29" />
     </patches>
   </product>
   <product name="freetype" version="2.4.11" />
   <product name="gmsh" version="3.0.5" />
   <product name="gl2ps" version="1.3.9-svn-20160620">
     <patches>
-      <patch comment="Fix problem with missing additional libraries" name="gl2ps.001_libs.patch" />
-      <patch comment="Fix compilation with paraview 5.4" name="gl2ps.002_for_pv.patch" />
+      <patch comment="Fix problem with missing additional libraries" name="gl2ps.001_libs.patch" sha1="59fb1261603d11392ce26a9c98561fa2777d826c" />
     </patches>
   </product>
   <product name="graphviz" version="2.38.0">
     <patches>
-      <patch comment="Fix build procedure" name="graphviz.001_build_procedure.patch" />
+      <patch comment="Fix build procedure" name="graphviz.001_build_procedure.patch" sha1="4b227e20ad416e8f08911fa907b66deb1d359102" />
     </patches>
   </product>
   <product name="hdf5" version="1.8.14" />
@@ -45,19 +44,19 @@
   <product name="lapack" version="3.5.0" />
   <product name="libxml2" version="2.9.0">
     <patches>
-      <patch comment="Fix crash on 64bits platforms" name="libxml2.001_64bits_crash.patch" />
+      <patch comment="Fix crash on 64bits platforms" name="libxml2.001_64bits_crash.patch" sha1="0fd898b7998ada0ffe6cd6806c0a76564c275386" />
     </patches>
   </product>
   <product name="markupsafe" version="0.23" />
   <product name="matplotlib" version="1.4.3">
     <patches>
-      <patch comment="Fix build procedure: create configuration file properly" name="matplotlib.001_build_procedure.patch" />
+      <patch comment="Fix build procedure: create configuration file properly" name="matplotlib.001_build_procedure.patch" sha1="38611bfd4148bfb80740c6126a52560b7fecd8cf" />
     </patches>
   </product>
   <product name="medfile" version="3.3.1">
     <patches>
-      <patch comment="Fix problem when builiding parallel support" name="medfile.001_parallel.patch" />
-      <patch comment="Compatibility with gcc6" name="medfile.002_gcc6.patch" />
+      <patch comment="Fix problem when builiding parallel support" name="medfile.001_parallel.patch" sha1="27e059085ca84be03edeef942de2f5d2e68fab76" />
+      <patch comment="Compatibility with gcc6" name="medfile.002_gcc6.patch" sha1="f625c9ee091ece9e5b7c2aa0c443ed8dfc64e982" />
     </patches>
   </product>
   <product name="meshgems" version="2.5-7" />
@@ -66,7 +65,7 @@
   <product name="mpi4py" version="1.3.1" />
   <product name="netgen" version="5.3.1">
     <patches>
-      <patch comment="General patch needed for SALOME platform" name="netgen.001_sources.patch" />
+      <patch comment="General patch needed for SALOME platform" name="netgen.001_sources.patch" sha1="bf57cf2c33d62ee9122c219e5db21ce133286f07" />
     </patches>
   </product>
   <product name="nose" version="1.3.7" />
@@ -74,29 +73,29 @@
   <product name="occt" version="88af3920" />
   <product name="omniorb" version="4.1.6">
     <patches>
-      <patch comment="Fix compilation issues" name="omninotify.001_compilation.patch" />
-      <patch comment="Fix for 64 bits platforms" name="omninotify.002_64bits.patch" />
+      <patch comment="Fix compilation issues" name="omniorb.001_omninotify_compilation.patch" sha1="2ea6f693df5dc9a69cf315b04e9c77f57712a88e" />
+      <patch comment="Fix for 64 bits platforms" name="omniorb.002_omninotify_64bits.patch" sha1="0a7fccb439a368bb0e3a4701df1084e748fd5ece" />
     </patches>
   </product>
   <product name="omniorbpy" version="3.6" />
   <product name="opencv" version="2.4.6.1">
     <patches>
-      <patch comment="Fix compilation problem (reduce optimizaion level)" name="opencv.001_compile.patch" />
-      <patch comment="Gcc 6 compatibility patch" name="opencv.002_gcc6.patch" />
+      <patch comment="Fix compilation problem (reduce optimizaion level)" name="opencv.001_compile.patch" sha1="1daad6f39cd53502c5062a366fa5a543489cd632"/>
+      <patch comment="Gcc 6 compatibility patch" name="opencv.002_gcc6.patch" sha1="64f8954aadd739037dadac69f7f4ca3a2cf7edd5"/>
     </patches>
   </product>
   <product name="openmpi" version="1.8.5" />
   <product name="paco++" version="0.5.5">
     <patches>
-      <patch comment="Gcc 4.4 compatibility" name="paco++.001_gcc44_compat.patch" />
+      <patch comment="Gcc 4.4 compatibility" name="paco++.001_gcc44_compat.patch" sha1="b1d28cbe87caa37177432aadaa612e792eecf1ea" />
     </patches>
   </product>
   <product name="paraview" version="5.4.0-463c0633">
     <patches>
-      <patch comment="Fix problem with installation of VTKTargets.cmake" name="paraview.001_vtk_targets.patch" />
-      <patch comment="Fix compilation of VisItBridge utility" name="paraview.002_visitbridge.patch" />
-      <patch comment="Fix hangup on generation of docs in SurfaceLIC plugin" name="paraview.003_surfacelic.patch" />
-      <patch comment="Fix problem with forwarding executables on some platforms" name="paraview.004_forwarding.patch" />
+      <patch comment="Fix problem with installation of VTKTargets.cmake" name="paraview.001_vtk_targets.patch" sha1="6e2024fc8503ef05d0ce493bc4804ff844e6a51a" />
+      <patch comment="Fix compilation of VisItBridge utility" name="paraview.002_visitbridge.patch" sha1="34d2f6f064775c288e5aaba9ad72893c6de6fd72" />
+      <patch comment="Fix hangup on generation of docs in SurfaceLIC plugin" name="paraview.003_surfacelic.patch" sha1="eeca272ec7a01f4dbdec9d0af441a35209aa174b" />
+      <patch comment="Fix problem with forwarding executables on some platforms" name="paraview.004_forwarding.patch" sha1="7856257c15ae5375ac5a88d94868e106379169fa" />
     </patches>
   </product>
   <product name="pkgconfig" version="1.1.0" />
@@ -107,18 +106,18 @@
   <product name="pytz" version="2015.4" />
   <product name="qt" version="5.9.1">
     <patches>
-      <patch comment="Fix problem with proxy factory (WebKit)." name="qt.001_proxy_factory.patch" />
-      <patch comment="Fix problem with compiling webview" name="qt.002_webview_include.patch" />
-      <patch comment="Fix problem with compiling QWebEngine with gcc 4.7" name="qt.003_webengine.patch" />
-      <patch comment="Fix compilation of blender scene (Qt 3D)" name="qt.004_blender_scene.patch" />
-      <patch comment="Fix compilation problem with null pointer (nullptr)" name="qt.005_null_ptr.patch" />
+      <patch comment="Fix problem with proxy factory (WebKit)." name="qt.001_proxy_factory.patch" sha1="7bf00a49425d1e7158e4d98f0dcba625b8462b1a" />
+      <patch comment="Fix problem with compiling webview" name="qt.002_webview_include.patch" sha1="6d4417d08fe32019fa52dd00a48ab1302f4fde94" />
+      <patch comment="Fix problem with compiling QWebEngine with gcc 4.7" name="qt.003_webengine.patch" sha1="1ae91894aee127470b05a9680a8399dd54ed7bf0" />
+      <patch comment="Fix compilation of blender scene (Qt 3D)" name="qt.004_blender_scene.patch" sha1="d36dacb1fbd2438dff5588e2e905a39cec66bf84" />
+      <patch comment="Fix compilation problem with null pointer (nullptr)" name="qt.005_null_ptr.patch" sha1="3112e302b56f1baa3963a5f92fd6eeffd6fe79ce" />
     </patches>
   </product>
   <product name="qwt" version="6.1.2" />
   <product name="scipy" version="0.15.1" />
   <product name="scotch" version="5.1.11">
     <patches>
-      <patch comment="Fix problem with linking to pthreads" name="scotch.001_pthreads.patch" />
+      <patch comment="Fix problem with linking to pthreads" name="scotch.001_pthreads.patch" sha1="10b8e8c0fa1da10f3fb6e266cf3dbddad1755512" />
     </patches>
   </product>
   <product name="setuptools" version="0.6c11" />
@@ -127,7 +126,7 @@
   <product name="snowballstemmer" version="1.2.0" />
   <product name="solvespace" version="2.1">
     <patches>
-      <patch comment="To build w/o GUI" name="solvespace.001_nogui.patch" />
+      <patch comment="To build w/o GUI" name="solvespace.001_nogui.patch" sha1="5f29477e1c27daf0a87879d3a841d0485c053a46" />
     </patches>
   </product>
   <product name="sphinx" version="1.2.3" />
