@@ -2,8 +2,16 @@
 #
 # Output variables:
 #   SPHINX_EXECUTABLE - path to the Sphinx executable
-#   SPHINX_PYTHONPATH - path to the Sphinx Python modules                 
-# 
+#   SPHINX_PYTHONPATH - path to the Sphinx Python modules
+#
+# Additional features:
+#   Sphinx_EXTENSIONS - optional variable which can be used to specify
+#                       a list of required Sphinx extensions; not found
+#                       extensions will be reported during the detection
+#                       procedure; by default this variable is empty.
+#                       Example:
+#                           set(Sphinx_EXTENSIONS sphinxcontrib.napoleon)
+#
 ###########################################################################
 # Copyright (C) 2007-2016  CEA/DEN, EDF R&D, OPEN CASCADE
 #
@@ -61,3 +69,12 @@ IF(SPHINX_EXECUTABLE)
     SET(SPHINX_THEME "classic")
   ENDIF()
 ENDIF(SPHINX_EXECUTABLE)
+
+FOREACH(_ext ${Sphinx_EXTENSIONS})
+  EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c "import ${_ext}; print 'ok'" OUTPUT_VARIABLE _has_ext ERROR_QUIET)
+  IF(_has_ext)
+    MESSAGE(STATUS "Required Sphinx extension '${_ext}' has been found!")
+  ELSE()
+    MESSAGE(WARNING "Required Sphinx extension '${_ext}' is not found!")
+  ENDIF()
+ENDFOREACH()
