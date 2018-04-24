@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE config>
-<config comment="SALOME 8.4" name="V8_4_0">
+<config comment="SALOME 8.5" name="V8_5_0">
   <product name="alabaster" version="0.7.6" />
   <product name="babel" version="2.0" />
   <product name="boost" version="1.52.0">
@@ -134,42 +134,42 @@
   <product name="tbb" version="4.2.4" />
   <product name="eigen" version="3.2.7" />
   <product name="planegcs" version="0.16" />
-  <product comment="SALOME Geometry module" name="geom" version="V8_4_0" />
-  <product comment="SALOME GUI module" name="gui" version="V8_4_0" />
-  <product comment="SALOME HexaBlock module" name="hexablock" version="V8_4_0" />
-  <product comment="SALOME Homard module" name="homard" version="V8_4_0" />
-  <product comment="SALOME JobManager module" name="jobmanager" version="V8_4_0" />
-  <product comment="SALOME Kernel module" name="kernel" version="V8_4_0" />
-  <product comment="SALOME Med module" name="med" version="V8_4_0" />
-  <product comment="SALOME ParaVis module" name="paravis" version="V8_4_0" />
-  <product comment="SALOME Mesh module" name="smesh" version="V8_4_0" />
-  <product comment="SALOME YACS module" name="yacs" version="V8_4_0" />
-  <product comment="SALOME MG-CadSurf meshing plugin" name="blsurfplugin" version="V8_4_0" />
-  <product comment="SALOME MG-Tetra meshing plugin" name="ghs3dplugin" version="V8_4_0" />
-  <product comment="SALOME MG-Tetra_HPC meshing plugin" name="ghs3dprlplugin" version="V8_4_0" />
-  <product comment="SALOME MG-Hexa meshing plugin" name="hexoticplugin" version="V8_4_0" />
-  <product comment="SALOME HexaBlock meshing plugin" name="hexablockplugin" version="V8_4_0" />
-  <product comment="SALOME MG-Hybrid meshing plugin" name="hybridplugin" version="V8_4_0" />
-  <product comment="SALOME Netgen meshing plugin" name="netgenplugin" version="V8_4_0" />
-  <product comment="SALOME Gmsh meshing plugin" name="gmshplugin" version="V8_4_0" />
-  <product comment="SALOME Documentation tool" name="documentation" version="V8_4_0" />
-  <product comment="SALOME Hxx2salome tool" name="hxx2salome" version="V8_4_0" />
+  <product comment="SALOME Geometry module" name="geom" version="V8_5_0" />
+  <product comment="SALOME GUI module" name="gui" version="V8_5_0" />
+  <product comment="SALOME HexaBlock module" name="hexablock" version="V8_5_0" />
+  <product comment="SALOME Homard module" name="homard" version="V8_5_0" />
+  <product comment="SALOME JobManager module" name="jobmanager" version="V8_5_0" />
+  <product comment="SALOME Kernel module" name="kernel" version="V8_5_0" />
+  <product comment="SALOME Med module" name="med" version="V8_5_0" />
+  <product comment="SALOME ParaVis module" name="paravis" version="V8_5_0" />
+  <product comment="SALOME Mesh module" name="smesh" version="V8_5_0" />
+  <product comment="SALOME YACS module" name="yacs" version="V8_5_0" />
+  <product comment="SALOME MG-CadSurf meshing plugin" name="blsurfplugin" version="V8_5_0" />
+  <product comment="SALOME MG-Tetra meshing plugin" name="ghs3dplugin" version="V8_5_0" />
+  <product comment="SALOME MG-Tetra_HPC meshing plugin" name="ghs3dprlplugin" version="V8_5_0" />
+  <product comment="SALOME MG-Hexa meshing plugin" name="hexoticplugin" version="V8_5_0" />
+  <product comment="SALOME HexaBlock meshing plugin" name="hexablockplugin" version="V8_5_0" />
+  <product comment="SALOME MG-Hybrid meshing plugin" name="hybridplugin" version="V8_5_0" />
+  <product comment="SALOME Netgen meshing plugin" name="netgenplugin" version="V8_5_0" />
+  <product comment="SALOME Gmsh meshing plugin" name="gmshplugin" version="V8_5_0" />
+  <product comment="SALOME Documentation tool" name="documentation" version="V8_5_0" />
+  <product comment="SALOME Hxx2salome tool" name="hxx2salome" version="V8_5_0" />
   <product comment="libBatch library" name="libbatch" version="V2_4_0" />
-  <product comment="SALOME MedCoupling library" name="medcoupling" version="V8_4_0" />
-  <product comment="SALOME Tutorial" name="tutorial" version="V8_4_0" />
-  <product comment="SALOME YacsGen tool" name="yacsgen" version="V8_4_0" />
-  <product comment="SALOME AtomGen sample module" name="atomgen" version="V8_4_0" />
-  <product comment="SALOME Atomic sample module" name="atomic" version="V8_4_0" />
-  <product comment="SALOME AtomSolv sample module" name="atomsolv" version="V8_4_0" />
-  <product comment="SALOME Calculator sample module" name="calculator" version="V8_4_0" />
-  <product comment="SALOME Component sample module" name="component" version="V8_4_0" />
-  <product comment="SALOME data files" name="samples" version="V8_4_0" />
-  <product comment="SALOME DscCode sample module" name="dsccode" version="V8_4_0" />
-  <product comment="SALOME Hello sample module" name="hello" version="V8_4_0" />
-  <product comment="SALOME Light sample module" name="light" version="V8_4_0" />
-  <product comment="SALOME PyCalculator sample module" name="pycalculator" version="V8_4_0" />
-  <product comment="SALOME PyHello sample module" name="pyhello" version="V8_4_0" />
-  <product comment="SALOME PyLight sample module" name="pylight" version="V8_4_0" />
-  <product comment="SALOME Randomizer sample module" name="randomizer" version="V8_4_0" />
-  <product comment="SALOME Sierpinsky sample module" name="sierpinsky" version="V8_4_0" />
+  <product comment="SALOME MedCoupling library" name="medcoupling" version="V8_5_0" />
+  <product comment="SALOME Tutorial" name="tutorial" version="V8_5_0" />
+  <product comment="SALOME YacsGen tool" name="yacsgen" version="V8_5_0" />
+  <product comment="SALOME AtomGen sample module" name="atomgen" version="V8_5_0" />
+  <product comment="SALOME Atomic sample module" name="atomic" version="V8_5_0" />
+  <product comment="SALOME AtomSolv sample module" name="atomsolv" version="V8_5_0" />
+  <product comment="SALOME Calculator sample module" name="calculator" version="V8_5_0" />
+  <product comment="SALOME Component sample module" name="component" version="V8_5_0" />
+  <product comment="SALOME data files" name="samples" version="V8_5_0" />
+  <product comment="SALOME DscCode sample module" name="dsccode" version="V8_5_0" />
+  <product comment="SALOME Hello sample module" name="hello" version="V8_5_0" />
+  <product comment="SALOME Light sample module" name="light" version="V8_5_0" />
+  <product comment="SALOME PyCalculator sample module" name="pycalculator" version="V8_5_0" />
+  <product comment="SALOME PyHello sample module" name="pyhello" version="V8_5_0" />
+  <product comment="SALOME PyLight sample module" name="pylight" version="V8_5_0" />
+  <product comment="SALOME Randomizer sample module" name="randomizer" version="V8_5_0" />
+  <product comment="SALOME Sierpinsky sample module" name="sierpinsky" version="V8_5_0" />
 </config>
