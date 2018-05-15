@@ -41,8 +41,8 @@ endfunction()
 # ADD_MULTI_LANG_DOCUMENTATION is a macro which adds sphinx multi-language 
 # documentation.
 #
-# USAGE: SALOME_CONFIGURE_FILE(TARGET <target_name> MODULE <module_name> 
-#                              LANGUAGES <languages_list>)
+# USAGE: ADD_MULTI_LANG_DOCUMENTATION(TARGET <target_name> MODULE <module_name>
+#                                     LANGUAGES <languages_list>)
 #
 # ARGUMENTS:
 # TARGET_NAME : IN : target name for the documentation
@@ -133,6 +133,8 @@ MACRO(ADD_MULTI_LANG_DOCUMENTATION)
   # 8. Update PO files
   FOREACH(lang ${MULTI_LANG_LANGUAGES})
     FILE(GLOB _pfiles ${CMAKE_CURRENT_BINARY_DIR}/locale/${lang}/LC_MESSAGES/*.po)
+    ADD_CUSTOM_COMMAND(TARGET ${MULTI_LANG_TARGET_NAME} POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_SOURCE_DIR}/locale/${lang}/LC_MESSAGES)
     FOREACH(pofile ${_pfiles})
       GET_FILENAME_COMPONENT(fn_wo_path ${pofile} NAME)
       ADD_CUSTOM_COMMAND(TARGET ${MULTI_LANG_TARGET_NAME} POST_BUILD
