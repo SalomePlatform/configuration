@@ -23,6 +23,11 @@
 #
 #  !! Please read the generic detection procedure in SalomeMacros.cmake !!
 #
+
+# Workaround about stupid CMake bug that find_program performs search by iterating through names at first place
+# instead of paths!!!
+FIND_PROGRAM(SWIG_EXECUTABLE NAMES swig3.0 swig2.0 swig HINTS $ENV{SWIG_ROOT_DIR} PATH_SUFFIXES bin NO_CMAKE_SYSTEM_PATH NO_SYSTEM_ENVIRONMENT_PATH)
+
 SALOME_FIND_PACKAGE_AND_DETECT_CONFLICTS(SWIG SWIG_EXECUTABLE 2)
 MARK_AS_ADVANCED(SWIG_EXECUTABLE SWIG_VERSION)
 

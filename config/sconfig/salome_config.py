@@ -247,16 +247,16 @@ class CfgTool(object):
             self.tree = ET.parse(self.cfgFile).getroot()
             self._checkConfig()
             pass
-        except IOError, e:
+        except IOError as e:
             self.tree = self._new()
             pass
-        except exceptionClass, e:
+        except exceptionClass as e:
             if e.code == 3: # no element found, it's OK
                 self.tree = self._new()
             else:
                 raise Exception("bad XML file %s: %s" % (self.cfgFile, str(e)))
             pass
-        except Exception, e:
+        except Exception as e:
             raise Exception("unkwnown error: %s" % str(e))
         pass
     
@@ -323,7 +323,7 @@ class CfgTool(object):
         tag = path[-1][0]
         params = {}
         # process keyword arguments
-        for param, value in kwargs.items():
+        for param, value in list(kwargs.items()):
             if param not in tagAttributes(tag):
                 raise Exception("unsupported parameter %s for target %s" % (param, target))
             params[param] = value
@@ -344,7 +344,7 @@ class CfgTool(object):
             pass
         # create / modify target
         elem = self._findPath(path, True)
-        for param, value in params.items():
+        for param, value in list(params.items()):
             elem.set(param, value)
             pass
         self._write()
@@ -528,7 +528,7 @@ class CfgTool(object):
         elem = self.tree
         for tag, name in path[1:]:
             if name:
-                children = filter(lambda i: i.tag == tag and i.get(nameAttr()) == name, elem.getchildren())
+                children = [i for i in elem.getchildren() if i.tag == tag and i.get(nameAttr()) == name]
                 if len(children) > 1:
                     raise Exception("error parsing target path: more than one child element found")
                 elif len(children) == 1:
@@ -542,7 +542,7 @@ class CfgTool(object):
                     return None
                 pass
             else:
-                children = filter(lambda i: i.tag == tag, elem.getchildren())
+                children = [i for i in elem.getchildren() if i.tag == tag]
                 if len(children) > 1:
                     raise Exception("error parsing target path: more than one child element found")
                 elif len(children) == 1:
@@ -571,7 +571,7 @@ class CfgTool(object):
             _name = _obj.tag
             attrs = tagAttributes(_obj.tag, True)
             if nameAttr() in attrs and attrs[nameAttr()]:
-                if nameAttr() not in _obj.keys(): _name += " [unnamed]"
+                if nameAttr() not in list(_obj.keys()): _name += " [unnamed]"
                 else: _name += " [%s]" % _obj.get(nameAttr())
                 pass
             return _name
@@ -596,7 +596,7 @@ class CfgTool(object):
         """
         result = []
         result += [i.get(nameAttr()) for i in \
-                       filter(lambda i: i.tag == param and i.get(nameAttr()), elem.getchildren())]
+                       [i for i in elem.getchildren() if i.tag == param and i.get(nameAttr())]]
         for c in elem.getchildren():
             result += self._children(c, param)
             pass
@@ -619,7 +619,7 @@ class CfgTool(object):
                 et.write(f, self.encoding())
                 pass
             pass
-        except IOError, e:
+        except IOError as e:
             raise Exception("can't write to %s: %s" % (self.cfgFile, e.strerror))
         pass
 
@@ -661,15 +661,15 @@ class CfgTool(object):
             return
         indent = "  "
         # dump element
-        print "%s%s" % (indent * level, elem.tag)
+        print("%s%s" % (indent * level, elem.tag))
         attrs = tagAttributes(elem.tag, True)
         format = "%" + "-%ds" % max([len(i) for i in supportedAttributes()]) + " : %s"
         for a in attrs:
-            if a in elem.attrib.keys():
-                print indent*(level+1) + format % (a, elem.get(a))
+            if a in list(elem.attrib.keys()):
+                print(indent*(level+1) + format % (a, elem.get(a)))
                 pass
             pass
-        print
+        print()
         # dump all childrens recursively
         for c in elem.getchildren():
             self._dump(c, level+1)
@@ -702,7 +702,7 @@ class CfgTool(object):
             errors.append("bad XML element: %s" % elem.tag)
         else:
             # check attributes
-            attrs = elem.keys()
+            attrs = list(elem.keys())
             for attr in attrs:
                 if attr not in tagAttributes(elem.tag, True):
                     errors.append("unsupported attribute '%s' for XML element '%s'" % (attr, elem.tag))
@@ -729,14 +729,14 @@ class CfgTool(object):
         attrs = tagAttributes(elem.tag, True)
         # check mandatory attributes
         for attr in attrs:
-            if attrs[attr] and (attr not in elem.keys() or not elem.get(attr).strip()):
+            if attrs[attr] and (attr not in list(elem.keys()) or not elem.get(attr).strip()):
                 errors.append("mandatory parameter '%s' of object '%s' is not set" % (attr, self._path(elem)))
                 pass
             pass
         # specific check for particular XML element
         try:
             self._checkObject(elem)
-        except Exception, e:
+        except Exception as e:
             errors.append("%s : %s" % (self._path(elem), str(e)))
         # check all childrens recursively
         for c in elem.getchildren():

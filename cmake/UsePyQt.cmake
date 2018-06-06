@@ -57,6 +57,7 @@ ENDFUNCTION()
 # ARGUMENTS:
 #   output_files [out] variable where output file names are listed to
 #   pyuic_files  [in]  list of *.ui files
+#   options      [in]  additional options to be specified to pyuic
 # 
 # NOTES:
 #   - Input files are considered relative to the current source directory.
@@ -65,18 +66,18 @@ ENDFUNCTION()
 # 
 ####################################################################
 MACRO(PYQT_WRAP_UIC outfiles)
+ SET(_output)
 
- PARSE_ARGUMENTS(PYQT_WRAP_UIC "TARGET_NAME" "" ${ARGN})
+ PARSE_ARGUMENTS(PYQT_WRAP_UIC "TARGET_NAME;OPTIONS" "" ${ARGN})
 
  IF(NOT WIN32)
-
   FOREACH(_input ${PYQT_WRAP_UIC_DEFAULT_ARGS})
     GET_FILENAME_COMPONENT(_input_name ${_input} NAME)
     STRING(REPLACE ".ui" "_ui.py" _input_name ${_input_name})
     SET(_output ${CMAKE_CURRENT_BINARY_DIR}/${_input_name})
     ADD_CUSTOM_COMMAND(
       OUTPUT ${_output}
-      COMMAND ${PYQT_PYUIC_PATH} -o ${_output} ${CMAKE_CURRENT_SOURCE_DIR}/${_input}
+      COMMAND ${PYQT_PYUIC_PATH} ${PYQT_WRAP_UIC_OPTIONS} -o ${_output} ${CMAKE_CURRENT_SOURCE_DIR}/${_input}
       MAIN_DEPENDENCY ${_input}
       )
     SET(${outfiles} ${${outfiles}} ${_output})

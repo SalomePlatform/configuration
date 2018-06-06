@@ -446,7 +446,7 @@ ENDMACRO()
 
 
 ####################################################################
-# SALOME_FIND_PACKAGE_DETECT_CONFLICTS(pkg referenceVariable upCount)
+# SALOME_FIND_PACKAGE_AND_DETECT_CONFLICTS(pkg referenceVariable upCount)
 #    pkg              : name of the system package to be detected
 #    referenceVariable: variable containing a path that can be browsed up to 
 # retrieve the package root directory (xxx_ROOT_DIR)
@@ -978,10 +978,17 @@ ENDMACRO(SALOME_CONFIGURE_PREPARE)
 # version 2.7.12+ and the interp is 2.7.12 ...
 #
 MACRO(SALOME_EXTRACT_VERSION version_string major minor patch)
-  IF(${version_string} MATCHES "[0-9]+[^0-9]*\\.[0-9]+[^0-9]*\\.[0-9]+[^0-9]*")
-    STRING(REGEX REPLACE "^([0-9]+)[^0-9]*\\.[0-9]+[^0-9]*\\.[0-9]+[^0-9]*" "\\1" ${major} "${version_string}")
-    STRING(REGEX REPLACE "^[0-9]+[^0-9]*\\.([0-9]+)[^0-9]*\\.[0-9]+[^0-9]*" "\\1" ${minor} "${version_string}")
-    STRING(REGEX REPLACE "^[0-9]+[^0-9]*\\.[0-9]+[^0-9]*\\.([0-9]+)[^0-9]*" "\\1" ${patch} "${version_string}")
+  IF(${version_string} MATCHES "[0-9]+[^0-9]*\\.[0-9]+[^0-9]*\\.*[0-9]*[^0-9]*")
+    STRING(REGEX REPLACE "^([0-9]+)[^0-9]*\\.[0-9]+[^0-9]*\\.*[0-9]*[^0-9]*" "\\1" ${major} "${version_string}")
+    STRING(REGEX REPLACE "^[0-9]+[^0-9]*\\.([0-9]+)[^0-9]*\\.*[0-9]*[^0-9]*" "\\1" ${minor} "${version_string}")
+
+    IF(${version_string} MATCHES "[0-9]+[^0-9]*\\.[0-9]+[^0-9]*\\.[0-9]+[^0-9]*")
+        # X.Y.Z format (python 3.5.2 ...)
+        STRING(REGEX REPLACE "^[0-9]+[^0-9]*\\.[0-9]+[^0-9]*\\.([0-9]+)[^0-9]*" "\\1" ${patch} "${version_string}")
+    ELSE()
+        # X.Y format (python 3.5 ...)
+        SET(${patch} "0")
+    ENDIF()
   ELSE()
     MESSAGE("MACRO(SALOME_EXTRACT_VERSION ${version_string} ${major} ${minor} ${patch}")
     MESSAGE(FATAL_ERROR "Problem parsing version string, I can't parse it properly.")

@@ -15,25 +15,25 @@ def get_tool_name():
     return os.path.basename(sys.argv[0])
 
 def error_exit(msg):
-    print "%s: %s" % (get_tool_name(), msg)
-    print "Try '%s --help' for more information." % get_tool_name()
+    print("%s: %s" % (get_tool_name(), msg))
+    print("Try '%s --help' for more information." % get_tool_name())
     sys.exit(2)
     pass
 
 def usage():
-    print "Command line tool to compare two SALOME configurations."
-    print
-    print "Usage: %s [options] CFGFILE1 [CFGFILE2]" % get_tool_name()
-    print
-    print "  CFGFILE1       First configuration file to compare."
-    print "  CFGFILE2       Second configuration file to compare; if not specified,"
-    print "                 default one is used: %s." % defaultConfFile()
-    print
-    print "Options:"
-    print "  --help (-h)    Prints this help information."
-    print "  --force (-f)   Perform full comparation, including optional parameters."
-    print "  --verbose (-v) Print results of comparison to the screen."
-    print
+    print("Command line tool to compare two SALOME configurations.")
+    print()
+    print("Usage: %s [options] CFGFILE1 [CFGFILE2]" % get_tool_name())
+    print()
+    print("  CFGFILE1       First configuration file to compare.")
+    print("  CFGFILE2       Second configuration file to compare; if not specified,")
+    print("                 default one is used: %s." % defaultConfFile())
+    print()
+    print("Options:")
+    print("  --help (-h)    Prints this help information.")
+    print("  --force (-f)   Perform full comparation, including optional parameters.")
+    print("  --verbose (-v) Print results of comparison to the screen.")
+    print()
 
 def main():
     # parse command line
@@ -76,7 +76,7 @@ def main():
     try:
         tool1 = CfgTool(cfgfile1)
         tool2 = CfgTool(cfgfile2)
-    except Exception, e:
+    except Exception as e:
         error_exit(str(e))
         pass
     
@@ -145,8 +145,8 @@ def main():
 
     if errors:
         if isverbose:
-            print "Files %s and %s differ:" % (tool1.cfgFile, tool2.cfgFile)
-            print "\n".join(["  " + i for i in errors])
+            print("Files %s and %s differ:" % (tool1.cfgFile, tool2.cfgFile))
+            print("\n".join(["  " + i for i in errors]))
             pass
         return 1
 

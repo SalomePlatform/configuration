@@ -51,7 +51,8 @@ IF ("${QT_VERSION}" VERSION_LESS "5.6.0")
   LIST(APPEND Qt5_FIND_COMPONENTS WebKit WebKitWidgets)
 ELSE()
   # QtWebEngine package is (optionally) used with Qt >= 5.6
-  LIST(APPEND Qt5_OPTIONAL_COMPONENTS WebEngine WebEngineWidgets)
+  # Anyway, not available with Python 3
+  # LIST(APPEND Qt5_OPTIONAL_COMPONENTS WebEngine WebEngineWidgets)
 ENDIF()
 
 IF(NOT WIN32)
