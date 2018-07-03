@@ -1,0 +1,11 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e3031c3..f5585fa 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -923,3 +923,6 @@ if (NOT WIN32 AND is_git)
+       "paraview-source-${format}")
+   endforeach ()
+ endif ()
++
++FILE(WRITE ${PROJECT_BINARY_DIR}/lib/cmake/paraview-5.4/Modules/vtkPVPythonCatalystHierarchy.txt "This is a patch")
++

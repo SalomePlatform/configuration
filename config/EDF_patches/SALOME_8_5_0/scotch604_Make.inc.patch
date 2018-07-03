@@ -1,0 +1,51 @@
+diff -Naur Scotch-604/src/Make.inc/Makefile.inc.i686_pc_linux2 Scotch-604_esmumps/src/Make.inc/Makefile.inc.i686_pc_linux2
+--- Scotch-604/src/Make.inc/Makefile.inc.i686_pc_linux2	2018-02-20 11:23:34.588586025 +0100
++++ Scotch-604_esmumps/src/Make.inc/Makefile.inc.i686_pc_linux2	2018-02-20 17:15:15.203967949 +0100
+@@ -9,9 +9,9 @@
+ CCS		= gcc
+ CCP		= mpicc
+ CCD		= gcc
+-CFLAGS		= -O3 -DCOMMON_FILE_COMPRESS_GZ -DCOMMON_PTHREAD -DCOMMON_RANDOM_FIXED_SEED -DSCOTCH_RENAME -DSCOTCH_PTHREAD -Drestrict=__restrict
++CFLAGS		= -O3 -fPIC -DCOMMON_FILE_COMPRESS_GZ -DCOMMON_PTHREAD -DCOMMON_RANDOM_FIXED_SEED -DSCOTCH_RENAME -DSCOTCH_PTHREAD -Drestrict=__restrict
+ CLIBFLAGS	=
+-LDFLAGS		= -lz -lm -pthread
++LDFLAGS		= -lz -lm -pthread -lrt
+ CP		= cp
+ LEX		= flex -Pscotchyy -olex.yy.c
+ LN		= ln
+diff -Naur Scotch-604EDFp1/src/Makefile Scotch-604EDFp1_esmumps/src/Makefile
+--- Scotch-604EDFp1/src/Makefile	2018-03-30 15:37:48.930229374 +0200
++++ Scotch-604EDFp1_esmumps/src/Makefile	2018-03-30 15:35:09.765696046 +0200
+@@ -93,11 +93,13 @@
+ 					(cd libscotch ;      $(MAKE) VERSION=$(VERSION) RELEASE=$(RELEASE) PATCHLEVEL=$(PATCHLEVEL) scotch && $(MAKE) install)
+ 					(cd scotch ;         $(MAKE) VERSION=$(VERSION) RELEASE=$(RELEASE) PATCHLEVEL=$(PATCHLEVEL) scotch && $(MAKE) install)
+ 					(cd libscotchmetis ; $(MAKE)                                                                scotch && $(MAKE) install)
++					(cd esmumps ;        $(MAKE)                                                                scotch && $(MAKE) install)
+ 
+ ptscotch			:	required
+ 					(cd libscotch ;      $(MAKE) VERSION=$(VERSION) RELEASE=$(RELEASE) PATCHLEVEL=$(PATCHLEVEL) ptscotch && $(MAKE) ptinstall)
+ 					(cd scotch ;         $(MAKE) VERSION=$(VERSION) RELEASE=$(RELEASE) PATCHLEVEL=$(PATCHLEVEL) ptscotch && $(MAKE) ptinstall)
+ 					(cd libscotchmetis ; $(MAKE)                                                                ptscotch && $(MAKE) ptinstall)
++					(cd esmumps ;        $(MAKE)                                                                ptscotch && $(MAKE) ptinstall)
+ 
+ check				:	scotch
+ 					(cd check ; $(MAKE) check)
+@@ -105,17 +107,12 @@
+ ptcheck				:	ptscotch
+ 					(cd check ; $(MAKE) ptcheck)
+ 
+-esmumps				:	scotch
+-					(cd esmumps ; $(MAKE) scotch && $(MAKE) install)
+-
+-ptesmumps			:	ptscotch
+-					(cd esmumps ; $(MAKE) ptscotch && $(MAKE) ptinstall)
+-
+ install				:	required	$(bindir)	$(includedir)	$(libdir)	$(mandir)/man1
+ 					-$(CP) -f ../bin/[agm]*$(EXE) $(bindir)
+ 					-$(CP) -f ../bin/d[agm]*$(EXE) $(bindir)
+ 					-$(CP) -f ../include/*scotch*.h $(includedir)
+ 					-$(CP) -f ../lib/*scotch*$(LIB) $(libdir)
++					-$(CP) -f ../lib/*esmumps*$(LIB) $(libdir)
+ 					-$(CP) -Rf ../man/* $(mandir)
+ 
+ clean				:	required

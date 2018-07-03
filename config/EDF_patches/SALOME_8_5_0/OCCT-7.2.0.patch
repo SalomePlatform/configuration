@@ -1,0 +1,969 @@
+diff --git a/adm/cmake/occt_resources.cmake b/adm/cmake/occt_resources.cmake
+index 7a88051..d51df4d 100644
+--- a/adm/cmake/occt_resources.cmake
++++ b/adm/cmake/occt_resources.cmake
+@@ -68,6 +68,7 @@ FILE_TO_LIST ("adm/RESOURCES" RESOURCES)
+ foreach (CurrentResource ${RESOURCES})
+   get_filename_component (CurrentResource_FileName "${CurrentResource}" NAME)
+   if ("${CurrentResource_FileName}" STREQUAL TObj.msg OR
++      "${CurrentResource_FileName}" STREQUAL BOPAlgo.msg OR
+       "${CurrentResource_FileName}" STREQUAL Units.dat OR
+       "${CurrentResource}" STREQUAL XSMessage OR
+       "${CurrentResource}" STREQUAL SHMessage OR
+diff --git a/src/BOPAlgo/BOPAlgo.msg b/src/BOPAlgo/BOPAlgo.msg
+index 67350fc..673a39e 100644
+--- a/src/BOPAlgo/BOPAlgo.msg
++++ b/src/BOPAlgo/BOPAlgo.msg
+@@ -67,3 +67,12 @@ Warning: Removal of internal boundaries among Faces has failed
+ 
+ .BOPAlgo_AlertRemovalOfIBForEdgesFailed
+ Warning: Removal of internal boundaries among Edges has failed
++
++.BOPAlgo_AlertIntersectionOfPairOfShapesFailed
++Warning: Intersection of pair of shapes has failed
++
++.BOPAlgo_AlertBuildingPCurveFailed
++Warning: Building 2D curve of edge on face has failed
++
++.BOPAlgo_AlertAcquiredSelfIntersection
++Warning: Some sub-shapes of some of the argument become connected through other shapes and the argument became self-interfered
+diff --git a/src/BOPAlgo/BOPAlgo_Alerts.hxx b/src/BOPAlgo/BOPAlgo_Alerts.hxx
+index 02cec15..04ce9c7 100644
+--- a/src/BOPAlgo/BOPAlgo_Alerts.hxx
++++ b/src/BOPAlgo/BOPAlgo_Alerts.hxx
+@@ -78,4 +78,14 @@ DEFINE_ALERT_WITH_SHAPE(BOPAlgo_AlertShellSplitterFailed)
+ //! Some edges are too small and have no valid range
+ DEFINE_ALERT_WITH_SHAPE(BOPAlgo_AlertTooSmallEdge)
+ 
++//! Intersection of pair of shapes has failed
++DEFINE_ALERT_WITH_SHAPE(BOPAlgo_AlertIntersectionOfPairOfShapesFailed)
++
++//! Building 2D curve of edge on face has failed
++DEFINE_ALERT_WITH_SHAPE(BOPAlgo_AlertBuildingPCurveFailed)
++
++//! Some sub-shapes of some of the argument become connected through
++//! other shapes and the argument became self-interfered
++DEFINE_ALERT_WITH_SHAPE(BOPAlgo_AlertAcquiredSelfIntersection)
++
+ #endif // _BOPAlgo_Alerts_HeaderFile
+diff --git a/src/BOPAlgo/BOPAlgo_BOPAlgo_msg.pxx b/src/BOPAlgo/BOPAlgo_BOPAlgo_msg.pxx
+index c63a538..feec778 100644
+--- a/src/BOPAlgo/BOPAlgo_BOPAlgo_msg.pxx
++++ b/src/BOPAlgo/BOPAlgo_BOPAlgo_msg.pxx
+@@ -69,4 +69,13 @@ static const char BOPAlgo_BOPAlgo_msg[] =
+   "Warning: Removal of internal boundaries among Faces has failed\n"
+   "\n"
+   ".BOPAlgo_AlertRemovalOfIBForEdgesFailed\n"
+-  "Warning: Removal of internal boundaries among Edges has failed\n";
++  "Warning: Removal of internal boundaries among Edges has failed\n"
++  "\n"
++  ".BOPAlgo_AlertIntersectionOfPairOfShapesFailed\n"
++  "Warning: Intersection of pair of shapes has failed\n"
++  "\n"
++  ".BOPAlgo_AlertBuildingPCurveFailed\n"
++  "Warning: Building 2D curve of edge on face has failed\n"
++  "\n"
++  ".BOPAlgo_AlertAcquiredSelfIntersection\n"
++  "Warning: Some sub-shapes of some of the argument become connected through other shapes and the argument became self-interfered\n";
+diff --git a/src/BOPAlgo/BOPAlgo_PaveFiller.hxx b/src/BOPAlgo/BOPAlgo_PaveFiller.hxx
+index ab79f4e..bd4e512 100644
+--- a/src/BOPAlgo/BOPAlgo_PaveFiller.hxx
++++ b/src/BOPAlgo/BOPAlgo_PaveFiller.hxx
+@@ -87,13 +87,19 @@ class TopoDS_Face;
+ //! - *Gluing options* - allows to speed up the calculation on the special
+ //!                      cases, in which some sub-shapes are coincide.<br>
+ //!
+-//! The algorithm returns the following Warning statuses:<br>
+-//! - *BOPAlgo_AlertSelfInterferingShape* - in case some of the argument shapes are self-interfering shapes;<br>
+-//! - *BOPAlgo_AlertTooSmallEdge* - in case some edges of the input shapes have no valid range;<br>
++//! The algorithm returns the following Warning statuses:
++//! - *BOPAlgo_AlertSelfInterferingShape* - in case some of the argument shapes are self-interfering shapes;
++//! - *BOPAlgo_AlertTooSmallEdge* - in case some edges of the input shapes have no valid range;
+ //! - *BOPAlgo_AlertNotSplittableEdge* - in case some edges of the input shapes has such a small
+-//!                         valid range so it cannot be split;<br>
++//!                                      valid range so it cannot be split;
+ //! - *BOPAlgo_AlertBadPositioning* - in case the positioning of the input shapes leads to creation
+-//!                      of small edges.<br>
++//!                                   of small edges;
++//! - *BOPAlgo_AlertIntersectionOfPairOfShapesFailed* - in case intersection of some of the
++//!                                                     sub-shapes has failed;
++//! - *BOPAlgo_AlertAcquiredSelfIntersection* - in case some sub-shapes of the argument become connected
++//!                                             through other shapes;
++//! - *BOPAlgo_AlertBuildingPCurveFailed* - in case building 2D curve for some of the edges
++//!                                         on the faces has failed.
+ //!
+ //! The algorithm returns the following Error alerts:
+ //! - *BOPAlgo_AlertTooFewArguments* - in case there are no enough arguments to
+@@ -290,6 +296,7 @@ protected:
+                                     BOPDS_DataMapOfPaveBlockListOfPaveBlock& theDMExEdges,
+                                     BOPCol_DataMapOfIntegerInteger& theDMNewSD,
+                                     const BOPCol_IndexedMapOfShape& theMicroEdges,
++                                    const BOPCol_IndexedMapOfShape& theVertsOnRejectedPB,
+                                     const BOPCol_BaseAllocator& theAllocator);
+   
+   Standard_EXPORT void FindPaveBlocks (const Standard_Integer theV, const Standard_Integer theF, BOPDS_ListOfPaveBlock& theLPB);
+@@ -474,6 +481,8 @@ protected:
+   //! In case self-interference is found the warning is added.
+   Standard_EXPORT void CheckSelfInterference();
+ 
++  //! Adds the warning about failed intersection of pair of sub-shapes
++  Standard_EXPORT void AddIntersectionFailedWarning(const TopoDS_Shape& theS1, const TopoDS_Shape& theS2);
+ 
+   BOPCol_ListOfShape myArguments;
+   BOPDS_PDS myDS;
+diff --git a/src/BOPAlgo/BOPAlgo_PaveFiller_11.cxx b/src/BOPAlgo/BOPAlgo_PaveFiller_11.cxx
+index c8341c5..83faf2d 100644
+--- a/src/BOPAlgo/BOPAlgo_PaveFiller_11.cxx
++++ b/src/BOPAlgo/BOPAlgo_PaveFiller_11.cxx
+@@ -112,7 +112,8 @@ void BOPAlgo_PaveFiller::CheckSelfInterference()
+               }
+               //
+               if (aLE.Extent() > 1) {
+-                // Add warning
++                // Add the acquired self-interference warning:
++                // The same common block contains several edges from one argument
+                 TopoDS_Compound aWC;
+                 aBB.MakeCompound(aWC);
+                 //
+@@ -122,7 +123,7 @@ void BOPAlgo_PaveFiller::CheckSelfInterference()
+                   aBB.Add(aWC, aE1);
+                 }
+                 //
+-                AddWarning (new BOPAlgo_AlertSelfInterferingShape (aWC));
++                AddWarning (new BOPAlgo_AlertAcquiredSelfIntersection (aWC));
+               }
+             }
+           }
+@@ -168,7 +169,8 @@ void BOPAlgo_PaveFiller::CheckSelfInterference()
+     for (j = 1; j <= aNbC; ++j) {
+       const BOPCol_IndexedMapOfShape& aMCS = aMCSI(j);
+       if (aMCS.Extent() > 1) {
+-        // Add self-interference warning
++        // Add acquired self-interference warning:
++        // Several faces from one argument contain the same vertex or edge
+         TopoDS_Compound aWC;
+         aBB.MakeCompound(aWC);
+         //
+@@ -177,7 +179,7 @@ void BOPAlgo_PaveFiller::CheckSelfInterference()
+           const TopoDS_Shape& aSx = aMCS(iS);
+           aBB.Add(aWC, aSx);
+         }
+-        AddWarning (new BOPAlgo_AlertSelfInterferingShape (aWC));
++        AddWarning (new BOPAlgo_AlertAcquiredSelfIntersection (aWC));
+       }
+     }
+   }
+diff --git a/src/BOPAlgo/BOPAlgo_PaveFiller_2.cxx b/src/BOPAlgo/BOPAlgo_PaveFiller_2.cxx
+index c496668..9ac5e67 100644
+--- a/src/BOPAlgo/BOPAlgo_PaveFiller_2.cxx
++++ b/src/BOPAlgo/BOPAlgo_PaveFiller_2.cxx
+@@ -17,6 +17,7 @@
+ 
+ 
+ #include <BOPAlgo_PaveFiller.hxx>
++#include <BOPAlgo_Alerts.hxx>
+ #include <BOPAlgo_Tools.hxx>
+ #include <BOPCol_NCVector.hxx>
+ #include <BOPCol_Parallel.hxx>
+@@ -27,6 +28,7 @@
+ #include <BOPDS_PaveBlock.hxx>
+ #include <BOPDS_VectorOfInterfVE.hxx>
+ #include <BOPTools_AlgoTools.hxx>
++#include <BRep_Builder.hxx>
+ #include <BRep_Tool.hxx>
+ #include <gp_Pnt.hxx>
+ #include <IntTools_Context.hxx>
+@@ -110,7 +112,16 @@ class BOPAlgo_VertexEdge : public BOPAlgo_Algo {
+   //
+   virtual void Perform() {
+     BOPAlgo_Algo::UserBreak();
+-    myFlag=myContext->ComputeVE (myV, myE, myT, myTolVNew, myFuzzyValue);
++    try
++    {
++      OCC_CATCH_SIGNALS
++
++      myFlag=myContext->ComputeVE (myV, myE, myT, myTolVNew, myFuzzyValue);
++    }
++    catch (Standard_Failure)
++    {
++      AddError(new BOPAlgo_AlertIntersectionFailed);
++    }
+   };
+   //
+  protected:
+@@ -267,6 +278,11 @@ void BOPAlgo_PaveFiller::IntersectVE
+   for (i = 0; i < aNbVE; ++i) {
+     const BOPAlgo_VertexEdge& aVESolver = aVVE(i);
+     if (aVESolver.Flag() != 0) {
++      if (aVESolver.HasErrors())
++      {
++        // Warn about failed intersection of sub-shapes
++        AddIntersectionFailedWarning(aVESolver.Vertex(), aVESolver.Edge());
++      }
+       continue;
+     }
+     //
+@@ -491,3 +507,19 @@ void BOPAlgo_PaveFiller::SplitPaveBlocks(const BOPCol_MapOfInteger& theMEdges,
+     }
+   }
+ }
++
++//=======================================================================
++// function: AddIntersectionFailedWarning
++// purpose: 
++//=======================================================================
++void BOPAlgo_PaveFiller::AddIntersectionFailedWarning(const TopoDS_Shape& theS1,
++                                                      const TopoDS_Shape& theS2)
++{
++  // Create the warn shape
++  TopoDS_Compound aWC;
++  BRep_Builder().MakeCompound(aWC);
++  BRep_Builder().Add(aWC, theS1);
++  BRep_Builder().Add(aWC, theS2);
++  // Add the warning
++  AddWarning(new BOPAlgo_AlertIntersectionOfPairOfShapesFailed(aWC));
++}
+\ No newline at end of file
+diff --git a/src/BOPAlgo/BOPAlgo_PaveFiller_3.cxx b/src/BOPAlgo/BOPAlgo_PaveFiller_3.cxx
+index 3a8892e..5db97a8 100644
+--- a/src/BOPAlgo/BOPAlgo_PaveFiller_3.cxx
++++ b/src/BOPAlgo/BOPAlgo_PaveFiller_3.cxx
+@@ -93,7 +93,16 @@ class BOPAlgo_EdgeEdge :
+   //
+   virtual void Perform() {
+     BOPAlgo_Algo::UserBreak();
+-    IntTools_EdgeEdge::Perform();
++    try
++    {
++      OCC_CATCH_SIGNALS
++
++      IntTools_EdgeEdge::Perform();
++    }
++    catch (Standard_Failure)
++    {
++      AddError(new BOPAlgo_AlertIntersectionFailed);
++    }
+   }
+   //
+  protected:
+@@ -229,7 +238,11 @@ void BOPAlgo_PaveFiller::PerformEE()
+     Bnd_Box aBB1, aBB2;
+     //
+     BOPAlgo_EdgeEdge& anEdgeEdge=aVEdgeEdge(k);
+-    if (!anEdgeEdge.IsDone()) {
++    if (!anEdgeEdge.IsDone() || anEdgeEdge.HasErrors()) {
++      // Warn about failed intersection of sub-shapes
++      const TopoDS_Shape& aE1 = myDS->Shape(anEdgeEdge.PaveBlock1()->OriginalEdge());
++      const TopoDS_Shape& aE2 = myDS->Shape(anEdgeEdge.PaveBlock2()->OriginalEdge());
++      AddIntersectionFailedWarning(aE1, aE2);
+       continue;
+     }
+     //
+diff --git a/src/BOPAlgo/BOPAlgo_PaveFiller_4.cxx b/src/BOPAlgo/BOPAlgo_PaveFiller_4.cxx
+index 291edb2..900d363 100644
+--- a/src/BOPAlgo/BOPAlgo_PaveFiller_4.cxx
++++ b/src/BOPAlgo/BOPAlgo_PaveFiller_4.cxx
+@@ -17,6 +17,7 @@
+ 
+ 
+ #include <BOPAlgo_PaveFiller.hxx>
++#include <BOPAlgo_Alerts.hxx>
+ #include <BOPAlgo_SectionAttribute.hxx>
+ #include <BOPCol_MapOfInteger.hxx>
+ #include <BOPCol_NCVector.hxx>
+@@ -107,7 +108,16 @@ class BOPAlgo_VertexFace : public BOPAlgo_Algo {
+   //
+   virtual void Perform() {
+     BOPAlgo_Algo::UserBreak();
+-    myFlag=myContext->ComputeVF(myV, myF, myT1, myT2, myTolVNew, myFuzzyValue);
++    try
++    {
++      OCC_CATCH_SIGNALS
++
++      myFlag=myContext->ComputeVF(myV, myF, myT1, myT2, myTolVNew, myFuzzyValue);
++    }
++    catch (Standard_Failure)
++    {
++      AddError(new BOPAlgo_AlertIntersectionFailed);
++    }
+   }
+   //
+  protected:
+@@ -212,7 +222,12 @@ void BOPAlgo_PaveFiller::PerformVF()
+     const BOPAlgo_VertexFace& aVertexFace=aVVF(k);
+     // 
+     iFlag=aVertexFace.Flag();
+-    if (iFlag) {
++    if (iFlag != 0) {
++      if (aVertexFace.HasErrors())
++      {
++        // Warn about failed intersection of sub-shapes
++        AddIntersectionFailedWarning(aVertexFace.Vertex(), aVertexFace.Face());
++      }
+       continue;
+     }
+     //
+diff --git a/src/BOPAlgo/BOPAlgo_PaveFiller_5.cxx b/src/BOPAlgo/BOPAlgo_PaveFiller_5.cxx
+index 84fc6d1..717e478 100644
+--- a/src/BOPAlgo/BOPAlgo_PaveFiller_5.cxx
++++ b/src/BOPAlgo/BOPAlgo_PaveFiller_5.cxx
+@@ -103,7 +103,16 @@ class BOPAlgo_EdgeFace :
+   //
+   virtual void Perform() {
+     BOPAlgo_Algo::UserBreak();
+-    IntTools_EdgeFace::Perform();
++    try
++    {
++      OCC_CATCH_SIGNALS
++
++      IntTools_EdgeFace::Perform();
++    }
++    catch (Standard_Failure)
++    {
++      AddError(new BOPAlgo_AlertIntersectionFailed);
++    }
+   }
+   //
+  protected:
+@@ -258,7 +267,9 @@ void BOPAlgo_PaveFiller::PerformEF()
+   //
+   for (k=0; k < aNbEdgeFace; ++k) {
+     BOPAlgo_EdgeFace& aEdgeFace=aVEdgeFace(k);
+-    if (!aEdgeFace.IsDone()) {
++    if (!aEdgeFace.IsDone() || aEdgeFace.HasErrors()) {
++      // Warn about failed intersection of sub-shapes
++      AddIntersectionFailedWarning(aEdgeFace.Edge(), aEdgeFace.Face());
+       continue;
+     }
+     //
+diff --git a/src/BOPAlgo/BOPAlgo_PaveFiller_6.cxx b/src/BOPAlgo/BOPAlgo_PaveFiller_6.cxx
+index bbc1b35..dfbfe61 100644
+--- a/src/BOPAlgo/BOPAlgo_PaveFiller_6.cxx
++++ b/src/BOPAlgo/BOPAlgo_PaveFiller_6.cxx
+@@ -144,7 +144,16 @@ class BOPAlgo_FaceFace :
+   //
+   virtual void Perform() {
+     BOPAlgo_Algo::UserBreak();
+-    IntTools_FaceFace::Perform(myF1, myF2);
++    try
++    {
++      OCC_CATCH_SIGNALS
++
++      IntTools_FaceFace::Perform(myF1, myF2);
++    }
++    catch (Standard_Failure)
++    {
++      AddError(new BOPAlgo_AlertIntersectionFailed);
++    }
+   }
+   //
+  protected:
+@@ -263,10 +272,12 @@ void BOPAlgo_PaveFiller::PerformFF()
+   for (k = 0; k < aNbFaceFace; ++k) {
+     BOPAlgo_FaceFace& aFaceFace = aVFaceFace(k);
+     aFaceFace.Indices(nF1, nF2);
+-    if (!aFaceFace.IsDone()) {
++    if (!aFaceFace.IsDone() || aFaceFace.HasErrors()) {
+       BOPDS_InterfFF& aFF = aFFs.Append1();
+       aFF.SetIndices(nF1, nF2);
+       aFF.Init(0, 0);
++      // Warn about failed intersection of faces
++      AddIntersectionFailedWarning(aFaceFace.Face1(), aFaceFace.Face2());
+       continue;
+     }
+     //
+@@ -373,6 +384,7 @@ void BOPAlgo_PaveFiller::MakeBlocks()
+   BOPCol_DataMapOfIntegerListOfInteger aDMBV(100, aAllocator);
+   BOPCol_DataMapIteratorOfDataMapOfIntegerReal aItMV;
+   BOPCol_IndexedMapOfShape aMicroEdges(100, aAllocator);
++  BOPCol_IndexedMapOfShape aVertsOnRejectedPB;
+   //
+   for (i=0; i<aNbFF; ++i) {
+     //
+@@ -557,6 +569,19 @@ void BOPAlgo_PaveFiller::MakeBlocks()
+             if (!bInBothFaces) {
+               aMPBAdd.Add(aPBOut);
+               PreparePostTreatFF(i, j, aPBOut, aMSCPB, aMVI, aLPBC);
++              // Try fusing the vertices of the existing pave block
++              // with the vertices put on the real section curve (except
++              // for technological vertices, which will be removed)
++              Standard_Integer nVOut1, nVOut2;
++              aPBOut->Indices(nVOut1, nVOut2);
++              if (nV1 != nVOut1 && nV1 != nVOut2 && !aMVBounds.Contains(nV1))
++              {
++                aVertsOnRejectedPB.Add(aV1);
++              }
++              if (nV2 != nVOut1 && nV2 != nVOut2 && !aMVBounds.Contains(nV2))
++              {
++                aVertsOnRejectedPB.Add(aV2);
++              }
+             }
+           }
+           continue;
+@@ -639,7 +664,7 @@ void BOPAlgo_PaveFiller::MakeBlocks()
+   // 
+   // post treatment
+   MakeSDVerticesFF(aDMVLV, aDMNewSD);
+-  PostTreatFF(aMSCPB, aDMExEdges, aDMNewSD, aMicroEdges, aAllocator);
++  PostTreatFF(aMSCPB, aDMExEdges, aDMNewSD, aMicroEdges, aVertsOnRejectedPB, aAllocator);
+   if (HasErrors()) {
+     return;
+   }
+@@ -697,6 +722,7 @@ void BOPAlgo_PaveFiller::PostTreatFF
+      BOPDS_DataMapOfPaveBlockListOfPaveBlock& aDMExEdges,
+      BOPCol_DataMapOfIntegerInteger& aDMNewSD,
+      const BOPCol_IndexedMapOfShape& theMicroEdges,
++     const BOPCol_IndexedMapOfShape& theVertsOnRejectedPB,
+      const Handle(NCollection_BaseAllocator)& theAllocator)
+ {
+   Standard_Integer aNbS = theMSCPB.Extent();
+@@ -724,8 +750,9 @@ void BOPAlgo_PaveFiller::PostTreatFF
+   BOPDS_VectorOfInterfFF& aFFs=myDS->InterfFF();
+   //
+   Standard_Integer aNbME = theMicroEdges.Extent();
++  Standard_Integer aNbVOnRPB = theVertsOnRejectedPB.Extent();
+   // 0
+-  if (aNbS==1 && (aNbME == 0)) {
++  if (aNbS==1 && (aNbME == 0) && (aNbVOnRPB == 0)) {
+     const TopoDS_Shape& aS=theMSCPB.FindKey(1);
+     const BOPDS_CoupleOfPaveBlocks &aCPB=theMSCPB.FindFromIndex(1);
+     //
+@@ -824,6 +851,20 @@ void BOPAlgo_PaveFiller::PostTreatFF
+       aBB.UpdateVertex(aVerts[1], aTolV2 + aDist);
+     }
+   }
++
++  // Add vertices put on the real section curves to unify them with the
++  // vertices of the edges, by which these sections curves have been rejected
++  for (Standard_Integer i = 1; i <= aNbVOnRPB; ++i)
++  {
++    TopoDS_Shape aVer = theVertsOnRejectedPB(i);
++    Standard_Integer iVer = myDS->Index(aVer);
++    const Standard_Integer* pSD = aDMNewSD.Seek(iVer);
++    if (pSD)
++      aVer = myDS->Shape(*pSD);
++
++    if (anAddedSD.Add(aVer))
++      aLS.Append(aVer);
++  }
+   //
+   // 2 Fuse shapes
+   aPF.SetProgressIndicator(myProgressIndicator);
+diff --git a/src/BOPAlgo/BOPAlgo_PaveFiller_7.cxx b/src/BOPAlgo/BOPAlgo_PaveFiller_7.cxx
+index bf02175..1e91f55 100644
+--- a/src/BOPAlgo/BOPAlgo_PaveFiller_7.cxx
++++ b/src/BOPAlgo/BOPAlgo_PaveFiller_7.cxx
+@@ -16,6 +16,7 @@
+ // commercial license or contractual agreement.
+ 
+ #include <BOPAlgo_PaveFiller.hxx>
++#include <BOPAlgo_Alerts.hxx>
+ #include <BOPAlgo_SectionAttribute.hxx>
+ #include <BOPAlgo_Tools.hxx>
+ #include <BOPCol_IndexedMapOfShape.hxx>
+@@ -241,28 +242,37 @@ class BOPAlgo_MPC : public BOPAlgo_Algo  {
+   }
+   //
+   virtual void Perform() {
+-    Standard_Integer iErr;
+-    //
+-    iErr=1;
+-    if (!myEz.IsNull()) {
+-      TopoDS_Edge aSpz;
++    try
++    {
++      OCC_CATCH_SIGNALS
++
++      Standard_Integer iErr;
+       //
+-      BOPTools_AlgoTools::MakeSplitEdge(myEz,myV1, myT1, 
+-                                        myV2, myT2, aSpz);
++      iErr=1;
++      if (!myEz.IsNull()) {
++        TopoDS_Edge aSpz;
++        //
++        BOPTools_AlgoTools::MakeSplitEdge(myEz,myV1, myT1, 
++                                          myV2, myT2, aSpz);
++        //
++        iErr=
++          BOPTools_AlgoTools2D::AttachExistingPCurve(aSpz, 
++                                                     myE, 
++                                                     myF, 
++                                                     myContext);
++      }
+       //
+-      iErr=
+-        BOPTools_AlgoTools2D::AttachExistingPCurve(aSpz, 
+-                                                   myE, 
+-                                                   myF, 
+-                                                   myContext);
+-    }
+-    //
+-    if (iErr) { 
+-      BOPTools_AlgoTools2D::BuildPCurveForEdgeOnFace(myE, myF, myContext);
++      if (iErr) { 
++        BOPTools_AlgoTools2D::BuildPCurveForEdgeOnFace(myE, myF, myContext);
++      }
++      // 
++      if (myFlag) {
++        UpdateVertices(myE, myF);
++      }
+     }
+-    // 
+-    if (myFlag) {
+-      UpdateVertices(myE, myF);
++    catch (Standard_Failure)
++    {
++      AddError(new BOPAlgo_AlertBuildingPCurveFailed(TopoDS_Shape()));
+     }
+   }
+   //
+@@ -676,6 +686,20 @@ void BOPAlgo_PaveFiller::MakePCurves()
+   //======================================================
+   BOPAlgo_MPCCnt::Perform(myRunParallel, aVMPC, myContext);
+   //======================================================
++
++  // Add warnings of the failed projections
++  Standard_Integer aNb = aVMPC.Extent();
++  for (i = 0; i < aNb; ++i)
++  {
++    if (aVMPC(i).HasErrors())
++    {
++      TopoDS_Compound aWC;
++      BRep_Builder().MakeCompound(aWC);
++      BRep_Builder().Add(aWC, aVMPC(i).Edge());
++      BRep_Builder().Add(aWC, aVMPC(i).Face());
++      AddWarning(new BOPAlgo_AlertBuildingPCurveFailed(aWC));
++    }
++  }
+ }
+ //=======================================================================
+ //function : UpdateVertices
+diff --git a/src/BOPAlgo/BOPAlgo_PaveFiller_8.cxx b/src/BOPAlgo/BOPAlgo_PaveFiller_8.cxx
+index 495c640..08f515a 100644
+--- a/src/BOPAlgo/BOPAlgo_PaveFiller_8.cxx
++++ b/src/BOPAlgo/BOPAlgo_PaveFiller_8.cxx
+@@ -32,6 +32,7 @@
+ #include <Geom2d_Line.hxx>
+ #include <Geom2d_TrimmedCurve.hxx>
+ #include <Geom2dAdaptor_Curve.hxx>
++#include <Geom2dAPI_ProjectPointOnCurve.hxx>
+ #include <Geom2dInt_GInter.hxx>
+ #include <gp_Lin2d.hxx>
+ #include <gp_Pnt.hxx>
+@@ -52,6 +53,11 @@ static
+                        const Standard_Real  aP2,
+                        TopoDS_Edge& aNewEdge);
+ 
++static
++  Standard_Boolean AddSplitPoint(const Handle(BOPDS_PaveBlock)& thePBD,
++                                 const BOPDS_Pave& thePave,
++                                 const Standard_Real theTol);
++
+ //=======================================================================
+ //function : ProcessDE
+ //purpose  : 
+@@ -304,25 +310,30 @@ void BOPAlgo_PaveFiller::ProcessDE()
+     }
+     // Intersection
+     Geom2dInt_GInter aGInter(aGAC1, aGAC2, aTolInt, aTolInt);
+-    if (!aGInter.IsDone()) {
+-      continue;
+-    }
+-    //
+-    // Analyze intersection points
+-    Standard_Integer i, aNbPoints = aGInter.NbPoints();
+-    for (i = 1; i <= aNbPoints; ++i) {
+-      Standard_Real aX = aGInter.Point(i).ParamOnFirst();
+-      if (aX - aTD1 < aTolCmp || aTD2 - aX < aTolCmp) {
+-        continue;
++    if (aGInter.IsDone() && aGInter.NbPoints())
++    {
++      // Analyze intersection points
++      Standard_Integer i, aNbPoints = aGInter.NbPoints();
++      for (i = 1; i <= aNbPoints; ++i) {
++        Standard_Real aX = aGInter.Point(i).ParamOnFirst();
++        aPave.SetParameter(aX);
++        AddSplitPoint(aPBD, aPave, aTolCmp);
+       }
+-      //
+-      Standard_Integer anInd;
+-      if (aPBD->ContainsParameter(aX, aTolCmp, anInd)) {
+-        continue;
++    }
++    else
++    {
++      // If the intersection did not succeed, try the projection of the end point
++      // of the curve corresponding to the vertex of degenerated edge
++      Standard_Real aT = (nVD == aPB->Pave1().Index() ?
++        aPB->Pave1().Parameter() : aPB->Pave2().Parameter());
++      gp_Pnt2d aP2d = aC2D->Value(aT);
++      Geom2dAPI_ProjectPointOnCurve aProj2d(aP2d, aC2DDE, aTD1, aTD2);
++      if (aProj2d.NbPoints())
++      {
++        Standard_Real aX = aProj2d.LowerDistanceParameter();
++        aPave.SetParameter(aX);
++        AddSplitPoint(aPBD, aPave, aTolCmp);
+       }
+-      //
+-      aPave.SetParameter(aX);
+-      aPBD->AppendExtPave1(aPave);
+     }
+   }
+ }
+@@ -354,3 +365,34 @@ void BOPAlgo_PaveFiller::ProcessDE()
+   BB.UpdateEdge(E, aTol);
+   aNewEdge=E;
+ }
++
++//=======================================================================
++// function: AddSplitPoint
++// purpose: Validates the point represented by the pave <thePave>
++//          for the Pave Block <thePBD>.
++//          In case the point passes the checks it is added as an
++//          Extra Pave to the Pave Block for further splitting of the latter.
++//          Returns TRUE if the point is added, otherwise returns FALSE.
++//=======================================================================
++Standard_Boolean AddSplitPoint(const Handle(BOPDS_PaveBlock)& thePBD,
++                               const BOPDS_Pave& thePave,
++                               const Standard_Real theTol)
++{
++  Standard_Real aTD1, aTD2;
++  thePBD->Range(aTD1, aTD2);
++
++  Standard_Real aT = thePave.Parameter();
++  // Check that the parameter is inside the Pave Block
++  if (aT - aTD1 < theTol || aTD2 - aT < theTol)
++    return Standard_False;
++
++  // Check that the pave block does not contain the same parameter
++  Standard_Integer anInd;
++  if (thePBD->ContainsParameter(aT, theTol, anInd))
++    return Standard_False;
++
++  // Add the point as an Extra pave to the Pave Block for further
++  // splitting of the latter
++  thePBD->AppendExtPave1(thePave);
++  return Standard_True;
++}
+diff --git a/src/BOPTest/BOPTest_CheckCommands.cxx b/src/BOPTest/BOPTest_CheckCommands.cxx
+index 618e86c..77d5cd2 100644
+--- a/src/BOPTest/BOPTest_CheckCommands.cxx
++++ b/src/BOPTest/BOPTest_CheckCommands.cxx
+@@ -235,6 +235,8 @@ Standard_Integer bopcheck (Draw_Interpretor& di,
+   //
+   aTimer.Stop();
+   //
++  BOPTest::ReportAlerts(aChecker);
++  //
+   iErr=aChecker.HasErrors();
+   //
+   const BOPDS_DS& aDS=*(aChecker.PDS());
+diff --git a/src/IntWalk/IntWalk_PWalking.cxx b/src/IntWalk/IntWalk_PWalking.cxx
+index 54c42a1..eed1c63 100644
+--- a/src/IntWalk/IntWalk_PWalking.cxx
++++ b/src/IntWalk/IntWalk_PWalking.cxx
+@@ -159,6 +159,35 @@ static void IsParallel(const Handle(IntSurf_LineOn2S)& theLine,
+   theIsUparallel = ((aVmax - aVmin) < theToler);
+ }
+ 
++//=======================================================================
++//function : AdjustToDomain
++//purpose  : Returns TRUE if theP has been changed (i.e. initial value
++//            was out of the domain)
++//=======================================================================
++static Standard_Boolean AdjustToDomain(const Standard_Integer theNbElem,
++                                       Standard_Real* theParam,
++                                       const Standard_Real* const theLowBorder,
++                                       const Standard_Real* const theUppBorder)
++{
++  Standard_Boolean aRetVal = Standard_False;
++  for (Standard_Integer i = 0; i < theNbElem; i++)
++  {
++    if ((theParam[i] - theLowBorder[i]) < -Precision::PConfusion())
++    {
++      theParam[i] = theLowBorder[i];
++      aRetVal = Standard_True;
++    }
++
++    if ((theParam[i] - theUppBorder[i]) > Precision::PConfusion())
++    {
++      theParam[i] = theUppBorder[i];
++      aRetVal = Standard_True;
++    }
++  }
++
++  return aRetVal;
++}
++
+ //==================================================================================
+ // function : IntWalk_PWalking::IntWalk_PWalking
+ // purpose  : 
+@@ -2247,7 +2276,19 @@ Standard_Boolean IntWalk_PWalking::HandleSingleSingularPoint(const Handle(Adapto
+         continue;
+ 
+       anInt.Point().Parameters(thePnt(1), thePnt(2), thePnt(3), thePnt(4));
+-      return Standard_True;
++
++      Standard_Boolean isInDomain = Standard_True;
++      for (Standard_Integer j = 1; isInDomain && (j <= 4); ++j)
++      {
++        if ((thePnt(j) - aLowBorder[j - 1] + Precision::PConfusion())*
++            (thePnt(j) - aUppBorder[j - 1] - Precision::PConfusion()) > 0.0)
++        {
++          isInDomain = Standard_False;
++        }
++      }
++
++      if (isInDomain)
++        return Standard_True;
+     }
+   }
+ 
+@@ -2259,16 +2300,26 @@ Standard_Boolean IntWalk_PWalking::HandleSingleSingularPoint(const Handle(Adapto
+ //purpose  : 
+ //=======================================================================
+ Standard_Boolean IntWalk_PWalking::
+-SeekPointOnBoundary(const Handle(Adaptor3d_HSurface)& theASurf1,
+-                    const Handle(Adaptor3d_HSurface)& theASurf2,
+-                    const Standard_Real theU1,
+-                    const Standard_Real theV1,
+-                    const Standard_Real theU2,
+-                    const Standard_Real theV2,
+-                    const Standard_Boolean isTheFirst)
++        SeekPointOnBoundary(const Handle(Adaptor3d_HSurface)& theASurf1,
++                            const Handle(Adaptor3d_HSurface)& theASurf2,
++                            const Standard_Real theU1,
++                            const Standard_Real theV1,
++                            const Standard_Real theU2,
++                            const Standard_Real theV2,
++                            const Standard_Boolean isTheFirst)
+ {
+   Standard_Boolean isOK = Standard_False;
+ 
++  // u1, v1, u2, v2 order is used.
++  const Standard_Real aLowBorder[4] = {theASurf1->FirstUParameter(),
++                                       theASurf1->FirstVParameter(),
++                                       theASurf2->FirstUParameter(),
++                                       theASurf2->FirstVParameter()};
++  const Standard_Real aUppBorder[4] = {theASurf1->LastUParameter(),
++                                       theASurf1->LastVParameter(),
++                                       theASurf2->LastUParameter(),
++                                       theASurf2->LastVParameter()};
++
+   // Tune solution tolerance according with object size.
+   const Standard_Real aRes1 = Max(Precision::PConfusion() / theASurf1->UResolution(1.0),
+                                   Precision::PConfusion() / theASurf1->VResolution(1.0));
+@@ -2288,21 +2339,26 @@ SeekPointOnBoundary(const Handle(Adaptor3d_HSurface)& theASurf1,
+   {
+     aNbIter--;
+     aStatus = DistanceMinimizeByGradient(theASurf1, theASurf2, aPnt);
+-    if(aStatus)
++    if (aStatus && !AdjustToDomain(4, &aPnt(1), &aLowBorder[0], &aUppBorder[0]))
+       break;
+ 
+-    aStatus = DistanceMinimizeByExtrema(theASurf1, theASurf2->Value(aPnt(3), aPnt(4)), aPnt(1), aPnt(2));
+-    if(aStatus)
++    aStatus = DistanceMinimizeByExtrema(theASurf1, theASurf2->Value(aPnt(3), aPnt(4)),
++                                        aPnt(1), aPnt(2));
++    if (aStatus && !AdjustToDomain(2, &aPnt(1), &aLowBorder[0], &aUppBorder[0]))
+       break;
+ 
+-    aStatus = DistanceMinimizeByExtrema(theASurf2, theASurf1->Value(aPnt(1), aPnt(2)), aPnt(3), aPnt(4));
+-    if(aStatus)
++    aStatus = DistanceMinimizeByExtrema(theASurf2, theASurf1->Value(aPnt(1), aPnt(2)),
++                                        aPnt(3), aPnt(4));
++    if (aStatus && !AdjustToDomain(2, &aPnt(3), &aLowBorder[2], &aUppBorder[2]))
+       break;
+   }
+   while(!aStatus && (aNbIter > 0));
+ 
+   // Handle singular points.
+-  Standard_Boolean aSingularStatus = HandleSingleSingularPoint(theASurf1, theASurf2, aTol, aSingularPnt);
++  Standard_Boolean aSingularStatus = HandleSingleSingularPoint(theASurf1,
++                                                               theASurf2,
++                                                               aTol,
++                                                               aSingularPnt);
+   if (aSingularStatus)
+     aPnt = aSingularPnt;
+ 
+diff --git a/tests/bugs/modalg_7/bug25879 b/tests/bugs/modalg_7/bug25879
+index bb45244..e344c39 100755
+--- a/tests/bugs/modalg_7/bug25879
++++ b/tests/bugs/modalg_7/bug25879
+@@ -13,7 +13,8 @@ explode Box E
+ 
+ blend Fillet Box 1 Box_1 1 Box_2 1 Box_3 1 Box_4 1 Box_5 1 Box_6 1 Box_7 1 Box_8 1 Box_9 1 Box_10 1 Box_11 1 Box_12
+ 
+-if { [regexp "There were errors during the operation, so the list may be incomplete" [bopcheck Fillet]] == 1 } {
++set bug_info [string trim [bopcheck Fillet]]
++if {$bug_info != "This shape seems to be OK."} {
+     puts "Error : result of blend fails the bopcheck"
+ }
+ 
+diff --git a/tests/bugs/modalg_7/bug29073 b/tests/bugs/modalg_7/bug29073
+new file mode 100644
+index 0000000..e13beca
+--- /dev/null
++++ b/tests/bugs/modalg_7/bug29073
+@@ -0,0 +1,34 @@
++puts "======="
++puts "0029073"
++puts "======="
++puts ""
++##################################################
++# Regression: General Cut produces invalid shape
++##################################################
++
++brestore [locate_data_file bug29073_M6.brep] b1
++brestore [locate_data_file bug29073_Shell.brep] b2
++
++bclearobjects
++bcleartools
++baddobjects b1
++baddtools b2
++bfillds
++
++# check the result of SECTION
++bbop rsec 4
++checknbshapes rsec -edge 1 -vertex 2
++
++# check the result of GF
++bbuild rgf
++checkshape rgf
++checkprops rgf -s 163.708 -v 115.912
++checknbshapes rgf -wire 25 -face 24 -shell 3 -solid 1
++
++# check the CUT
++bbop result 3
++checkshape result
++checkprops result -s 0.000713987
++checknbshapes result -wire 1 -face 1
++
++checkview -display result -2d -path ${imagedir}/${test_image}.png
+diff --git a/tests/bugs/modalg_7/bug29099 b/tests/bugs/modalg_7/bug29099
+new file mode 100644
+index 0000000..f4bbf91
+--- /dev/null
++++ b/tests/bugs/modalg_7/bug29099
+@@ -0,0 +1,23 @@
++puts "======="
++puts "0029099"
++puts "======="
++puts ""
++##################################################
++# Extra shapes in result of General Cut (box by ellipsoid)
++##################################################
++
++brestore [locate_data_file bug29099_Box.brep] b1
++brestore [locate_data_file bug29099_Rotation.brep] b2
++
++bclearobjects
++bcleartools
++baddobjects b1
++baddtools b2
++bfillds
++bbuild result
++
++checkshape result
++checknbshapes result -wire 11 -face 10 -shell 3 -solid 3
++checkprops result -s 12651.3 -v 52187.5
++
++checkview -display result -2d -path ${imagedir}/${test_image}.png
+\ No newline at end of file
+diff --git a/tests/bugs/modalg_7/bug29103 b/tests/bugs/modalg_7/bug29103
+new file mode 100644
+index 0000000..33bc06c
+--- /dev/null
++++ b/tests/bugs/modalg_7/bug29103
+@@ -0,0 +1,56 @@
++puts "========"
++puts "OCC29103"
++puts "========"
++puts ""
++#################################################
++# No intersection curve between faces if starting points are given
++#################################################
++
++set MaxTolReached 2.0e-7
++set GoodNbCurv 1
++set ExpLength 0.074141742883251954
++
++restore [locate_data_file bug29073_M6.brep] a
++restore [locate_data_file bug29073_Shell.brep] b
++explode a f
++explode b f
++
++don b_2
++axo
++fit
++disp a_6
++
++set log1 [bopcurves a_6 b_2 -2d]
++
++checkview -screenshot -2d -path ${imagedir}/${test_image}_1.png
++checklength c_1 -l $ExpLength
++
++don b_2
++axo
++fit
++disp a_6
++
++set log2 [bopcurves a_6 b_2 -2d -p -0.55478319275098653 1.2919191091235780 0.80333089657224976 0.67079577554162440 -p -0.62451407353846222 1.2667484772947102 0.82894736842100003 0.70523311453721027]
++
++checkview -screenshot -2d -path ${imagedir}/${test_image}_2.png
++checklength c_1 -l $ExpLength
++
++regexp {Tolerance Reached=+([-0-9.+eE]+)\n+([-0-9.+eE]+)} ${log1} full Toler1 NbCurv1
++regexp {Tolerance Reached=+([-0-9.+eE]+)\n+([-0-9.+eE]+)} ${log2} full Toler2 NbCurv2
++
++if {$Toler1 > $MaxTolReached} {
++  puts "Error: Big tolerance is returned by intersector w/o start points"
++}
++
++if {$Toler2 > $MaxTolReached} {
++  puts "Error: Big tolerance is returned by intersector with start points"
++}
++
++if {$NbCurv1 != $GoodNbCurv} {
++  puts "Error: Please check NbCurves for intersector w/o start points"
++}
++
++if {$NbCurv2 != $GoodNbCurv} {
++  puts "Error: Please check NbCurves for intersector with start points"
++}
++
+diff --git a/tests/bugs/moddata_3/bug25693_1 b/tests/bugs/moddata_3/bug25693_1
+index de7953d..86d1aeb 100755
+--- a/tests/bugs/moddata_3/bug25693_1
++++ b/tests/bugs/moddata_3/bug25693_1
+@@ -10,7 +10,8 @@ puts ""
+ 
+ restore [locate_data_file bug25693_path3035.brep] result
+ 
+-if { [regexp "There were errors during the operation, so the list may be incomplete" [bopcheck result]] == 1 } {
++set bug_info [string trim [bopcheck result]]
++if {$bug_info != "This shape seems to be OK."} {
+     puts "Error : Wire of BSplines fails bopcheck"
+ }
+ 
+diff --git a/tests/bugs/moddata_3/bug25693_2 b/tests/bugs/moddata_3/bug25693_2
+index 6b3bfb1..cfc7a0e 100755
+--- a/tests/bugs/moddata_3/bug25693_2
++++ b/tests/bugs/moddata_3/bug25693_2
+@@ -12,11 +12,13 @@ restore [locate_data_file bug25693_path3039.brep] path3039
+ 
+ prism Extrude_path3039 path3039 0 0 50
+ 
+-if { [regexp "There were errors during the operation, so the list may be incomplete" [bopcheck path3039]] == 1 } {
++set log1 [string trim [bopcheck path3039]]
++if {$log1 != "This shape seems to be OK."} {
+     puts "Error : bad shape"
+ }
+ 
+-if { [regexp "There were errors during the operation, so the list may be incomplete" [bopcheck Extrude_path3039]] == 1 } {
++set log2 [string trim [bopcheck Extrude_path3039]]
++if {$log2 != "This shape seems to be OK."} {
+     puts "Error : Wire of BSplines fails bopcheck"
+ }
+ 

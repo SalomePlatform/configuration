@@ -1,0 +1,11 @@
+--- Sphinx-123-doc012-jin273-pyg202-py2710-set3840/setup.py	2014-09-01 16:22:41.000000000 +0200
++++ Sphinx-123-doc012-jin273-pyg202-py2710-set3840_w_intl_nap/setup.py	2018-04-12 15:05:37.575068486 +0200
+@@ -41,7 +41,7 @@
+ * Setuptools integration
+ '''
+ 
+-requires = ['Pygments>=1.2', 'docutils>=0.7']
++requires = ['sphinxcontrib-napoleon==0.6.1', 'sphinx-intl==0.9.10','Pygments>=1.2', 'docutils>=0.7']
+ 
+ if sys.version_info[:3] >= (3, 3, 0):
+     requires[1] = 'docutils>=0.10'

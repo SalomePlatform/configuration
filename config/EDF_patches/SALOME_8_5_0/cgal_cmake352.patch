@@ -1,0 +1,11 @@
+--- a/src/CMakeLists.txt	2012-02-10 21:00:53.000000000 +0100
++++ b/src/CMakeLists.txt	2016-04-21 17:09:10.641089365 +0200
+@@ -117,7 +117,7 @@
+   file(GLOB CONFIGURED_LIBS_IN_PACKAGE ${package}/src/CGAL*/CMakeLists.txt)
+   foreach (libconfigfile ${CONFIGURED_LIBS_IN_PACKAGE})
+     string(REPLACE "${package}/src/" "" libconfigfile ${libconfigfile})
+-    string(REPLACE "//CMakeLists.txt" "" CGAL_CONFIGURED_LIBRARY_SUBDIR ${libconfigfile})
++    string(REPLACE "/CMakeLists.txt" "" CGAL_CONFIGURED_LIBRARY_SUBDIR ${libconfigfile})
+     if (NOT ${CGAL_CONFIGURED_LIBRARY_SUBDIR} STREQUAL "CGAL")
+ 
+       string(REPLACE "CGAL" "" CGAL_CONFIGURED_LIBRARY_NAME ${CGAL_CONFIGURED_LIBRARY_SUBDIR})
