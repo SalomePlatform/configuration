@@ -115,14 +115,13 @@ MACRO(SALOME_INSTALL_SCRIPTS file_list path)
   ENDIF(NOT SALOME_INSTALL_SCRIPTS_DEF_PERMS)
   SET(_all_pyc)
   SET(_all_pyo)
-  SET(_all_subdirs)
   FOREACH(file ${file_list})
     SET(PREFIX "")
     SET(_source_prefix "")
     GET_FILENAME_COMPONENT(file_name ${file} NAME)
     IF(NOT IS_ABSOLUTE ${file})
       IF(SALOME_INSTALL_SCRIPTS_WORKING_DIRECTORY)
-	    SET(PREFIX "${SALOME_INSTALL_SCRIPTS_WORKING_DIRECTORY}/")
+        SET(PREFIX "${SALOME_INSTALL_SCRIPTS_WORKING_DIRECTORY}/")
       ENDIF(SALOME_INSTALL_SCRIPTS_WORKING_DIRECTORY)
       SET(_source_prefix "${CMAKE_CURRENT_SOURCE_DIR}/")
     ENDIF(NOT IS_ABSOLUTE ${file})
@@ -134,28 +133,22 @@ MACRO(SALOME_INSTALL_SCRIPTS file_list path)
       # Generate and install the pyc and pyo
       # [ABN] Important: we avoid references or usage of CMAKE_INSTALL_PREFIX which is not correctly set 
       # when using CPack.       
-      SET(_pyc_file "${CMAKE_CURRENT_BINARY_DIR}/${we_ext}.pyc")
-      SET(_pyo_file "${CMAKE_CURRENT_BINARY_DIR}/${we_ext}.pyo")
+      SET(_pyc_file "${CMAKE_CURRENT_BINARY_DIR}/${we_ext}.cpython-${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}.pyc")
+      SET(_pyo_file "${CMAKE_CURRENT_BINARY_DIR}/${we_ext}.cpython-${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}.opt-1.pyc")
       LIST(APPEND _all_pyc ${_pyc_file})
       LIST(APPEND _all_pyo ${_pyo_file})
       ADD_CUSTOM_COMMAND(
-           OUTPUT ${_pyc_file}
-           COMMAND ${PYTHON_EXECUTABLE} -c "import py_compile ; py_compile.compile('${_source_prefix}${file}', '${_pyc_file}', doraise=True )"
-           DEPENDS ${PREFIX}${file}
-           VERBATIM
-       )
-      ADD_CUSTOM_COMMAND(
-           OUTPUT ${_pyo_file}
-           COMMAND ${PYTHON_EXECUTABLE} -O -c "import py_compile ; py_compile.compile('${_source_prefix}${file}', '${_pyo_file}', doraise=True )"
-           DEPENDS ${PREFIX}${file}
-           VERBATIM
-       )
+        OUTPUT ${_pyc_file} ${_pyo_file}
+        COMMAND ${PYTHON_EXECUTABLE} -c "from py_compile import compile; compile('${_source_prefix}${file}', '${_pyc_file}', doraise=True, optimize=0); compile('${_source_prefix}${file}', '${_pyo_file}', doraise=True, optimize=1)"
+        DEPENDS ${PREFIX}${file}
+        VERBATIM
+      )
       # Install the .pyo and the .pyc
-      INSTALL(FILES ${_pyc_file} DESTINATION ${path} PERMISSIONS ${PERMS})
-      INSTALL(FILES ${_pyo_file} DESTINATION ${path} PERMISSIONS ${PERMS})
+      INSTALL(FILES ${_pyc_file} DESTINATION ${path}/__pycache__ PERMISSIONS ${PERMS})
+      INSTALL(FILES ${_pyo_file} DESTINATION ${path}/__pycache__ PERMISSIONS ${PERMS})
     ENDIF(ext STREQUAL .py)
 
-  # get relativa path (from CMAKE_SOURCE_DIR to CMAKE_CURRENT_SOURCE_DIR)
+  # get relative path (from CMAKE_SOURCE_DIR to CMAKE_CURRENT_SOURCE_DIR)
   STRING(REGEX REPLACE ${CMAKE_SOURCE_DIR} "" rel_dir ${CMAKE_CURRENT_SOURCE_DIR})
   # convert "/" to "_"
   IF(rel_dir)
