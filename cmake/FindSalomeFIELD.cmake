@@ -19,28 +19,28 @@
 # Author: Adrien Bruneton
 #
 
-# MED detection for Salome - this is typically called by dependent modules
+# FIELD detection for Salome - this is typically called by dependent modules
 # (PARAVIS, etc ...)
 #
 # The detection is simpler than for other prerequisites.
 # See explanation in FindSalomeKERNEL.cmake.
 #
 
-IF(NOT SalomeMED_FIND_QUIETLY)
-  MESSAGE(STATUS "Looking for Salome MED ...")
+IF(NOT SalomeFIELD_FIND_QUIETLY)
+  MESSAGE(STATUS "Looking for Salome FIELD ...")
 ENDIF()
 
-SET(CMAKE_PREFIX_PATH "${MED_ROOT_DIR}")
-SALOME_FIND_PACKAGE(SalomeMED SalomeMED CONFIG)
+SET(CMAKE_PREFIX_PATH "${FIELD_ROOT_DIR}")
+SALOME_FIND_PACKAGE(SalomeFIELD SalomeFIELD CONFIG)
 
-IF(NOT SalomeMED_FIND_QUIETLY)
-  MESSAGE(STATUS "Found Salome MED: ${MED_ROOT_DIR}")
+IF(NOT SalomeFIELD_FIND_QUIETLY)
+  MESSAGE(STATUS "Found Salome FIELD: ${FIELD_ROOT_DIR}")
 ENDIF()
 
-FIND_LIBRARY(medcouplingcorba medcouplingcorba ${MED_ROOT_DIR}/lib/salome)
-FIND_LIBRARY(medcouplingclient medcouplingclient ${MED_ROOT_DIR}/lib/salome)
-FIND_LIBRARY(SalomeIDLMED SalomeIDLMED ${MED_ROOT_DIR}/lib/salome)
+FIND_LIBRARY(medcouplingcorba medcouplingcorba ${FIELD_ROOT_DIR}/lib/salome)
+FIND_LIBRARY(medcouplingclient medcouplingclient ${FIELD_ROOT_DIR}/lib/salome)
+FIND_LIBRARY(SalomeIDLMED SalomeIDLMED ${FIELD_ROOT_DIR}/lib/salome)
 
-FOREACH(_res ${SalomeMED_EXTRA_ENV})
-  SALOME_ACCUMULATE_ENVIRONMENT(${_res} "${SalomeMED_EXTRA_ENV_${_res}}")
+FOREACH(_res ${SalomeFIELD_EXTRA_ENV})
+  SALOME_ACCUMULATE_ENVIRONMENT(${_res} "${SalomeFIELD_EXTRA_ENV_${_res}}")
 ENDFOREACH()
