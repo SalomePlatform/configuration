@@ -108,7 +108,7 @@ ENDMACRO(PARSE_ARGUMENTS)
 # with this macro is returned via the given variable.
 #----------------------------------------------------------------------------
 MACRO(SALOME_INSTALL_SCRIPTS file_list path)
-  PARSE_ARGUMENTS(SALOME_INSTALL_SCRIPTS "WORKING_DIRECTORY;TARGET_NAME" "DEF_PERMS" ${ARGN})
+  PARSE_ARGUMENTS(SALOME_INSTALL_SCRIPTS "WORKING_DIRECTORY;TARGET_NAME;EXTRA_DPYS" "DEF_PERMS" ${ARGN})
   SET(PERMS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
   IF(NOT SALOME_INSTALL_SCRIPTS_DEF_PERMS)
     SET(PERMS ${PERMS} OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE)
@@ -137,6 +137,7 @@ MACRO(SALOME_INSTALL_SCRIPTS file_list path)
       SET(_pyo_file "${CMAKE_CURRENT_BINARY_DIR}/${we_ext}.cpython-${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}.opt-1.pyc")
       LIST(APPEND _all_pyc ${_pyc_file})
       LIST(APPEND _all_pyo ${_pyo_file})
+      #message("@@@@ '${_source_prefix}${file}' gives '${_pyc_file}' and depends  '${PREFIX}${file}'")
       ADD_CUSTOM_COMMAND(
         OUTPUT ${_pyc_file} ${_pyo_file}
         COMMAND ${PYTHON_EXECUTABLE} -c "from py_compile import compile; compile('${_source_prefix}${file}', '${_pyc_file}', doraise=True, optimize=0); compile('${_source_prefix}${file}', '${_pyo_file}', doraise=True, optimize=1)"
@@ -170,6 +171,9 @@ MACRO(SALOME_INSTALL_SCRIPTS file_list path)
      IF(SALOME_INSTALL_SCRIPTS_TARGET_NAME)
        SET(${SALOME_INSTALL_SCRIPTS_TARGET_NAME} ${_target_name})
      ENDIF(SALOME_INSTALL_SCRIPTS_TARGET_NAME)
+     IF(SALOME_INSTALL_SCRIPTS_EXTRA_DPYS)
+       ADD_DEPENDENCIES(${_target_name} ${SALOME_INSTALL_SCRIPTS_EXTRA_DPYS})
+     ENDIF(SALOME_INSTALL_SCRIPTS_EXTRA_DPYS)
   ENDIF()
 ENDMACRO(SALOME_INSTALL_SCRIPTS)
 
