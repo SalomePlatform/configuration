@@ -1,0 +1,10 @@
+
+patches applied to SALOME master on October 15th, with their sha1sum :
+
+    64c74ba409992518c6c639dd3a5a19bde88cbc1f  doxygen-1.8.3.1.patch
+    046eefd38729b4d9f8fe2d90116cc5889e61399d  doxygen_compatibility_flex260.patch
+    16a744c44edd656313518a2c4395faf3c2231b29  freeimage-3.16.0_gcc6.patch
+    0f7a3ede54223bcf9e8fd02fb3a70cdfc3feadd3  gl2ps-1.4.0-GLUT.patch
+    584680046919e11e5fa521a68b098a926542c0e3  metis-use_cat_not_more.patch
+    ab660d036e7f761e6c8d0df1cc994c5d2c9ec2db  netgen-5.3.1-for-SALOME-OCCT-7.2.0.patch
+
