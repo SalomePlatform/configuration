@@ -1,0 +1,149 @@
+KERNEL
+> cmake  -DSALOME_USE_LIBBATCH=ON -DSWIG_EXECUTABLE=${SWIG_ROOT_DIR}/bin/swig  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/KERNEL /volatile/crouzet/SAT/SALOME-master-CO7/SOURCES/KERNEL
+
+GUI
+> cmake  -DSWIG_EXECUTABLE=${SWIG_ROOT_DIR}/bin/swig  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/GUI /volatile/crouzet/SAT/SALOME-master-CO7/SOURCES/GUI
+
+GEOM
+> cmake  -DSWIG_EXECUTABLE=${SWIG_ROOT_DIR}/bin/swig -DSALOME_GEOM_USE_OPENCV=ON  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/GEOM /volatile/crouzet/SAT/SALOME-master-CO7/SOURCES/GEOM
+
+MEDCOUPLING
+> cmake  -DMEDCOUPLING_ENABLE_PYTHON=ON -DMEDCOUPLING_ENABLE_PARTITIONER=ON -DMEDCOUPLING_ENABLE_RENUMBER=ON -DMEDCOUPLING_PARTITIONER_METIS=ON -DMEDCOUPLING_PARTITIONER_SCOTCH=ON -DMEDCOUPLING_PARTITIONER_PARMETIS=OFF -DMEDCOUPLING_MICROMED=OFF -DMEDCOUPLING_USE_MPI=OFF  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/MEDCOUPLING /volatile/crouzet/SAT/SALOME-master-CO7/SOURCES/MEDCOUPLING
+
+BLSURFPLUGIN
+> cmake  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/BLSURFPLUGIN /volatile/crouzet/SAT/SALOME-master-CO7/SOURCES/BLSURFPLUGIN
+
+CALCULATOR
+> cmake  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/CALCULATOR /volatile/crouzet/SAT/SALOME-master-CO7/SOURCES/CALCULATOR
+
+MED
+> cmake  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/MED /volatile/crouzet/SAT/SALOME-master-CO7/SOURCES/MED
+
+YACS
+> cmake  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/YACS /volatile/crouzet/SAT/SALOME-master-CO7/SOURCES/YACS
+
+PARAVIS
+> cmake  -DSALOME_PARAVIS_USE_GEOM_SOURCE=ON -DSALOME_PARAVIS_USE_SMESH_SOURCE=ON  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/PARAVIS /volatile/crouzet/SAT/SALOME-master-CO7/SOURCES/PARAVIS
+
+SMESH
+> cmake  -DSALOME_SMESH_USE_CGNS:BOOL=ON -DSWIG_EXECUTABLE=${SWIG_ROOT_DIR}/bin/swig -DSALOME_SMESH_DYNLOAD_LOCAL:BOOL=ON -DSALOME_SMESH_BUILD_FRENCH_DOC=OFF  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/SMESH /volatile/crouzet/SAT/SALOME-master-CO7/SOURCES/SMESH
+
+JOBMANAGER
+> cmake  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/JOBMANAGER /volatile/crouzet/SAT/SALOME-master-CO7/SOURCES/JOBMANAGER
+
+CAS
+> cmake  -DUSE_TCL=OFF -DBUILD_MODULE_Draw=OFF -DUSE_FREETYPE=ON -D3RDPARTY_FREETYPE_DIR=$FREETYPEDIR -DCMAKE_BUILD_TYPE=Release -DUSE_GL2PS=ON -D3RDPARTY_GL2PS_DIR=$GL2PSDIR -DUSE_FREEIMAGE=ON -D3RDPARTY_FREEIMAGE_DIR=$FREEIMAGEDIR  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/CAS /volatile/crouzet/SAT/SALOME-master-CO7/SOURCES/CAS
+
+HEXABLOCK
+> cmake  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/HEXABLOCK /volatile/crouzet/SAT/SALOME-master-CO7/SOURCES/HEXABLOCK
+
+NETGENPLUGIN
+> cmake  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/NETGENPLUGIN /volatile/crouzet/SAT/SALOME-master-CO7/SOURCES/NETGENPLUGIN
+
+HEXABLOCKPLUGIN
+> cmake  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/HEXABLOCKPLUGIN /volatile/crouzet/SAT/SALOME-master-CO7/SOURCES/HEXABLOCKPLUGIN
+
+GHS3DPRLPLUGIN
+> cmake  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/GHS3DPRLPLUGIN /volatile/crouzet/SAT/SALOME-master-CO7/SOURCES/GHS3DPRLPLUGIN
+
+GMSHPLUGIN
+> cmake  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/GMSHPLUGIN /volatile/crouzet/SAT/SALOME-master-CO7/SOURCES/GMSHPLUGIN
+
+HexoticPLUGIN
+> cmake  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/HexoticPLUGIN /volatile/crouzet/SAT/SALOME-master-CO7/SOURCES/HexoticPLUGIN
+
+PYCALCULATOR
+> cmake  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/PYCALCULATOR /volatile/crouzet/SAT/SALOME-master-CO7/SOURCES/PYCALCULATOR
+
+HELLO
+> cmake  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/HELLO /volatile/crouzet/SAT/SALOME-master-CO7/SOURCES/HELLO
+
+PYHELLO
+> cmake  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/PYHELLO /volatile/crouzet/SAT/SALOME-master-CO7/SOURCES/PYHELLO
+
+HYBRIDPLUGIN
+> cmake  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/HYBRIDPLUGIN /volatile/crouzet/SAT/SALOME-master-CO7/SOURCES/HYBRIDPLUGIN
+
+GHS3DPLUGIN
+> cmake  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/GHS3DPLUGIN /volatile/crouzet/SAT/SALOME-master-CO7/SOURCES/GHS3DPLUGIN
+
+LIBBATCH
+> cmake  -DSWIG_EXECUTABLE=${SWIG_ROOT_DIR}/bin/swig  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/LIBBATCH /volatile/crouzet/SAT/SALOME-master-CO7/SOURCES/LIBBATCH
+
+HOMARD
+> cmake  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/HOMARD /volatile/crouzet/SAT/SALOME-master-CO7/SOURCES/HOMARD
+
+SALOME
+> cmake  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/SALOME /volatile/crouzet/SAT/SALOME-master-CO7/SOURCES/SALOME
+
+gl2ps
+> cmake  -DCMAKE_BUILD_TYPE=Release -DENABLE_PNG=ON -DENABLE_ZLIB=ON -DENABLE_GLUT=OFF  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/gl2ps /volatile/crouzet/SAT/SALOME-master-CO7/SOURCES/gl2ps
+
+freetype
+> cmake  -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_SHARED_LIBS:BOOL=true -DWITH_HarfBuzz=OFF  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/freetype /volatile/crouzet/SAT/SALOME-master-CO7/SOURCES/freetype
+
+hdf5
+*** cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_INSTALL_PREFIX:STRING=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/hdf5 -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_SHARED_LIBS:BOOL=ON -DHDF5_ALLOW_EXTERNAL_SUPPORT:BOOL=ON -DHDF5_BUILD_HL_LIB:BOOL=ON -DHDF5_ENABLE_PARALLEL:BOOL=OFF -DHDF5_BUILD_CPP_LIB:BOOL=ON
+
+cgns
+*** cmake -DCMAKE_INSTALL_PREFIX:STRING=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/cgns -DCMAKE_BUILD_TYPE:STRING=Release -DENABLE_HDF5=ON
+
+gmsh
+*** cmake -DCMAKE_INSTALL_PREFIX=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/gmsh -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_BUILD_TYPE=Release -DENABLE_BUILD_SHARED=ON -DENABLE_ACIS=OFF -DENABLE_FLTK=OFF -DENABLE_MED=OFF -DENABLE_ONELAB_METAMODEL=OFF -DENABLE_PARSER=ON -DENABLE_PETSC=OFF
+
+med
+*** cmake -DCMAKE_INSTALL_PREFIX:STRING=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/med -DCMAKE_BUILD_TYPE:STRING=Release -DMEDFILE_BUILD_STATIC_LIBS:BOOL=OFF -DMEDFILE_BUILD_SHARED_LIBS:BOOL=ON -DHDF5_ROOT_DIR:STRING=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/hdf5 -DMEDFILE_USE_MPI:BOOL=OFF
+
+opencv
+*** cmake -DCMAKE_INSTALL_PREFIX:STRING=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/opencv -DCMAKE_BUILD_TYPE:STRING=Release -DWITH_CUDA:BOOL=OFF -DWITH_FFMPEG:BOOL=OFF -DPYTHON_EXECUTABLE=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/Python/bin/python -DPYTHON_INCLUDE_DIRS=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/Python/include/python3.5 -DPYTHON_LIBRARY=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/Python/lib/libpython3.5.so -DBUILD_opencv_java=OFF
+
+ParaView
+*** cmake -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX:STRING=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/ParaView -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_SHARED_LIBS:BOOL=ON -DBUILD_TESTING:BOOL=OFF -DCMAKE_CXX_FLAGS:STRING=-m64 -DCMAKE_C_FLAGS:STRING=-m64 -DPARAVIEW_INSTALL_DEVELOPMENT_FILES:BOOL=ON -DPARAVIEW_USE_MPI:BOOL=OFF -DCMAKE_CXX_COMPILER:STRING=/usr/bin/g++ -DCMAKE_C_COMPILER:STRING=/usr/bin/gcc -DPARAVIEW_ENABLE_CATALYST:BOOL=OFF -DPARAVIEW_ENABLE_COPROCESSING:BOOL=OFF -DVTK_USE_64BIT_IDS:BOOL=OFF -DVTK_PYTHON_FULL_THREADSAFE=ON -DVTK_NO_PYTHON_THREADS:BOOL=OFF -DVTK_USE_SYSTEM_PYGMENTS:BOOL=ON -DVTK_INSTALL_LIBRARY_DIR=lib/paraview-5.6 -DVTK_INSTALL_ARCHIVE_DIR=lib/paraview-5.6 -DVTK_PYTHON_SITE_PACKAGES_SUFFIX=site-packages -DPARAVIEW_INSTALL_PLUGINS_DIR=lib/paraview-5.6/plugins -DVTKm_INSTALL_LIB_DIR=lib/paraview-5.6 -DVTK_REPORT_OPENGL_ERRORS:BOOL=OFF -DVTK_RENDERING_BACKEND:STRING=OpenGL2 -DPARAVIEW_BUILD_QT_GUI:BOOL=ON -DPARAVIEW_QT_VERSION=5 -DQT_HELP_GENERATOR:STRING=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/qt/bin/qhelpgenerator -DVTK_BUILD_QT_DESIGNER_PLUGIN:BOOL=OFF -DPARAVIEW_ENABLE_PYTHON:BOOL=ON -DVTK_WRAP_PYTHON:BOOL=ON -DPYTHON_EXECUTABLE:STRING=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/Python/bin/python3.5 -DPYTHON_INCLUDE_DIR:STRING=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/Python/include/python3.5 -DPYTHON_LIBRARY:STRING=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/Python/lib/libpython3.5.so -DVTK_WRAP_JAVA:BOOL=OFF -DVTK_USE_SYSTEM_HDF5:BOOL=ON -DPARAVIEW_USE_VISITBRIDGE=ON -DBOOST_ROOT=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/boost -DVTK_USE_SYSTEM_GL2PS:BOOL=ON -DGL2PS_INCLUDE_DIR:STRING=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/gl2ps/include -DGL2PS_LIBRARY:STRING=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/gl2ps/lib/libgl2ps.so -DVTK_USE_SYSTEM_LIBXML2:BOOL=ON -DLIBXML2_INCLUDE_DIR:STRING=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/libxml2/include/libxml2 -DLIBXML2_LIBRARIES:STRING=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/libxml2/lib/libxml2.so -DLIBXML2_XMLLINT_EXECUTABLE=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/libxml2/bin/xmllint -DVTK_USE_SYSTEM_FREETYPE:BOOL=ON -DFREETYPE_INCLUDE_DIRS:STRING=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/freetype/include/freetype2 -DFREETYPE_LIBRARY:STRING=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/freetype/lib/libfreetype.so -DPARAVIEW_BUILD_PLUGIN_Moments:BOOL=OFF -DPARAVIEW_BUILD_PLUGIN_SLACTools:BOOL=OFF -DPARAVIEW_BUILD_PLUGIN_SierraPlotTools:BOOL=OFF -DPARAVIEW_BUILD_PLUGIN_PacMan:BOOL=OFF -DPARAVIEW_ENABLE_WEB=OFF -DPARAVIEW_BUILD_PLUGIN_EyeDomeLighting:BOOL=ON -DPARAVIEW_BUILD_PLUGIN_SurfaceLIC:BOOL=ON -DPARAVIEW_ENABLE_MATPLOTLIB:BOOL=ON -DCGNS_FIND_REQUIRED:BOOL=ON -DCGNS_INCLUDE_DIR:STRING=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/cgns/include -DCGNS_LIBRARY:STRING=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/cgns/lib/libcgns.so -DVTK_USE_SYSTEM_CGNS:BOOL=ON
+
+planegcs
+*** cmake  -DCMAKE_INSTALL_PREFIX=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/planegcs
+
+eigen
+*** cmake  -DCMAKE_INSTALL_PREFIX=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/eigen
+
+lapack
+*** cmake /volatile/crouzet/SAT/SALOME-master-CO7/SOURCES/lapack -DCMAKE_INSTALL_PREFIX=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/lapack -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS:BOOL=ON -DCMAKE_CXX_FLAGS=-fPIC -DCMAKE_C_FLAGS=-fPIC -DUSE_OPTIMIZED_BLAS=OFF -DCBLAS=ON -DLAPACKE=ON
+
+netgen
+./configure --prefix=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/netgen --with-occ=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/CAS --with-tcl=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/tcl/lib --with-tk=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/tcl/lib --disable-openmp --with-tclinclude=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/tcl/include
+running CONFIG_SHELL=/bin/sh /bin/sh ./configure --prefix=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/netgen --with-occ=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/CAS --with-tcl=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/tcl/lib --with-tk=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/tcl/lib --disable-openmp --with-tclinclude=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/tcl/include CXXFLAGS=-I/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/CAS/include/opencascade -O2 -m64 -std=c++0x --no-create --no-recursion
+
+graphviz
+*** ./configure --prefix=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/graphviz --with-tcl=no --with-expat=no --with-qt=no --with-cgraph=no  --enable-perl=no
+running CONFIG_SHELL=/bin/sh /bin/sh ./configure --prefix=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/graphviz --with-tcl=no --with-expat=no --with-qt=no --with-cgraph=no --enable-perl=no --enable-ltdl-convenience --no-create --no-recursion
+
+qt
+*** configure  -release -opensource -no-rpath -verbose -no-separate-debug-info -confirm-license -qt-libpng -qt-xcb -no-eglfs -dbus-runtime -skip qtwebengine -skip wayland -skip qtgamepad -system-freetype -qt-harfbuzz -no-openssl -no-glib
+
+omniORB
+*** configure --disable-ipv6
+
+Python
+*** configure --prefix=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/Python --enable-shared --with-threads --without-pymalloc --enable-unicode=ucs4
+
+omniORBpy
+*** configure
+
+sip
+*** configure.py -b /volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/sip/bin -d /volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/sip/lib/python3.5/site-packages -e /volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/sip/include/python3.5 -v /volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/sip/sip
+
+swig
+*** configure --without-pcre --without-octave
+
+cppunit
+*** configure --enable-static LDFLAGS="-ldl"
+
+tcl
+*** configure --enable-shared --enable-threads
+
+tk
+*** configure --enable-shared --enable-threads --with-tcl=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/tcl/lib --with-tclinclude=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/tcl/include
+
+PyQt
+*** configure.py --confirm-license --no-designer-plugin --verbose --bindir=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/PyQt/bin --destdir=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/PyQt/lib/python3.5/site-packages --sipdir=/volatile/crouzet/SAT/SALOME-master-CO7/INSTALL/PyQt/sip --disable=QtNetwork --disable=QtWebSockets
+
