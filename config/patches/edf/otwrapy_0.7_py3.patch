@@ -1,0 +1,12 @@
+diff -Naur a/setup.py b/setup.py
+--- a/setup.py	2017-10-26 11:31:16.000000000 +0200
++++ b/setup.py	2018-09-13 13:58:34.256434654 +0200
+@@ -6,7 +6,7 @@
+ from codecs import open
+ from os import path
+ 
+-with open('otwrapy/__init__.py') as fid:
++with open('otwrapy/__init__.py', 'r') as fid:
+     for line in fid:
+         if line.startswith('__version__'):
+             version = line.strip().split()[-1][1:-1]

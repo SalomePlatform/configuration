@@ -1,0 +1,74 @@
+diff -Naur a/python3/omniORB/__init__.py b/python3/omniORB/__init__.py
+--- a/python3/omniORB/__init__.py	2015-06-08 13:39:59.000000000 +0200
++++ b/python3/omniORB/__init__.py	2017-05-09 14:57:00.521302183 +0200
+@@ -458,17 +458,65 @@
+     def __repr__(self):
+         return self._n
+ 
+-    def __cmp__(self, other):
++    def __eq__(self, other):
+         try:
+             if isinstance(other, EnumItem):
+                 if other._parent_id == self._parent_id:
+-                    return cmp(self._v, other._v)
++                    return self._v == other._v
+                 else:
+-                    return cmp(self._parent_id, other._parent_id)
++                    return self._parent_id == other._parent_id
+             else:
+-                return cmp(id(self), id(other))
++                return id(self) == id(other)
+         except:
+-            return cmp(id(self), id(other))
++            return id(self) == id(other)
++
++    def __lt__(self, other):
++        try:
++            if isinstance(other, EnumItem):
++                if other._parent_id == self._parent_id:
++                    return self._v < other._v
++                else:
++                    return self._parent_id < other._parent_id
++            else:
++                return id(self) < id(other)
++        except:
++            return id(self) < id(other)
++
++    def __le__(self, other):
++        try:
++            if isinstance(other, EnumItem):
++                if other._parent_id == self._parent_id:
++                    return self._v <= other._v
++                else:
++                    return self._parent_id <= other._parent_id
++            else:
++                return id(self) <= id(other)
++        except:
++            return id(self) <= id(other)
++
++    def __gt__(self, other):
++        try:
++            if isinstance(other, EnumItem):
++                if other._parent_id == self._parent_id:
++                    return self._v > other._v
++                else:
++                    return self._parent_id > other._parent_id
++            else:
++                return id(self) > id(other)
++        except:
++            return id(self) > id(other)
++
++    def __ge__(self, other):
++        try:
++            if isinstance(other, EnumItem):
++                if other._parent_id == self._parent_id:
++                    return self._v >= other._v
++                else:
++                    return self._parent_id >= other._parent_id
++            else:
++                return id(self) >= id(other)
++        except:
++            return id(self) >= id(other)
+ 
+     def __hash__(self):
+         return hash(self._parent_id + "/" + self._n)

@@ -1,0 +1,12 @@
+diff -Naur Pillow-3.4.2/setup.py Pillow-3.4.2-new/setup.py
+--- Pillow-3.4.2/setup.py	2017-05-10 14:42:20.479585980 +0200
++++ Pillow-3.4.2-new/setup.py	2017-05-10 14:41:33.468524757 +0200
+@@ -116,7 +116,7 @@
+ ZLIB_ROOT = None
+ IMAGEQUANT_ROOT = None
+ TIFF_ROOT = None
+-FREETYPE_ROOT = None
++FREETYPE_ROOT = os.getenv("FREETYPEDIR")
+ LCMS_ROOT = None
+ 
+ 

@@ -1,0 +1,148 @@
+KERNEL
+kernel.py:84:      self.config_options += " -DCMAKE_MODULE_PATH=${CONFIGURATION_CMAKE_DIR} "
+
+GUI
+gui.py:78:      self.config_options += ' -DCMAKE_MODULE_PATH="${CONFIGURATION_CMAKE_DIR}" '
+gui.py:81:      self.config_options += " -DPARAVIEW_VERSION=${PVVERSION}"
+gui.py:84:      self.config_options += " -DWITH_MPI=${ENVOPENMPI_LIB}"
+gui.py:87:      self.config_options += " -DSALOME_BUILD_WITH_QT%d=ON " % misc.major(version_name)
+gui.py:90:      self.config_options += " -DCMAKE_INCLUDE_DIRECTORIES_BEFORE=ON"
+gui.py:94:      self.config_options += " -DSWIG_EXECUTABLE:PATH=$(which swig%s) " % swig_version
+gui.py:98:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+gui.py:108:      self.config_options += " -DQWT_LIBRARY=$QWT_INSTALL_DIR/lib/libqwt.so"
+gui.py:111:      self.config_options += " -DCAS_ROOT_DIR=$OCC_INSTALL_DIR"
+gui.py:114:      self.config_options += " -DQT%d_ROOT_DIR=$QT_INSTALL_DIR " % misc.major(version_name)
+gui.py:118:        self.config_options += " -DPYQT%s_ROOT_DIR=$PYQT_INSTALL_DIR" % qtversion
+
+GEOM
+geom.py:62:      self.config_options += " -DSALOME_GEOM_USE_OPENCV=ON "
+geom.py:65:      self.config_options += ' -DCMAKE_MODULE_PATH="${CONFIGURATION_CMAKE_DIR}" '
+geom.py:69:      self.config_options += " -DSWIG_EXECUTABLE:PATH=$(which swig%s) " % swig_version
+geom.py:73:      self.config_options += ' -DFREETYPE_INCLUDE_DIR_freetype2="${FREETYPE_INSTALL_DIR}/include/freetype2/freetype" '
+geom.py:74:      self.config_options += ' -DFREETYPE_INCLUDE_DIR_ft2build="${FREETYPE_INSTALL_DIR}/include/freetype2/freetype" '
+geom.py:75:      self.config_options += ' -DFREETYPE_LIBRARY="${FREETYPE_INSTALL_DIR}/lib" '
+
+HOMARD
+homard.py:81:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+
+GMSHPLUGIN
+gmshplugin.py:55:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+
+FIELDS
+fields.py:70:      self.config_options += ' -DSALOME_USE_MPI=ON -DSALOME_FIELDS_ENABLE_PARTITIONER=OFF '
+fields.py:71:      self.config_options += ' -DSALOME_FIELDS_ENABLE_RENUMBER=OFF -DSALOME_BUILD_TESTS=OFF '
+fields.py:72:      self.config_options += ' -DSALOME_BUILD_DOC=OFF -DSALOME_FIELDS_STANDALONE=OFF '
+fields.py:73:      self.config_options += ' -DSALOME_FIELDS_MICROFIELDS=OFF -DMPI_CXX_LIBRARIES:FILEPATH=${ENVOPENMPI_LIB} libmpi_cxx.so '
+fields.py:74:      self.config_options += ' -DMPI_C_LIBRARIES:FILEPATH=${ENVOPENMPI_LIB} libmpi.so '
+fields.py:75:      self.config_options += ' -DMPI_LIBRARY:PATH=${ENVOPENMPI_LIB} '
+fields.py:76:      self.config_options += ' -DCMAKE_SHARED_LINKER_FLAGS="-L${ENVOPENMPI_LIB}" -lmpi_cxx -lmpi " '
+fields.py:77:      self.config_options += ' -DCMAKE_EXE_LINKER_FLAGS="-L${ENVOPENMPI_LIB}" -lmpi_cxx -lmpi" '
+fields.py:81:      self.config_options += " -DMEDCOUPLING_ROOT_DIR=${MEDCOUPLING_INSTALL_DIR} "
+fields.py:83:      self.config_options += " -DFIELDSFILE_ROOT_DIR=${MEDFICHIER_INSTALL_DIR} "
+fields.py:85:      self.config_options += " -DMMETIS_ROOT_DIR=${METIS_INSTALL_DIR} "
+fields.py:87:      self.config_options += " -DSCOTCH_ROOT_DIR=${SCOTCH_INSTALL_DIR} "
+fields.py:91:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+
+YACS
+yacs.py:81:      self.config_options += " -DSALOME_BUILD_GUI=ON "
+yacs.py:87:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+
+MODULECARMEL
+modulecarmel.py:43:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+
+LIGHT
+light.py:52:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+
+PYCALCULATOR
+pycalculator.py:50:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+hybridplugin.py:54:      self.config_options += "--with-meshgems=$MESHGEMS_INSTALL_DIR"
+hybridplugin.py:58:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+
+component.py:49:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+
+oscard.py:43:      self.config_options += " -DCMAKE_MODULE_PATH=${CONFIGURATION_CMAKE_DIR} "
+
+calculator.py:49:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+
+parametric.py:55:      self.config_options += " -DPYTHON_EXECUTABLE=$(which python%s)" % self.python_version
+parametric.py:59:      self.config_options += " -DPYTHON_ROOT_DIR=${PYTHONHOME}"
+parametric.py:63:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+
+openturns.py:91:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+
+hello1.py:52:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+atomgen.py:55:      self.config_options += " -DSWIG_EXECUTABLE:PATH=$(which swig%s) " % swig_version
+atomgen.py:56:      self.config_options += " -DSWIG_DIR:PATH=$(swig%s -swiglib) " % swig_version
+atomgen.py:59:      self.config_options += " -DCMAKE_INCLUDE_DIRECTORIES_BEFORE=ON"
+atomgen.py:63:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+ghs3dplugin.py:51:      self.config_options += " -DMESHGEMS_ROOT_DIR=\"${MESHGEMS_ROOT_DIR}\" "
+ghs3dplugin.py:55:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+kernel.py:80:      self.config_options += " -DSALOME_BUILD_TESTS=ON "
+kernel.py:82:      self.config_options += " -DSALOME_USE_LIBBATCH=ON "
+kernel.py:84:      self.config_options += " -DCMAKE_MODULE_PATH=${CONFIGURATION_CMAKE_DIR} "
+kernel.py:86:      self.config_options += ' -DSALOME_USE_MPI=ON '
+kernel.py:89:      self.config_options += " -DSWIG_EXECUTABLE:PATH=$(which swig%s) " % swig_version
+kernel.py:93:      self.config_options += " --with-cppunit=${CPPUNIT_INSTALL_DIR} "
+kernel.py:97:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+shaper.py:38:    self.config_options += "-DADD_MODELS_TESTS=TRUE"
+shaper.py:71:      self.config_options += " -DQT%d_ROOT_DIR=${QT_INSTALL_DIR} " % misc.major(version_name)
+shaper.py:75:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+modulemagnetothermic.py:48:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+hexablockplugin.py:48:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+eficas.py:60:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+med.py:70:      self.config_options += ' -DSALOME_USE_MPI=ON -DSALOME_MED_ENABLE_PARTITIONER=OFF '
+med.py:71:      self.config_options += ' -DSALOME_MED_ENABLE_RENUMBER=OFF -DSALOME_BUILD_TESTS=OFF '
+med.py:72:      self.config_options += ' -DSALOME_BUILD_DOC=OFF -DSALOME_MED_STANDALONE=OFF '
+med.py:73:      self.config_options += ' -DSALOME_MED_MICROMED=OFF -DMPI_CXX_LIBRARIES:FILEPATH=${ENVOPENMPI_LIB} libmpi_cxx.so '
+med.py:74:      self.config_options += ' -DMPI_C_LIBRARIES:FILEPATH=${ENVOPENMPI_LIB} libmpi.so '
+med.py:75:      self.config_options += ' -DMPI_LIBRARY:PATH=${ENVOPENMPI_LIB} '
+med.py:76:      self.config_options += ' -DCMAKE_SHARED_LINKER_FLAGS="-L${ENVOPENMPI_LIB}" -lmpi_cxx -lmpi " '
+med.py:77:      self.config_options += ' -DCMAKE_EXE_LINKER_FLAGS="-L${ENVOPENMPI_LIB}" -lmpi_cxx -lmpi" '
+med.py:81:      self.config_options += " -DMEDCOUPLING_ROOT_DIR=${MEDCOUPLING_INSTALL_DIR} "
+med.py:83:      self.config_options += " -DMEDFILE_ROOT_DIR=${MEDFICHIER_INSTALL_DIR} "
+med.py:85:      self.config_options += " -DMMETIS_ROOT_DIR=${METIS_INSTALL_DIR} "
+med.py:87:      self.config_options += " -DSCOTCH_ROOT_DIR=${SCOTCH_INSTALL_DIR} "
+med.py:91:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+modulecarmelcnd.py:47:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+documentation.py:63:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+pylight.py:55:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+pyhello1.py:54:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+hexablock.py:52:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+jobmanager.py:53:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+atomic.py:53:      self.config_options += " -DSWIG_EXECUTABLE:PATH=$(which swig%s) " % swig_version
+atomic.py:54:      self.config_options += " -DSWIG_DIR:PATH=$(swig%s -swiglib) " % swig_version
+atomic.py:57:      self.config_options += " -DCMAKE_INCLUDE_DIRECTORIES_BEFORE=ON"
+ot.py:80:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+dsccode.py:48:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+smesh.py:113:      self.config_options += " -DCMAKE_MODULE_PATH=\"${CONFIGURATION_CMAKE_DIR}\" "
+smesh.py:115:      self.config_options += " -DSALOME_SMESH_USE_TBB=ON "
+smesh.py:117:      self.config_options += " -DSALOME_SMESH_USE_CGNS=ON "
+smesh.py:119:      self.config_options += ' -DSALOME_USE_MPI=ON -DCMAKE_SHARED_LINKER_FLAGS="-L${ENVOPENMPI_LIB} -lmpi_cxx -lmpi" '
+smesh.py:120:      self.config_options += ' -DCMAKE_EXE_LINKER_FLAGS="-L${ENVOPENMPI_LIB} -lmpi_cxx -lmpi" '
+smesh.py:123:      self.config_options += " -DSWIG_EXECUTABLE:PATH=$(which swig%s) " % swig_version
+smesh.py:130:      self.config_options += " -DPADDERHOME:STRING=${PADDERHOME} "
+smesh.py:133:        self.config_options += " --with-TBB=${TBB_INSTALL_DIR}"
+smesh.py:136:        self.config_options += " --with-cgns=${CGNSLIB_INSTALL_DIR}"
+smesh.py:138:        self.config_options += " -DCGNS_ROOT_DIR=${CGNSLIB_INSTALL_DIR} "
+smesh.py:140:      self.config_options += " -DMEDFILE_ROOT_DIR=$MEDFICHIER_INSTALL_DIR "
+smesh.py:142:      self.config_options += " -DQWT_ROOT_DIR=$QWT_INSTALL_DIR "
+smesh.py:148:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+adao.py:53:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+paravis.py:61:    self.config_options += " -DSALOME_PARAVIS_MINIMAL_CORBA=ON "
+paravis.py:77:      self.config_options += " -DPYTHON_EXECUTABLE=$(which python%s)" % self.python_version
+paravis.py:79:      self.config_options += ' -DSALOME_USE_MPI=ON -DHDF5_IS_PARALLEL:BOOL=ON -DSALOME_PARAVIS_BUILD_PLUGINS=ON '
+paravis.py:83:      self.config_options += " -DPYTHON_ROOT_DIR=${PYTHONHOME}"
+paravis.py:87:      self.config_options += " -DVTK_DIR=${PARAVIEW_INSTALL_DIR}/lib/cmake/paraview-%s " % pvversion
+paravis.py:91:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+ghs3dprlplugin.py:53:      self.config_options += ' -DCMAKE_SHARED_LINKER_FLAGS="-L${ENVOPENMPI_LIB} -lmpi_cxx -lmpi" '
+ghs3dprlplugin.py:54:      self.config_options += ' -DCMAKE_EXE_LINKER_FLAGS="-L${ENVOPENMPI_LIB} -lmpi_cxx -lmpi" '
+ghs3dprlplugin.py:61:      self.config_options += " -DMESHGEMS_ROOT_DIR=\"${MESHGEMS_ROOT_DIR}\" "
+moduleinterpol.py:43:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+atomsolv.py:55:      self.config_options += " -DSWIG_EXECUTABLE:PATH=$(which swig%s) " % swig_version
+atomsolv.py:56:      self.config_options += " -DSWIG_DIR:PATH=$(swig%s -swiglib) " % swig_version
+atomsolv.py:59:      self.config_options += " -DCMAKE_INCLUDE_DIRECTORIES_BEFORE=ON"
+atomsolv.py:63:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+netgenplugin.py:57:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+hexoticplugin.py:55:      self.config_options += " -DSPHINX_ROOT_DIR:FILEPATH=$(dirname $(dpkg -L python3-sphinx |grep sphinx-build))"
+
+
