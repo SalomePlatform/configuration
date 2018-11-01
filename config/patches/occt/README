@@ -35,3 +35,18 @@ Comments
 9. omniorb
    ! Patch is applied to installed omniorb in order to set correct path to python3 executable
 
+10. matplotlib
+   - matplotlib.001_build_procedure.patch : patch for creation matplotlib configuration file for build procedure
+
+11. med
+   - med.001.bug_correct_cmake.patch : patch to correct med-4.0.0r1 CMake build procedure
+
+12. opencv
+   - opencv.001_compile.patch : patch to reduce gcc optimization level
+   - opencv.002_gcc6.patch : patch for gcc 6 version
+
+13. netgen
+   - netgen.001.common.patch : common patch for netgen
+
+14. planegcs
+   - planegcs.001_for_shaper.patch : patch planegcs for Shaper module needs

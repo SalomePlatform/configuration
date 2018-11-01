@@ -1,8 +1,8 @@
-diff -Naur matplotlib-2.2.2_SRC_orig/setup.cfg matplotlib-2.2.2_SRC_modif/setup.cfg
---- matplotlib-2.2.2_SRC_orig/setup.cfg	1970-01-01 03:00:00.000000000 +0300
-+++ matplotlib-2.2.2_SRC_modif/setup.cfg	2018-11-01 10:05:22.479529732 +0300
-@@ -0,0 +1,99 @@
-+# Rename this file to setup.cfg to modify Matplotlib's
+diff -NaurwB matplotlib-1.4.3__1/setup.cfg matplotlib-1.4.3__0/setup.cfg
+--- matplotlib-1.4.3__0/setup.cfg	1970-01-01 03:00:00.000000000 +0300
++++ matplotlib-1.4.3__1/setup.cfg	2017-03-15 14:42:36.569265032 +0300
+@@ -0,0 +1,86 @@
++# Rename this file to setup.cfg to modify matplotlib's
 +# build options.
 +
 +[egg_info]
@@ -13,38 +13,31 @@ diff -Naur matplotlib-2.2.2_SRC_orig/setup.cfg matplotlib-2.2.2_SRC_modif/setup.
 +# This can be a single directory or a comma-delimited list of directories.
 +#basedirlist = /usr
 +
-+[test]
-+# If you plan to develop Matplotlib and run or add to the test suite,
-+# set this to True.  It will download and build a specific version of
-+# FreeType, and then use that to build the ft2font extension.  This
-+# ensures that test images are exactly reproducible.
-+#local_freetype = False
-+
 +[status]
 +# To suppress display of the dependencies and their versions
 +# at the top of the build log, uncomment the following line:
-+#suppress = True 
++#suppress = False
 +
 +[packages]
-+# There are a number of subpackages of Matplotlib that are considered
-+# optional. All except tests are installed by default, but that can
-+# be changed here.
++# There are a number of subpackages of matplotlib that are considered
++# optional.  They are all installed by default, but they may be turned
++# off here.
 +#
-+#tests = False
++tests = False
 +sample_data = False
-+toolkits = False
++toolkits = True
 +# Tests for the toolkits are only automatically installed
 +# if the tests and toolkits packages are also getting installed.
 +#toolkits_tests = auto
 +
 +[gui_support]
-+# Matplotlib supports multiple GUI toolkits, including
-+# GTK, MacOSX, Qt4, Qt5, Tk, and WX. Support for many of
++# Matplotlib supports multiple GUI toolkits, including Cocoa,
++# GTK, Fltk, MacOSX, Qt, Qt4, Tk, and WX. Support for many of
 +# these toolkits requires AGG, the Anti-Grain Geometry library,
-+# which is provided by Matplotlib and built by default.
++# which is provided by matplotlib and built by default.
 +#
 +# Some backends are written in pure Python, and others require
-+# extension code to be compiled. By default, Matplotlib checks for
++# extension code to be compiled. By default, matplotlib checks for
 +# these GUI toolkits during installation and, if present, compiles the
 +# required extensions to support the toolkit.
 +#
@@ -60,7 +53,7 @@ diff -Naur matplotlib-2.2.2_SRC_orig/setup.cfg matplotlib-2.2.2_SRC_modif/setup.
 +# therefore they are installed unconditionally.
 +#
 +# You can uncomment any the following lines to change this
-+# behavior. Acceptable values are:
++# behavior. Acceptible values are:
 +#
 +#     True: build the extension. Exits with a warning if the
 +#           required dependencies are not available
@@ -77,7 +70,7 @@ diff -Naur matplotlib-2.2.2_SRC_orig/setup.cfg matplotlib-2.2.2_SRC_modif/setup.
 +#gtkagg = auto
 +#macosx = auto
 +#pyside = auto
-+qt4agg = auto
++qt5agg = auto
 +#tkagg = auto
 +#windowing = auto
 +#wxagg = auto
@@ -85,19 +78,13 @@ diff -Naur matplotlib-2.2.2_SRC_orig/setup.cfg matplotlib-2.2.2_SRC_modif/setup.
 +[rc_options]
 +# User-configurable options
 +#
-+# Default backend, one of: Agg, Cairo, GTK, GTKAgg, GTKCairo,
-+# GTK3Agg, GTK3Cairo, MacOSX, Pdf, Ps, Qt4Agg, Qt5Agg, SVG, TkAgg, WX, WXAgg.
++# Default backend, one of: Agg, Cairo, CocoaAgg, GTK, GTKAgg, GTKCairo,
++# FltkAgg, MacOSX, Pdf, Ps, QtAgg, Qt4Agg, SVG, TkAgg, WX, WXAgg.
 +#
 +# The Agg, Ps, Pdf and SVG backends do not require external
 +# dependencies. Do not choose GTK, GTKAgg, GTKCairo, MacOSX, or TkAgg
-+# if you have disabled the relevant extension modules.  Agg will be used
++# if you have disabled the relevent extension modules.  Agg will be used
 +# by default.
 +#
 +backend = Qt5Agg
 +#
-+
-+[package_data]
-+# Package additional files found in the lib/matplotlib directories.
-+#
-+# On Windows, package DLL files.
-+#dlls = True

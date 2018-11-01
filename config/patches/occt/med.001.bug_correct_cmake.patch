@@ -1,0 +1,37 @@
+diff -Naur --exclude=CVS --exclude=.git med-4.0.0rc1.orig/CMakeLists.txt med-4.0.0rc1.patched/CMakeLists.txt
+--- med-4.0.0rc1.orig/CMakeLists.txt	2018-10-24 18:38:31.000000000 +0300
++++ med-4.0.0rc1.patched/CMakeLists.txt	2018-10-30 18:57:34.000000000 +0300
+@@ -121,7 +121,8 @@
+ 
+ ## Installation of the doc
+ IF(MEDFILE_INSTALL_DOC)
+-  INSTALL(DIRECTORY doc DESTINATION ${CMAKE_INSTALL_PREFIX}/share)
++  INSTALL(DIRECTORY doc/html.dox/ DESTINATION ${CMAKE_INSTALL_PREFIX}/share/doc/med REGEX "Makefile*" EXCLUDE PATTERN "*.am" EXCLUDE)
++  INSTALL(DIRECTORY doc/gif doc/jpg doc/png DESTINATION ${CMAKE_INSTALL_PREFIX}/share/doc/med FILES_MATCHING PATTERN "*.gif" PATTERN "*.jpg" PATTERN "*.svg" PATTERN "*.png")
+ ENDIF()
+ 
+ #######################
+diff -Naur --exclude=CVS --exclude=.git med-4.0.0rc1.orig/config/cmake_files/medMacros.cmake med-4.0.0rc1.patched/config/cmake_files/medMacros.cmake
+--- med-4.0.0rc1.orig/config/cmake_files/medMacros.cmake	2018-10-22 11:36:07.000000000 +0300
++++ med-4.0.0rc1.patched/config/cmake_files/medMacros.cmake	2018-10-30 19:03:44.673012496 +0300
+@@ -406,7 +406,7 @@
+ 
+     ADD_DEFINITIONS(-DH5_USE_16_API)  
+     IF(WIN32 AND MEDFILE_BUILD_SHARED_LIBS)
+-      ADD_DEFINITIONS(-D_HDF5USEDLL_)  
++      ADD_DEFINITIONS(-D_HDF5USEDLL_ -DH5_BUILT_AS_DYNAMIC_LIB=1)   
+     ENDIF()
+     
+     # Take what is exposed by the standard FIND_PACKAGE()
+diff -Naur --exclude=CVS --exclude=.git med-4.0.0rc1.orig/python/CMakeLists.txt med-4.0.0rc1.patched/python/CMakeLists.txt
+--- med-4.0.0rc1.orig/python/CMakeLists.txt	2018-10-23 01:43:04.000000000 +0300
++++ med-4.0.0rc1.patched/python/CMakeLists.txt	2018-10-30 19:03:44.657012959 +0300
+@@ -24,7 +24,7 @@
+   medparameter_module.i
+   medprofile_module.i
+   medsubdomain_module.i
+-  medstructelement.i
++  medstructelement_module.i
+ )
+ 
+ IF(APPLE)
