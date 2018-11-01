@@ -1,0 +1,7 @@
+diff -Naur qt-5.9.1_SRC_orig/qtgamepad/src/plugins/plugins.pro qt-5.9.1_SRC_modif/qtgamepad/src/plugins/plugins.pro
+--- qt-5.9.1_SRC_orig/qtgamepad/src/plugins/plugins.pro	2017-06-23 09:35:28.000000000 +0300
++++ qt-5.9.1_SRC_modif/qtgamepad/src/plugins/plugins.pro	2018-10-31 15:53:41.396430110 +0300
+@@ -1,2 +1,2 @@
+ TEMPLATE = subdirs
+-SUBDIRS += gamepads
++#SUBDIRS += gamepads
