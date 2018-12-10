@@ -60,7 +60,16 @@ IF(HDF5_ENABLE_PARALLEL OR HDF5_IS_PARALLEL)
   # HDF5 was compiled with MPI support
   # Unfortunately HDF5 doesn't expose its MPI configuration easily ...
   # We sniff the properties of the HDF5 target which should also be there:
-  GET_PROPERTY(_lib_lst TARGET hdf5 PROPERTY IMPORTED_LINK_INTERFACE_LIBRARIES_NOCONFIG)
+  IF(NOT DEFINED HDF5_LIBRARIES)
+    SET(HDF5_LIBRARIES "hdf5")
+    IF(NOT TARGET hdf5 AND NOT TARGET hdf5-static AND NOT TARGET hdf5-shared)
+      # Some HDF5 versions (e.g. 1.8.18) used hdf5::hdf5 etc
+      SET(_target_prefix "hdf5::")
+    ENDIF()
+    SET(_suffix "-shared")
+    SET(HDF5_LIBRARIES "${_target_prefix}hdf5${_suffix}")
+  ENDIF()
+  GET_PROPERTY(_lib_lst TARGET ${HDF5_LIBRARIES} PROPERTY IMPORTED_LINK_INTERFACE_LIBRARIES_NOCONFIG)
   FOREACH(s ${_lib_lst})
     STRING(FIND "${s}" "mpi." _res)   # should cover WIN(?) and LINUX
     IF(_res GREATER -1)
