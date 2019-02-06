@@ -1,7 +1,6 @@
-#!/usr/bin/env python
-#  -*- coding: utf8 -*-
-
-# Copyright (C) 2017  CEA/DEN, EDF R&D
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# Copyright (C) 2017-2019  OPEN CASCADE
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License Version 3 as
@@ -22,12 +21,10 @@ Usage: type "insert_copyright --help" to learn how to use tool.
 """
 
 import argparse
-import os
+import os.path as osp
 import re
 import sys
 import time
-
-# pragma pylint: disable=redefined-builtin
 
 # -----------------------------------------------------------------------------
 _COMMENTS = {
@@ -150,18 +147,16 @@ def get_copyright(comment, owner, year):
     Returns:
         list[str]: List of strings with copyright data.
     """
-    template = os.path.join(os.path.dirname(sys.argv[0]), 'copyright.template')
-    the_copyright = []
+    template = osp.join(osp.dirname(sys.argv[0]), 'copyright.template')
     try:
         with open(template) as fid:
-            the_copyright = fid.readlines()
+            cp_notice = [i.strip() for i in fid.readlines()]
+            cp_notice = [i % {'year' : year, 'owner' : owner} for i in cp_notice]
+            cp_notice = [comment + ' ' + i if i else comment for i in cp_notice]
+            return [i + '\n' for i in cp_notice] + ['\n']
     except IOError:
         error_exit("cannot find copyright template")
-    the_copyright = [i.replace('@year@', year) for i in the_copyright]
-    the_copyright = [i.replace('@owner@', owner) for i in the_copyright]
-    the_copyright = [comment + ' ' + i if i.strip() else comment + '\n'
-                     for i in the_copyright]
-    return the_copyright
+    return []
 
 
 # -----------------------------------------------------------------------------
@@ -175,7 +170,7 @@ def get_module_owner(module):
     Returns:
         str: Module's owner.
     """
-    modules_info = os.path.join(os.path.dirname(sys.argv[0]), 'modules.info')
+    modules_info = osp.join(osp.dirname(sys.argv[0]), 'modules.info')
     owner = None
     try:
         with open(modules_info) as fid:
@@ -199,12 +194,12 @@ def autodetect_owner(filename):
     Returns:
         str: Owner; *None* if owner isn't detected.
     """
-    filename = os.path.realpath(filename)
-    if os.path.exists(filename):
-        directory = os.path.dirname(filename)
+    filename = osp.realpath(filename)
+    if osp.exists(filename):
+        directory = osp.dirname(filename)
         while directory != '/':
-            config_file = os.path.join(directory, '.git', 'config')
-            if os.path.exists(config_file):
+            config_file = osp.join(directory, '.git', 'config')
+            if osp.exists(config_file):
                 try:
                     from ConfigParser import ConfigParser
                 except ImportError:
@@ -217,14 +212,14 @@ def autodetect_owner(filename):
                     gitcfg = fid.readlines()
                     cfg = ConfigParser()
                     data = StringIO(''.join([l.lstrip() for l in gitcfg]))
-                    cfg.readfp(data)
+                    cfg.readfp(data) # pragma pylint: disable=deprecated-method
                     url = cfg.get('remote "origin"', 'url')
-                    module = os.path.split(url)[-1]
+                    module = osp.split(url)[-1]
                     if module.endswith('.git'):
                         module = module[:-4]
                     return get_module_owner(module)
                 break
-            directory = os.path.dirname(directory)
+            directory = osp.dirname(directory)
     return None
 
 
@@ -247,25 +242,25 @@ def autodetect_format(filename):
         'python': ('py',),
         }
     rev_extensions = {e: k for k, exts in extensions.items() for e in exts}
-    if filename and os.path.isfile(filename):
-        extension = os.path.splitext(filename)[1][1:].lower()
+    if filename and osp.isfile(filename):
+        extension = osp.splitext(filename)[1][1:].lower()
         if extension in ('in',):
-            name = os.path.splitext(filename)[0]
-            extension = os.path.splitext(name)[1][1:].lower()
+            name = osp.splitext(filename)[0]
+            extension = osp.splitext(name)[1][1:].lower()
         if extension in rev_extensions:
             return rev_extensions[extension]
 
     try:
         import magic
-        m = magic.open(magic.MAGIC_MIME_TYPE)
-        m.load()
+        mtool = magic.open(magic.MAGIC_MIME_TYPE)
+        mtool.load()
         file_formats = {
             'cpp': ('text/x-c', 'text/x-c++'),
             'shell': ('text/x-shellscript',),
             'python': ('text/x-python',),
             }
         rev_file_formats = {f: k for k, ff in file_formats.items() for f in ff}
-        file_format = m.file(filename)
+        file_format = mtool.file(filename)
         if file_format in rev_file_formats:
             return rev_file_formats[file_format]
     except ImportError:
@@ -311,10 +306,9 @@ def insert_copyright(filename, owner, year, file_format):
         if file_format in ('py', 'python') else -1
     insert_point = max(0, shell_row + 1, coding_row + 1)
 
-    the_copyright = get_copyright(comment, owner, year)
-    if the_copyright:
-        lines = lines[:insert_point] + the_copyright + ['\n'] \
-            + lines[insert_point:]
+    cp_notice = get_copyright(comment, owner, year)
+    if cp_notice:
+        lines[insert_point:insert_point] = cp_notice
         try:
             with open(filename, 'w') as fid:
                 for line in lines:
@@ -329,7 +323,7 @@ def main():
     """Main function."""
 
     # Parse command line.
-    description = "Command line tool to insert copyright notice to a file."
+    description = "Command line tool to insert copyright notice to file(s)."
     parser = argparse.ArgumentParser(description=description)
 
     help_string = "copyright owner; if not specified, tool tries to " \
@@ -350,7 +344,8 @@ def main():
                         dest="format", default=file_format,
                         help=help_string.format(file_format=file_format,
                                                 choices="|".join(formats())))
-    parser.add_argument('files', nargs='+', metavar='FILE')
+    help_string = "file where to insert copyright notice"
+    parser.add_argument('files', nargs='+', metavar='FILE', help=help_string)
 
     args = parser.parse_args(sys.argv[1:])
 
