@@ -180,12 +180,13 @@ ENDMACRO(SALOME_INSTALL_SCRIPTS)
 # SALOME_CONFIGURE_FILE is a macro useful for copying a file to another location 
 # and modify its contents.
 #
-# USAGE: SALOME_CONFIGURE_FILE(in_file out_file [INSTALL dir])
+# USAGE: SALOME_CONFIGURE_FILE(in_file out_file [INSTALL dir [EXEC_PERMS]])
 #
 # ARGUMENTS:
 # in_file: IN : input file (if relative path is given, full file path is computed from current source dir).
 # out_file: IN : output file (if relative path is given, full file path is computed from current build dir).
 # If INSTALL is specified, then 'out_file' will be installed to the 'dir' directory.
+# In this case, EXEC_PERMS can be used to set execution permission for installed file.
 #----------------------------------------------------------------------------
 MACRO(SALOME_CONFIGURE_FILE IN_FILE OUT_FILE)
   IF(IS_ABSOLUTE ${IN_FILE})
@@ -200,9 +201,13 @@ MACRO(SALOME_CONFIGURE_FILE IN_FILE OUT_FILE)
   ENDIF()
   MESSAGE(STATUS "Creation of ${_out_file}")
   CONFIGURE_FILE(${_in_file} ${_out_file} @ONLY)
-  PARSE_ARGUMENTS(SALOME_CONFIGURE_FILE "INSTALL" "" ${ARGN})
+  PARSE_ARGUMENTS(SALOME_CONFIGURE_FILE "INSTALL" "EXEC_PERMS" ${ARGN})
   IF(SALOME_CONFIGURE_FILE_INSTALL)
-    INSTALL(FILES ${_out_file} DESTINATION ${SALOME_CONFIGURE_FILE_INSTALL})
+    SET(PERMS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
+    IF(SALOME_CONFIGURE_FILE_EXEC_PERMS)
+      SET(PERMS ${PERMS} OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE)
+    ENDIF(SALOME_CONFIGURE_FILE_EXEC_PERMS)
+    INSTALL(FILES ${_out_file} DESTINATION ${SALOME_CONFIGURE_FILE_INSTALL} PERMISSIONS ${PERMS})
   ENDIF(SALOME_CONFIGURE_FILE_INSTALL)
 ENDMACRO(SALOME_CONFIGURE_FILE)
 
