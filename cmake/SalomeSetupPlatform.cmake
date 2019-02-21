@@ -74,6 +74,8 @@ IF(WIN32)
   ELSE()
     SET(SIZE_OF_LONG ${CMAKE_SIZEOF_VOID_P})  # Set sizeof(long) the same as size of pointers
   ENDIF()
+  ADD_DEFINITIONS(-DUNICODE)                  # Unicode 
+  ADD_DEFINITIONS(-D_UNICODE)
 ELSE()
   ## Linux specific:
   SET(PLATFORM_LIBS dl)                       # Dynamic loading (dlopen, dlsym)
