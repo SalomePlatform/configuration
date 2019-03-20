@@ -19,17 +19,9 @@
 
 MESSAGE(STATUS "Check for XDR ...")
 
-FIND_PATH(XDR_INCLUDE_DIRS rpc/xdr.h)
+FIND_PATH(XDR_INCLUDE_DIRS rpc/xdr.h PATH_SUFFIXES tirpc)
 IF(XDR_INCLUDE_DIRS)
   SET(XDR_DEFINITIONS "-DHAS_XDR")
-ELSE(XDR_INCLUDE_DIRS)
-  IF(EXISTS "/usr/include/tirpc/rpc/xdr.h")
-    MESSAGE(STATUS "XDR was found in /usr/include/tirpc ...")
-    include_directories(/usr/include/tirpc)
-    SET(XDR_DEFINITIONS "-DHAS_XDR")
-    SET(XDR_INCLUDE_DIRS "/usr/include/tirpc")
-    FIND_LIBRARY(XDR_LIBRARIES tirpc)
-  ENDIF()
 ENDIF(XDR_INCLUDE_DIRS)
 
 IF(WIN32)
