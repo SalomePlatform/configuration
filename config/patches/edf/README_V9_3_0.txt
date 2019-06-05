@@ -9,7 +9,7 @@ CGAL              4.0   : cgal_cmake352.patch
 FREEIMAGE        3.17   : freeimage_3170_sci9.patch and FreeImage3170_Make.patch
 > patch to build freeimage
 
-GL2PS           1.4.0   :
+GL2PS           1.4.0   : gl2ps.patch
 > Patch for : if(GLUT_FOUND)
 
 HDF5           1.10.3   : patchHDF5Build.py
