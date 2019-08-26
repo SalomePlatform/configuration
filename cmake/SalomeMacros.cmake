@@ -793,14 +793,39 @@ ENDMACRO(SALOME_ACCUMULATE_ENVIRONMENT)
 # Macro generates environement script using previously created variables
 # _${PROJECT_NAME}_EXTRA_ENV_<var>, where <var> is name of variable and
 # _${PROJECT_NAME}_EXTRA_ENV (see marco SALOME_ACCUMULATE_ENVIRONMENT);
-# and puts generated command in proper environment into <output> argument.
-# 
+# and puts generated command in proper environment into <output> argument. To ignore
+# _${PROJECT_NAME}_EXTRA_ENV_<var> and _${PROJECT_NAME}_EXTRA_ENV variables set 
+# environment variable 'SALOME_HAS_GLOBAL_ENV=1'
+#
+# NAMED ARGUMENTS:
+#  CONTEXT: is used under Windows platform only to generate command file. See explanations 
+#           below.
+#  CONTEXT_NAME: is used under Windows platform only to generate command file. See 
+#                explanations below. 
+#  ADDITIONAL_VARIABLES: list of the additional variables to write into environment script.
+#                        Each item of this list should be in the 'Variable=Value' format.
+#
+#
 # Notes:
 # - If <script> is specified as relative path, it is computed from the current build
 #   directory.
+# - If CONTEXT variables is passed into this macro, then on 
+#   Windows platform command file looks like:
+#   =================================================
+#   IF SET_${CONTEXT}_VARS == 1 GOTO ${CONTEXT_NAME}
+#    @SET VAR1=VAR1_VALUE;%VAR1%
+#    .........
+#    .........
+#    .........
+#    @SET VARN=VARN_VALUE;%VARN%
+#    @SET SET_${CONTEXT}_VARS = 1
+#   :${CONTEXT_NAME}
+#   ================================================= 
+#   By default CONTEXT_NAME is equal to 'END'
 #
 MACRO(SALOME_GENERATE_ENVIRONMENT_SCRIPT output script cmd opts)
-  PARSE_ARGUMENTS(SALOME_GENERATE_ENVIRONMENT_SCRIPT "CONTEXT" "" ${ARGN})
+  PARSE_ARGUMENTS(SALOME_GENERATE_ENVIRONMENT_SCRIPT "CONTEXT;CONTEXT_NAME;ADDITIONAL_VARIABLES" "" ${ARGN})
+  
   IF(IS_ABSOLUTE ${script})
     SET(_script ${script})
   ELSE()
@@ -814,40 +839,51 @@ MACRO(SALOME_GENERATE_ENVIRONMENT_SCRIPT output script cmd opts)
     SET(_ext "sh")
     SET(_call_cmd ".")
   ENDIF()
-  
-  SET(_env)
-  IF(WIN32 AND SALOME_GENERATE_ENVIRONMENT_SCRIPT_CONTEXT)
-    SET(_env "IF ${_env}\"%SET_${SALOME_GENERATE_ENVIRONMENT_SCRIPT_CONTEXT}_VARS%\"==\"1\" GOTO END\n")
+
+  SET(_ctx "END")
+  IF(SALOME_GENERATE_ENVIRONMENT_SCRIPT_CONTEXT_NAME)
+    SET(_ctx "${SALOME_GENERATE_ENVIRONMENT_SCRIPT_CONTEXT_NAME}")
   ENDIF()
-  FOREACH(_item ${_${PROJECT_NAME}_EXTRA_ENV})
-    FOREACH(_val ${_${PROJECT_NAME}_EXTRA_ENV_${_item}})
-      IF(WIN32)
-        IF(${_item} STREQUAL "LD_LIBRARY_PATH")
-          SET(_item PATH)
-        ENDIF()
-        STRING(REPLACE "/" "\\" _env "${_env}@SET ${_item}=${_val};%${_item}%\n")        
-      ELSEIF(APPLE)
-        IF(${_item} STREQUAL "LD_LIBRARY_PATH")
-          SET(_env "${_env} export DYLD_LIBRARY_PATH=${_val}:\${DYLD_LIBRARY_PATH}\n")
-        ELSE()
-          SET(_env "${_env} export ${_item}=${_val}:\${${_item}}\n")
-        ENDIF()
-      ELSE()
-        SET(_env "${_env} export ${_item}=${_val}:\${${_item}}\n")
-      ENDIF()
-    ENDFOREACH()
-  ENDFOREACH()
+  
+  SET(_env "")
   IF(WIN32 AND SALOME_GENERATE_ENVIRONMENT_SCRIPT_CONTEXT)
-    SET(_env "${_env}@SET SET_${SALOME_GENERATE_ENVIRONMENT_SCRIPT_CONTEXT}_VARS=1\n")
-    SET(_env "${_env}:END\n" )
+    SET(_env "IF ${_env}\"%SET_${SALOME_GENERATE_ENVIRONMENT_SCRIPT_CONTEXT}_VARS%\"==\"1\" GOTO ${_ctx}\n")
+  ENDIF()
+  IF (NOT "$ENV{SALOME_HAS_GLOBAL_ENV}" STREQUAL "1")
+    FOREACH(_item ${_${PROJECT_NAME}_EXTRA_ENV})
+      FOREACH(_val ${_${PROJECT_NAME}_EXTRA_ENV_${_item}})
+        SALOME_DO_VAR_SUBSTITUTION(_env ${_item} ${_val})
+      ENDFOREACH()
+    ENDFOREACH()
   ENDIF()
 
-  
-  SET(_script ${_script}.${_ext})
-  FILE(WRITE ${_script} "${_env}")
-  
-  SET(${output} ${_call_cmd} ${_script} && ${cmd} ${opts})
-  
+  # Additional variables
+  IF(SALOME_GENERATE_ENVIRONMENT_SCRIPT_ADDITIONAL_VARIABLES)
+    FOREACH(_item ${SALOME_GENERATE_ENVIRONMENT_SCRIPT_ADDITIONAL_VARIABLES})
+      STRING(REGEX MATCHALL "([^=]+|[^=]+$)" a_list "${_item}")
+      LIST(LENGTH a_list a_list_len)
+      IF(NOT ${a_list_len} EQUAL 2) 
+        MESSAGE(FATAL_ERROR  "Each item of ${ADDITIONAL_VARIABLES} list should be in 'Variable=Value' format")
+      ENDIF()
+      LIST(GET a_list 0 _item)
+      LIST(GET a_list 1 _val)
+      SALOME_DO_VAR_SUBSTITUTION(_env ${_item} ${_val})
+    ENDFOREACH()
+  ENDIF()
+
+  IF(WIN32 AND SALOME_GENERATE_ENVIRONMENT_SCRIPT_CONTEXT)
+     SET(_env "${_env}@SET SET_${SALOME_GENERATE_ENVIRONMENT_SCRIPT_CONTEXT}_VARS=1\n")
+     SET(_env "${_env}:${_ctx}\n" )
+  ENDIF()
+
+  IF(NOT "${_env}" STREQUAL "")
+    SET(_script ${_script}.${_ext})
+    FILE(WRITE ${_script} "${_env}")
+    SET(${output} ${_call_cmd} ${_script} && ${cmd} ${opts})
+  ELSE()
+    SET(${output} ${cmd} ${opts})
+  ENDIF()
+    
 ENDMACRO(SALOME_GENERATE_ENVIRONMENT_SCRIPT)
 
 #########################################################################
@@ -1051,3 +1087,43 @@ MACRO(SWIG_CHECK_GENERATION swig_module)
   ENDIF()
 ENDMACRO(SWIG_CHECK_GENERATION)
 
+#########################################################################
+# SALOME_DO_VAR_SUBSTITUTION()
+#
+# USAGE: SALOME_DO_VAR_SUBSTITUTION(env variable value)
+#
+# ARGUMENTS:
+#   env      [out]: output script.
+#   variable  [in]: varable name
+#   value     [in]: variable value
+#
+# This macro concatenate variable value into script, like this:
+# on Linux:
+# export variable=value:${varuable}
+#
+# or on Windows:
+# SET variable=value;${varuable}
+#
+# Platform dependat variables PATH (Windows), 
+# DYLD_LIBRARY_PATH (Apple), LD_LIBRARY_PATH (Linux), should be
+# passed in Linux naming style, i.e. LD_LIBRARY_PATH. Macro 
+# converts this variable into platform scpecific variable.
+#
+MACRO(SALOME_DO_VAR_SUBSTITUTION env variable value)
+  SET(_item ${variable})
+  SET(_val ${value})
+  IF(WIN32)
+    IF(${_item} STREQUAL "LD_LIBRARY_PATH")
+      SET(_item PATH)
+    ENDIF()
+      STRING(REPLACE "/" "\\" ${env} "${${env}}@SET ${_item}=${_val};%${_item}%\n")        
+    ELSEIF(APPLE)
+      IF(${_item} STREQUAL "LD_LIBRARY_PATH")
+        SET(${env} "${${env}} export DYLD_LIBRARY_PATH=${_val}:\${DYLD_LIBRARY_PATH}\n")
+      ELSE()
+        SET(${env} "${${env}} export ${_item}=${_val}:\${${_item}}\n")
+      ENDIF()
+    ELSE()
+       SET(${env} "${${env}} export ${_item}=${_val}:\${${_item}}\n")
+  ENDIF()
+ENDMACRO(SALOME_DO_VAR_SUBSTITUTION)

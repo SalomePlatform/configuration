@@ -48,13 +48,15 @@ endfunction()
 # TARGET_NAME : IN : target name for the documentation
 # MODULE : IN : SALOME module name
 # LANGUAGES : IN : list of the languages
+# ADDITIONAL_ENVIRONMENT: IN : list of additional enviromnent variable used 
+# for generation of the documentation
 #----------------------------------------------------------------------------
 MACRO(ADD_MULTI_LANG_DOCUMENTATION)
   # Common options
   SET(PAPEROPT_a4 "-D latex_paper_size=a4")
 
   # Parse input argument
-  PARSE_ARGUMENTS(MULTI_LANG "TARGET_NAME;MODULE;LANGUAGES" "" ${ARGN})
+  PARSE_ARGUMENTS(MULTI_LANG "TARGET_NAME;MODULE;LANGUAGES;ADDITIONAL_ENVIRONMENT" "" ${ARGN})
 
   # Content of the executable file to generate documentation
   SET(CMDS)
@@ -90,44 +92,17 @@ MACRO(ADD_MULTI_LANG_DOCUMENTATION)
   ENDFOREACH()
 
   # 6. Create command file
+  SET(_script_wo "build_doc")
   IF(WIN32)
     SET(_ext "bat")
-    SET(_call_cmd "call")
   ELSE()
     SET(_ext "sh")
-    SET(_call_cmd ".")
   ENDIF()
-  
-  SET(_env)
-  IF(WIN32)
-    SET(_env "IF ${_env}\"%SET_${MULTI_LANG_TARGET_NAME}_VARS%\"==\"1\" GOTO DO_GENERATION\n")
-  ENDIF()  
-  FOREACH(_item ${_${PROJECT_NAME}_EXTRA_ENV})
-    FOREACH(_val ${_${PROJECT_NAME}_EXTRA_ENV_${_item}})
-      IF(WIN32)
-        IF(${_item} STREQUAL "LD_LIBRARY_PATH")
-          SET(_item PATH)
-        ENDIF()
-        STRING(REPLACE "/" "\\" _env "${_env} @SET ${_item}=${_val}\;%${_item}%\n")        
-      ELSEIF(APPLE)
-        IF(${_item} STREQUAL "LD_LIBRARY_PATH")
-          SET(_env "${_env} export DYLD_LIBRARY_PATH=${_val}:\${DYLD_LIBRARY_PATH}\n")
-        ELSE()
-          SET(_env "${_env} export ${_item}=${_val}:\${${_item}}\n")
-        ENDIF()
-      ELSE()
-        SET(_env "${_env} export ${_item}=${_val}:\${${_item}}\n")
-      ENDIF()
-    ENDFOREACH()
-  ENDFOREACH()
-  IF(WIN32)
-    SET(_env "${_env}@SET SET_${MULTI_LANG_TARGET_NAME}_VARS=1\n")
-    SET(_env "${_env}:DO_GENERATION\n" )
-  ENDIF()
+  SET(_script "${_script_wo}.${_ext}")
 
-  
-  SET(_script ${CMAKE_CURRENT_BINARY_DIR}/build_doc.${_ext})
-  FILE(WRITE ${_script} ${_env}${CMDS})
+  SALOME_GENERATE_ENVIRONMENT_SCRIPT(_not_used_output ${_script_wo} "" "" CONTEXT "${MULTI_LANG_TARGET_NAME}" CONTEXT_NAME "DO_GENERATION" ADDITIONAL_VARIABLES ${MULTI_LANG_ADDITIONAL_ENVIRONMENT})
+
+  FILE(APPEND ${_script} "${CMDS}")
 
   # 7. Create custom target
   ADD_CUSTOM_TARGET(${MULTI_LANG_TARGET_NAME}

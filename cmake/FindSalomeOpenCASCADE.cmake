@@ -43,6 +43,16 @@ IF(OpenCASCADE_FOUND)
 
   SALOME_ACCUMULATE_HEADERS(OpenCASCADE_INCLUDE_DIR)
   SALOME_ACCUMULATE_ENVIRONMENT(LD_LIBRARY_PATH ${OpenCASCADE_LIBRARY_DIR})
+  IF(WIN32)
+    # RNV: Fix bug with OCCT CMake build procedure:
+    #      In Debug ${OpenCASCADE_BINARY_DIR} and ${OpenCASCADE_LIBRARY_DIR} are stored in the
+    #      config file w/o "d" suffix. To be checked with latest version of OCCT.
+    SET(SUFF "")
+    IF(${OpenCASCADE_BUILD_TYPE} STREQUAL "Debug")
+      SET(SUFF "d")
+    ENDIF()
+    SALOME_ACCUMULATE_ENVIRONMENT(LD_LIBRARY_PATH ${OpenCASCADE_BINARY_DIR}${SUFF})
+  ENDIF()
 
 ELSE()
   # TODO: Detect OpenCASCADE if it is distributed without CMake configuration.
