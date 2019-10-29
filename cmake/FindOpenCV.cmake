@@ -39,7 +39,7 @@ IF(OpenCV_INCLUDE_DIRS)
   LIST(APPEND OpenCV_INCLUDE_DIRS ${_OpenCV_INCLUDE_DIR_TMP})
 ENDIF()
 
-SET(OpenCV_LIB_COMPONENTS videostab;video;ts;superres;stitching;photo;ocl;objdetect;ml;legacy;imgproc;highgui;gpu;flann;features2d)
+SET(OpenCV_LIB_COMPONENTS videostab;video;ts;superres;stitching;photo;ocl;objdetect;ml;legacy;imgproc;highgui;gpu;flann;features2d;core;objdetect;imgcodecs;shape)
 
 FOREACH(_compo ${OpenCV_LIB_COMPONENTS})
   FIND_LIBRARY(OpenCV_${_compo} opencv_${_compo})
