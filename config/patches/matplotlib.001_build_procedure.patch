@@ -1,6 +1,6 @@
 diff -Naur matplotlib-2.2.2_SRC_orig/setup.cfg matplotlib-2.2.2_SRC_modif/setup.cfg
 --- matplotlib-2.2.2_SRC_orig/setup.cfg	1970-01-01 03:00:00.000000000 +0300
-+++ matplotlib-2.2.2_SRC_modif/setup.cfg	2018-11-01 10:05:22.479529732 +0300
++++ matplotlib-2.2.2_SRC_modif/setup.cfg	2019-11-14 15:26:36.710641396 +0300
 @@ -0,0 +1,99 @@
 +# Rename this file to setup.cfg to modify Matplotlib's
 +# build options.
