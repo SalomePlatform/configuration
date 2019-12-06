@@ -1,3 +1,0 @@
-.gitattributes eol=lf
-.gitignore     eol=lf
-*.patch        binary

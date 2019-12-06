@@ -1,0 +1,15 @@
+diff -Naur numpy-1.15.1_SRC_orig/numpy/distutils/exec_command.py numpy-1.15.1_SRC_modif/numpy/distutils/exec_command.py
+--- numpy-1.15.1_SRC_orig/numpy/distutils/exec_command.py	2018-08-19 11:17:10.000000000 +0300
++++ numpy-1.15.1_SRC_modif/numpy/distutils/exec_command.py	2018-09-26 11:44:07.000000000 +0300
+@@ -234,9 +234,9 @@
+         # On POSIX, subprocess always uses /bin/sh, override
+         sh = os.environ.get('SHELL', '/bin/sh')
+         if is_sequence(command):
+-            command = [sh, '-c', ' '.join(command)]
++            command = [sh, '-cf', ' '.join(command)]
+         else:
+-            command = [sh, '-c', command]
++            command = [sh, '-cf', command]
+         use_shell = False
+ 
+     elif os.name == 'nt' and is_sequence(command):
