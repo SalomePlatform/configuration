@@ -48,7 +48,7 @@ IF(OpenCASCADE_FOUND)
     #      In Debug ${OpenCASCADE_BINARY_DIR} and ${OpenCASCADE_LIBRARY_DIR} are stored in the
     #      config file w/o "d" suffix. To be checked with latest version of OCCT.
     SET(SUFF "")
-    IF(${OpenCASCADE_BUILD_TYPE} STREQUAL "Debug")
+    IF(${OpenCASCADE_BUILD_WITH_DEBUG})
       SET(SUFF "d")
     ENDIF()
     SALOME_ACCUMULATE_ENVIRONMENT(LD_LIBRARY_PATH ${OpenCASCADE_BINARY_DIR}${SUFF})
