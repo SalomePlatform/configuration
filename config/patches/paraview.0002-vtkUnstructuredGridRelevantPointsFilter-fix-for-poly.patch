@@ -1,0 +1,118 @@
+From 84627355e5b1d42754c655fdc5958695db11a25d Mon Sep 17 00:00:00 2001
+From: Antoine Gerschenfeld <antoine.gerschenfeld@cea.fr>
+Date: Fri, 13 Mar 2020 10:48:30 +0100
+Subject: [PATCH 2/3] vtkUnstructuredGridRelevantPointsFilter: fix for
+ polyhedra
+
+---
+ .../vtkUnstructuredGridRelevantPointsFilter.C | 67 ++++++++-----------
+ 1 file changed, 27 insertions(+), 40 deletions(-)
+
+diff --git a/Library/VisItLib/visit_vtk/full/vtkUnstructuredGridRelevantPointsFilter.C b/Library/VisItLib/visit_vtk/full/vtkUnstructuredGridRelevantPointsFilter.C
+index 5c73502..c4e772c 100644
+--- a/Library/VisItLib/visit_vtk/full/vtkUnstructuredGridRelevantPointsFilter.C
++++ b/Library/VisItLib/visit_vtk/full/vtkUnstructuredGridRelevantPointsFilter.C
+@@ -116,29 +116,21 @@ vtkUnstructuredGridRelevantPointsFilter::RequestData(
+     {
+     pointMap[i] = -1;
+     }
+-  vtkCellArray *cells = input->GetCells();
+-  auto cellIter = vtk::TakeSmartPointer(cells->NewIterator());
++
+   int numOutPts = 0;
+-  for (cellIter->GoToFirstCell();
+-       !cellIter->IsDoneWithTraversal();
+-       cellIter->GoToNextCell())
++  vtkIdList *list = vtkIdList::New();
++  for (i = 0; i < numCells; i++)
+     {
+-    vtkIdList *cell = cellIter->GetCurrentCell();
+-    int npts = static_cast<int>(cell->GetNumberOfIds());
+-    for (j = 0 ; j < npts ; j++)
+-      {
+-      int oldPt = static_cast<int>(cell->GetId(j));
+-      if (pointMap[oldPt] == -1)
+-        pointMap[oldPt] = numOutPts++;
+-      }
++    input->GetCellPoints(i, list);
++    for (j = 0; j < list->GetNumberOfIds(); j++) if (pointMap[list->GetId(j)] < 0) pointMap[list->GetId(j)] = numOutPts++;
+     }
+ 
+-  vtkPoints *newPts = vtkPoints::New(input->GetPoints()->GetDataType());
+-  newPts->SetNumberOfPoints(numOutPts);
+   vtkPointData *inputPD  = input->GetPointData();
+   vtkPointData *outputPD = output->GetPointData();
+   outputPD->CopyAllocate(inputPD, numOutPts);
+   
++  vtkPoints *newPts = vtkPoints::New(input->GetPoints()->GetDataType());
++  newPts->SetNumberOfPoints(numOutPts);
+   for (j = 0 ; j < numInPts ; j++)
+     {
+     if (pointMap[j] != -1)
+@@ -149,43 +141,38 @@ vtkUnstructuredGridRelevantPointsFilter::RequestData(
+       outputPD->CopyData(inputPD, j, pointMap[j]);
+       }
+     }
++  output->SetPoints(newPts);
+ 
+   vtkCellData  *inputCD = input->GetCellData();
+   vtkCellData  *outputCD = output->GetCellData();
+   outputCD->PassData(inputCD);
+-  
+-  vtkIdList *cellIds = vtkIdList::New();
+-
+-  output->SetPoints(newPts);
+-
+-  // now work through cells, changing associated point id to coincide
+-  // with the new ones as specified in the pointmap;
+ 
+-  vtkIdList *oldIds = vtkIdList::New(); 
+-  vtkIdList *newIds = vtkIdList::New();
+-  int id, cellType;
+-  cellIter = vtk::TakeSmartPointer(cells->NewIterator());
+-  for (cellIter->GoToFirstCell();
+-       !cellIter->IsDoneWithTraversal();
+-       cellIter->GoToNextCell())
++  std::vector<vtkIdType> points, faces;
++  for (i = 0; i < numCells; i++)
+     {
+-    vtkIdList *cell = cellIter->GetCurrentCell();
+-    cellType = input->GetCellType(cellIter->GetCurrentCellId());
+-    int npts = static_cast<int>(cell->GetNumberOfIds());
++      int CellType = input->GetCellType(i);
++      points.resize(0), faces.resize(0);
++      input->GetCellPoints(i, list);
++      
++      for (j = 0; j < list->GetNumberOfIds(); j++) points.push_back(pointMap[list->GetId(j)]);
+ 
+-    newIds->SetNumberOfIds(npts);
+-    for (j = 0; j < npts ; j++)
++      if (CellType == VTK_POLYHEDRON) //must deal with faces stream
+       {
+-      id = cell->GetId(j);
+-      newIds->SetId(j, pointMap[id]);
++        input->GetFaceStream(i, list);
++        int nfaces = list->GetId(0), idx = 1;
++        for (j = 0; j < nfaces; j++)
++        {
++          int npts = list->GetId(idx);
++          faces.push_back(npts), idx++;
++          for (int k = 0; k < npts; k++) faces.push_back(pointMap[list->GetId(idx)]), idx++;
++        }
++        output->InsertNextCell(CellType, points.size(), &points[0], nfaces, &faces[0]);
+       }
+-      output->InsertNextCell(cellType, newIds);
++      else output->InsertNextCell(CellType, points.size(), &points[0]);      
+     }
+ 
+   newPts->Delete();
+-  oldIds->Delete();
+-  newIds->Delete();
+-  cellIds->Delete();
++  list->Delete();
+   delete [] pointMap;
+ 
+   return 1;
+-- 
+2.17.0
+
