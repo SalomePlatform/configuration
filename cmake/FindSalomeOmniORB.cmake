@@ -23,6 +23,12 @@
 #
 #  !! Please read the generic detection procedure in SalomeMacros.cmake !!
 #
+IF(WIN32)
+  IF(NOT DEFINED SIZEOF_LONG)
+    MESSAGE(FATAL_ERROR "Developer error -> SalomeSetupPlatform macros should be inclided before find_package(SalomeOmniORB) !")
+  ENDIF()
+ENDIF()
+
 SALOME_FIND_PACKAGE_AND_DETECT_CONFLICTS(OmniORB OMNIORB_INCLUDE_DIR 1)
 #MARK_AS_ADVANCED()
 

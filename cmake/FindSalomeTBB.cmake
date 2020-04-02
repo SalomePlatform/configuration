@@ -17,6 +17,10 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
+IF(NOT DEFINED MACHINE_IS_64)
+  MESSAGE(FATAL_ERROR "Developer error -> SalomeSetupPlatform macros should be inclided before find_package(SalomeTBB) !")
+ENDIF()
+
 SALOME_FIND_PACKAGE_AND_DETECT_CONFLICTS(TBB TBB_INCLUDE_DIRS 1)
 
 IF(TBB_INCLUDE_DIRS AND TBB_LIBRARIES)
