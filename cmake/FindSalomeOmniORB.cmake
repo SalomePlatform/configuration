@@ -24,7 +24,7 @@
 #  !! Please read the generic detection procedure in SalomeMacros.cmake !!
 #
 IF(WIN32)
-  IF(NOT DEFINED SIZEOF_LONG)
+  IF(NOT DEFINED SIZE_OF_LONG)
     MESSAGE(FATAL_ERROR "Developer error -> SalomeSetupPlatform macros should be inclided before find_package(SalomeOmniORB) !")
   ENDIF()
 ENDIF()
