@@ -8,7 +8,7 @@
 # the detection mechanism. 
 #
 #############################################################
-# Copyright (C) 2007-2019  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2020  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
