@@ -20,6 +20,16 @@
 #
 
 #----------------------------------------------------------------------------
+# Set-up global policies
+#----------------------------------------------------------------------------
+CMAKE_POLICY(SET CMP0003 NEW)   # Ensure proper linker behavior
+IF(WIN32)
+  CMAKE_POLICY(SET CMP0020 OLD) # Disable automatic linking to qtmain.lib
+ENDIF(WIN32)
+CMAKE_POLICY(SET CMP0053 NEW)   # For correct Qt 5 detection procedure
+CMAKE_POLICY(SET CMP0074 NEW)   # Use ROOT variables when detecting packages
+
+#----------------------------------------------------------------------------
 # LIST_CONTAINS is a macro useful for determining whether a list has a 
 # particular entry
 #----------------------------------------------------------------------------
