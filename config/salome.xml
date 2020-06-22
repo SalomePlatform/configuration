@@ -1,5 +1,5 @@
 <!DOCTYPE config>
-<config comment="SALOME 9.4" name="V9_4_0">
+<config comment="SALOME 9.5" name="V9_5_0">
   <product name="alabaster" version="0.7.6" />
   <product name="babel" version="2.6.0" />
   <product name="boost" version="1.58.0" />
@@ -24,11 +24,6 @@
   </product>
   <product name="freetype" version="2.9.0" />
   <product name="gmsh" version="4.1.4" />
-  <product name="gl2ps" version="1.4.0-20170729">
-    <patches>
-      <patch comment="Fix problem with missing additional libraries" name="gl2ps.001_libs.patch" sha1="59fb1261603d11392ce26a9c98561fa2777d826c" />
-    </patches>
-  </product>
   <product name="graphviz" version="2.38.0">
     <patches>
       <patch comment="Fix build procedure" name="graphviz.001_build_procedure.patch" sha1="4b227e20ad416e8f08911fa907b66deb1d359102" />
@@ -42,25 +37,21 @@
   <product name="homardtool" version="11.12" />
   <product name="idna" version="2.7" />
   <product name="imagesize" version="1.0.0" />
-  <product name="ispc" vesrion="1.12.0" />
+  <product name="ispc" vesrion="1.9.2" />
   <product name="h5py" version="2.5.0" />
   <product name="jinja2" version="2.7.3" />
   <product name="kiwisolver" version="1.0.1" />
   <product name="lapack" version="3.7.0" />
   <product name="libxml2" version="2.9.1"/>
-  <product name="llvm" version="8.0.1"/>
+  <product name="llvm" version="3.9.1"/>
   <product name="markupsafe" version="0.23" />
   <product name="matplotlib" version="2.2.2">
     <patches>
       <patch comment="Fix build procedure: create configuration file properly" name="matplotlib.001_build_procedure.patch" sha1="e01651c9160f7a2a73311ba0cbf1686385bea301" />
     </patches>
   </product>
-  <product name="medfile" version="4.0.0" >
-     <patches>
-      <patch comment="Fix bugs in the med CMake build procedure" name="medfile.001.bug_correct_cmake.patch" sha1="7f34557969af227905a2ce065f25c104a096ff00" />
-    </patches>
-  </product> 
-  <product name="meshgems" version="2.9.6" />
+  <product name="medfile" version="4.1.0" /> 
+  <product name="meshgems" version="2.10.3" />
   <product name="metis" version="5.1.0" />
   <product name="mpich2" version="1.4.1p1" />
   <product name="mpi4py" version="1.3.1" />
@@ -69,13 +60,14 @@
       <patch comment="General patch needed for SALOME platform" name="netgen.001.common.patch" sha1="a0a629d2dde375ee22405e26cae692bad09f8b63" />
     </patches>
   </product>
+  <product name="nlopt" version="2.4.2" />
   <product name="nose" version="1.3.7" />
   <product name="numpy" version="1.15.1" >
     <patches>
       <patch comment="Fix problem with shell command" name="numpy.001_shell.patch" sha1="d004dfb9053fcc7bcdc021e8c7aa3eb552a80452" />
     </patches>
   </product>
-  <product name="occt" version="7.3.0p4" />
+  <product name="occt" version="7.4.0p1" />
   <product name="omniorb" version="4.2.2" />
   <product name="omniorbpy" version="4.2.2" />
   <product name="opencv" version="3.2.0">
@@ -87,13 +79,19 @@
   <product name="openmpi" version="1.8.5" />
   <product name="ospray" version="1.8.4" />
   <product name="packaging" version="17.1" />
-  <product name="paraview" version="5.6.0p2-bfaf7b82">
+  <product name="paraview" version="5.8.0">
     <patches>
-      <patch comment="Fix problem with python threads" name="paraview.001_against_multiple_py_sv_thr.patch" sha1="6f2bfdc85cd22ceb3ff8a85cd177a0b373461045" />
-      <patch comment="Fix bug in the vtkStateStorage class" name="paraview.002_statestorage_bug.patch" sha1="abc5ad2bf5565ea1edd25df68a4242830b986ae7" />
-      <patch comment="Fix problem with forwarding executables on some platforms" name="paraview.004_forwarding.patch" sha1="7856257c15ae5375ac5a88d94868e106379169fa" />
+      <patch comment="Patch for LATA Reader" name="paraview.0001-LATA-reader.patch" sha1="d1b723eab368e716f7bee33e4064c839a7055b34" />
+      <patch comment="Patches for Visit Bridge " name="paraview.0002-vtkUnstructuredGridRelevantPointsFilter-fix-for-poly.patch" sha1="ac843a5d0135b4c9d657dc92e0e69007cca84d1d" />
+      <patch comment="Patch for ParaView client" name="paraview.0003-ParaViewClient.patch" sha1="5a09612a69ecb13831062f36eee50a02b82370da" />
+      <patch comment="Patch for ParaView HDF5" name="paraview.0004-ParaView_hdf5.patch" sha1="b34706a3bb5e6873b0c94726e565624928994a57" />
+      <patch comment="Patch for ParaView CNGS's detection procedure" name="paraview.0005-ParaView_find_cgns.patch" sha1="b48b6008506607eaedbbeb662ca822903bcc274d" />
+      <patch comment="Patch for ParaView libxml2's detection procedure" name="paraview.0006-ParaView_find_libxml2.patch" sha1="adc67576f12ca3b6abc06be2960495029c24c2a6" />
+      <patch comment="Patch for ParaView freetype's detection procedure" name="paraview.0007-ParaView_find_freetype.patch" sha1="58a8b25b56fb325134129445c2ac90d7d4115980" />
+      <patch comment="Patch to fix ParaView bug with rendering coincident topology" name="paraview.0008-ParaView_coincident_rendering.patch" sha1="45f74561b5301187bd73ee10f0c266c1345c8666" />
     </patches>
   </product>
+  <product name="pillow" version="7.1.1" />  
   <product name="pkgconfig" version="1.1.0" />
   <product name="pygments" version="2.0.2" />
   <product name="pyparsing" version="2.0.3" />
@@ -124,14 +122,10 @@
   <product name="swig" version="3.0.12" />
   <product name="tcltk" version="8.6.0" />
   <product name="tclx" version="8.4.1" />
-  <product name="tbb" version="2019-U8" >
-    <patches>
-      <patch comment="Patch to install python backend in the TBB dir" name="tbb.001_install_py_backend.patch" sha1="f013ef00fdec58aaf80b447f79fd67807e40982b" />
-    </patches>
-  </product>
+  <product name="tbb" version="4.4" />
   <product name="urllib3" version="1.23" />
   <product name="eigen" version="3.2.7" />
-  <product name="embree" version="3.5.2" >
+  <product name="embree" version="3.3.0" >
     <patches>
       <patch comment="Patch for CentOS-6 platform" name="embree.001_centos6.patch" sha1="63fe01e0c3da109bc092525f9573188e0c5625ea" />
     </patches>
@@ -142,42 +136,42 @@
     </patches>
   </product>
   <product name="pockets" version="0.6.2" />
-  <product comment="SALOME Geometry module" name="geom" version="" />
-  <product comment="SALOME GUI module" name="gui" version="9_4_0" />
-  <product comment="SALOME HexaBlock module" name="hexablock" version="9_4_0" />
-  <product comment="SALOME Homard module" name="homard" version="9_4_0" />
-  <product comment="SALOME JobManager module" name="jobmanager" version="9_4_0" />
-  <product comment="SALOME Kernel module" name="kernel" version="9_4_0" />
-  <product comment="SALOME Med module" name="med" version="9_4_0" />
-  <product comment="SALOME ParaVis module" name="paravis" version="9_4_0" />
-  <product comment="SALOME Mesh module" name="smesh" version="9_4_0" />
-  <product comment="SALOME YACS module" name="yacs" version="9_4_0" />
-  <product comment="SALOME MG-CadSurf meshing plugin" name="blsurfplugin" version="9_4_0" />
-  <product comment="SALOME MG-Tetra meshing plugin" name="ghs3dplugin" version="9_4_0" />
-  <product comment="SALOME MG-Tetra_HPC meshing plugin" name="ghs3dprlplugin" version="9_4_0" />
-  <product comment="SALOME MG-Hexa meshing plugin" name="hexoticplugin" version="9_4_0" />
-  <product comment="SALOME HexaBlock meshing plugin" name="hexablockplugin" version="9_4_0" />
-  <product comment="SALOME MG-Hybrid meshing plugin" name="hybridplugin" version="9_4_0" />
-  <product comment="SALOME Netgen meshing plugin" name="netgenplugin" version="9_4_0" />
-  <product comment="SALOME Gmsh meshing plugin" name="gmshplugin" version="9_4_0" />
-  <product comment="SALOME Documentation tool" name="documentation" version="9_4_0" />
-  <product comment="SALOME Hxx2salome tool" name="hxx2salome" version="9_4_0" />
+  <product comment="SALOME Geometry module" name="geom" version="9_5_0" />
+  <product comment="SALOME GUI module" name="gui" version="9_5_0" />
+  <product comment="SALOME HexaBlock module" name="hexablock" version="9_5_0" />
+  <product comment="SALOME Homard module" name="homard" version="9_5_0" />
+  <product comment="SALOME JobManager module" name="jobmanager" version="9_5_0" />
+  <product comment="SALOME Kernel module" name="kernel" version="9_5_0" />
+  <product comment="SALOME Med module" name="med" version="9_5_0" />
+  <product comment="SALOME ParaVis module" name="paravis" version="9_5_0" />
+  <product comment="SALOME Mesh module" name="smesh" version="9_5_0" />
+  <product comment="SALOME YACS module" name="yacs" version="9_5_0" />
+  <product comment="SALOME MG-CadSurf meshing plugin" name="blsurfplugin" version="9_5_0" />
+  <product comment="SALOME MG-Tetra meshing plugin" name="ghs3dplugin" version="9_5_0" />
+  <product comment="SALOME MG-Tetra_HPC meshing plugin" name="ghs3dprlplugin" version="9_5_0" />
+  <product comment="SALOME MG-Hexa meshing plugin" name="hexoticplugin" version="9_5_0" />
+  <product comment="SALOME HexaBlock meshing plugin" name="hexablockplugin" version="9_5_0" />
+  <product comment="SALOME MG-Hybrid meshing plugin" name="hybridplugin" version="9_5_0" />
+  <product comment="SALOME Netgen meshing plugin" name="netgenplugin" version="9_5_0" />
+  <product comment="SALOME Gmsh meshing plugin" name="gmshplugin" version="9_5_0" />
+  <product comment="SALOME Documentation tool" name="documentation" version="9_5_0" />
+  <product comment="SALOME Hxx2salome tool" name="hxx2salome" version="9_5_0" />
   <product comment="libBatch library" name="libbatch" version="V2_4_0" />
-  <product comment="SALOME MedCoupling library" name="medcoupling" version="9_4_0" />
-  <product comment="SALOME Tutorial" name="tutorial" version="9_4_0" />
-  <product comment="SALOME YacsGen tool" name="yacsgen" version="9_4_0" />
-  <product comment="SALOME AtomGen sample module" name="atomgen" version="9_4_0" />
-  <product comment="SALOME Atomic sample module" name="atomic" version="9_4_0" />
-  <product comment="SALOME AtomSolv sample module" name="atomsolv" version="9_4_0" />
-  <product comment="SALOME Calculator sample module" name="calculator" version="9_4_0" />
-  <product comment="SALOME Component sample module" name="component" version="9_4_0" />
-  <product comment="SALOME data files" name="samples" version="9_4_0" />
-  <product comment="SALOME DscCode sample module" name="dsccode" version="9_4_0" />
-  <product comment="SALOME Hello sample module" name="hello" version="9_4_0" />
-  <product comment="SALOME Light sample module" name="light" version="9_4_0" />
-  <product comment="SALOME PyCalculator sample module" name="pycalculator" version="9_4_0" />
-  <product comment="SALOME PyHello sample module" name="pyhello" version="9_4_0" />
-  <product comment="SALOME PyLight sample module" name="pylight" version="9_4_0" />
-  <product comment="SALOME Randomizer sample module" name="randomizer" version="9_4_0" />
-  <product comment="SALOME Sierpinsky sample module" name="sierpinsky" version="9_4_0" />
+  <product comment="SALOME MedCoupling library" name="medcoupling" version="9_5_0" />
+  <product comment="SALOME Tutorial" name="tutorial" version="9_5_0" />
+  <product comment="SALOME YacsGen tool" name="yacsgen" version="9_5_0" />
+  <product comment="SALOME AtomGen sample module" name="atomgen" version="9_5_0" />
+  <product comment="SALOME Atomic sample module" name="atomic" version="9_5_0" />
+  <product comment="SALOME AtomSolv sample module" name="atomsolv" version="9_5_0" />
+  <product comment="SALOME Calculator sample module" name="calculator" version="9_5_0" />
+  <product comment="SALOME Component sample module" name="component" version="9_5_0" />
+  <product comment="SALOME data files" name="samples" version="9_5_0" />
+  <product comment="SALOME DscCode sample module" name="dsccode" version="9_5_0" />
+  <product comment="SALOME Hello sample module" name="hello" version="9_5_0" />
+  <product comment="SALOME Light sample module" name="light" version="9_5_0" />
+  <product comment="SALOME PyCalculator sample module" name="pycalculator" version="9_5_0" />
+  <product comment="SALOME PyHello sample module" name="pyhello" version="9_5_0" />
+  <product comment="SALOME PyLight sample module" name="pylight" version="9_5_0" />
+  <product comment="SALOME Randomizer sample module" name="randomizer" version="9_5_0" />
+  <product comment="SALOME Sierpinsky sample module" name="sierpinsky" version="9_5_0" />
 </config>
