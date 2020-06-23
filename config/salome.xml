@@ -89,6 +89,7 @@
       <patch comment="Patch for ParaView libxml2's detection procedure" name="paraview.0006-ParaView_find_libxml2.patch" sha1="adc67576f12ca3b6abc06be2960495029c24c2a6" />
       <patch comment="Patch for ParaView freetype's detection procedure" name="paraview.0007-ParaView_find_freetype.patch" sha1="58a8b25b56fb325134129445c2ac90d7d4115980" />
       <patch comment="Patch to fix ParaView bug with rendering coincident topology" name="paraview.0008-ParaView_coincident_rendering.patch" sha1="45f74561b5301187bd73ee10f0c266c1345c8666" />
+      <patch comment="Patch for volume mapper (fix crash)" name="paraview.0009-ParaView_volume_mapper.patch" sha1="a14b75914c76d15897e470c2948cb8fea9377f5a" />
     </patches>
   </product>
   <product name="pillow" version="7.1.1" />  
