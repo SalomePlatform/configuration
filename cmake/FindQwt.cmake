@@ -42,7 +42,7 @@ ELSE()
   SET(_qwt_qt_version_major "5")
 ENDIF()
 
-FIND_PATH(QWT_INCLUDE_DIR qwt_plot.h PATH_SUFFIXES qwt-qt${_qwt_qt_version_major})
+FIND_PATH(QWT_INCLUDE_DIR qwt_plot.h PATH_SUFFIXES qwt-qt${_qwt_qt_version_major} qt${_qwt_qt_version_major}/qwt)
 FIND_PATH(QWT_INCLUDE_DIR qwt_plot.h PATH_SUFFIXES qwt)
 
 IF(WIN32)
