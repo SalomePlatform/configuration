@@ -55,16 +55,18 @@
 # cfg_dir : IN - path to directory that contains sphinx configuration file (if not specified,
 #           it is considered equal to src_dir)
 #
-# ADDITIONAL SETTINGS:
+# ADDITIONAL OPTIONS:
 #
-# Also you can set these variables to define additional sphinx settings:
-#
-#                        SPHINXOPTS    - sphinx executable options
-#                        PAPER         - LaTeX paper type          ("a4" by default)
-#                        BUILDDIR      - local sphinx build directory  ("_build" by default)
+#       OPTIONS   - extra options for sphinx-build
+#       PAPER     - LaTeX paper type ("a4" by default)
+#       BUILDDIR  - build directory ("_build" by default)
+#       OUTDIR    - output directory (by default, set to `sphinx_type` parameter)
+# 
 #----------------------------------------------------------------------------
 
 MACRO(SALOME_ADD_SPHINX_DOC sphinx_type sphinx_name src_dir cfg_dir)
+  # Parse options
+  CMAKE_PARSE_ARGUMENTS(SALOME_ADD_SPHINX_DOC "" "PAPER;BUILDDIR;OUTDIR" "OPTIONS" ${ARGN})
 
   # Get type and additional settings
   SET(SPHINX_TYPE ${sphinx_type})
@@ -72,12 +74,16 @@ MACRO(SALOME_ADD_SPHINX_DOC sphinx_type sphinx_name src_dir cfg_dir)
     SET(SPHINX_TYPE html)
   ENDIF(${SPHINX_TYPE} STREQUAL "")
 
-  IF("${PAPER}" STREQUAL "")
-    SET(PAPER a4)
+  IF("${SALOME_ADD_SPHINX_DOC_PAPER}" STREQUAL "")
+    SET(SALOME_ADD_SPHINX_DOC_PAPER a4)
   ENDIF()
  
-  IF("${BUILDDIR}" STREQUAL "")
-    SET(BUILDDIR _build)
+  IF("${SALOME_ADD_SPHINX_DOC_BUILDDIR}" STREQUAL "")
+    SET(SALOME_ADD_SPHINX_DOC_BUILDDIR _build)
+  ENDIF()
+
+  IF("${SALOME_ADD_SPHINX_DOC_OUTDIR}" STREQUAL "")
+    SET(SALOME_ADD_SPHINX_DOC_OUTDIR ${SPHINX_TYPE})
   ENDIF()
 
   SET(SPHINX_CFG ${cfg_dir})
@@ -88,21 +94,19 @@ MACRO(SALOME_ADD_SPHINX_DOC sphinx_type sphinx_name src_dir cfg_dir)
   # Initialize internal variables
   SET(PAPEROPT_a4 -D latex_paper_size=a4)
   SET(PAPEROPT_letter -D latex_paper_size=letter)
-  SET(ALLSPHINXOPTS  -d ${BUILDDIR}/doctrees ${PAPEROPT_${PAPER}} ${SPHINXOPTS})
-  SET(I18NSPHINXOPTS  ${PAPEROPT_${PAPER}} ${SPHINXOPTS})
+  SET(ALLSPHINXOPTS  -d ${SALOME_ADD_SPHINX_DOC_BUILDDIR}/doctrees ${PAPEROPT_${SALOME_ADD_SPHINX_DOC_PAPER}} ${SPHINXOPTS})
+  SET(I18NSPHINXOPTS  ${PAPEROPT_${SALOME_ADD_SPHINX_DOC_PAPER}} ${SPHINXOPTS})
 
   SET(ALLSPHINXOPTS ${ALLSPHINXOPTS} ${src_dir})
   SET(I18NSPHINXOPTS ${I18NSPHINXOPTS} ${src_dir})
 
   # Set internal out directory
-  SET(_OUT_DIR ${SPHINX_TYPE}) 
   IF(${SPHINX_TYPE} STREQUAL "gettext")
-    SET(_OUT_DIR gettext)
     SET(ALLSPHINXOPTS ${I18NSPHINXOPTS})
   ENDIF(${SPHINX_TYPE} STREQUAL "gettext")
 
   # Build sphinx command
-  SET(_CMD_OPTIONS -b ${SPHINX_TYPE} -c ${SPHINX_CFG} ${ALLSPHINXOPTS} ${BUILDDIR}/${_OUT_DIR})
+  SET(_CMD_OPTIONS -b ${SPHINX_TYPE} -c ${SPHINX_CFG} ${ALLSPHINXOPTS} ${SALOME_ADD_SPHINX_DOC_BUILDDIR}/${SALOME_ADD_SPHINX_DOC_OUTDIR})
 
   # This macro mainly prepares the environment in which sphinx should run:
   # this sets the PYTHONPATH and LD_LIBRARY_PATH to include OMNIORB, DOCUTILS, SETUPTOOLS, etc ...
