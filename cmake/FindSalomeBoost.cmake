@@ -27,7 +27,8 @@ SET(Boost_USE_STATIC_LIBS        OFF)
 SET(Boost_USE_MULTITHREADED      ON)
 SET(Boost_USE_STATIC_RUNTIME     OFF)
 SET(Boost_NO_BOOST_CMAKE         ON)
-SET(SalomeBoost_FIND_COMPONENTS  filesystem regex system thread date_time chrono serialization)
+SET(SalomeBoost_COMPONENTS       filesystem regex system thread date_time chrono serialization)
+SET(SalomeBoost_FIND_COMPONENTS ${SalomeBoost_COMPONENTS})
 
 IF(WIN32)
   # Under windows, one extra sub-directory in the boost installation hierarchy:
