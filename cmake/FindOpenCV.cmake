@@ -29,12 +29,7 @@ IF(NOT OpenCV_FIND_QUIETLY)
   MESSAGE(STATUS "Check for OpenCV ...")
 ENDIF()
 
-FIND_PATH(OpenCV_INCLUDE_DIRS cv.h PATH_SUFFIXES opencv)
-IF(OpenCV_INCLUDE_DIRS)
-  SET(_OpenCV_INCLUDE_DIR_TMP "${OpenCV_INCLUDE_DIRS}/../opencv2")
-  GET_FILENAME_COMPONENT(_OpenCV_INCLUDE_DIR_TMP "${_OpenCV_INCLUDE_DIR_TMP}" REALPATH)
-  LIST(APPEND OpenCV_INCLUDE_DIRS ${_OpenCV_INCLUDE_DIR_TMP})
-ENDIF()
+FIND_PATH(OpenCV_INCLUDE_DIRS opencv2/core.hpp)
 
 SET(OpenCV_LIB_COMPONENTS videostab;video;ts;superres;stitching;photo;ocl;objdetect;ml;legacy;imgproc;highgui;gpu;flann;features2d;core;objdetect;imgcodecs;shape)
 
