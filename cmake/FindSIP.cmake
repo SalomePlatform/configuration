@@ -17,11 +17,13 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-# - Find SIP
+# - Find sip
 # Sets the following variables:
-#   SIP_EXECUTABLE      - path to the SIP executable
-#   SIP_INCLUDE_DIR     - path to the SIP headers
-#   SIP_PYTHONPATH      - path to the SIP Python packages
+#   SIP_VERSION           - version of SIP
+#   SIP_MODULE_EXECUTABLE - path to the sip-module executable (sip >= 5)
+#   SIP_EXECUTABLE        - path to the sip executable
+#   SIP_INCLUDE_DIR       - path to the sip headers (sip < 5)
+#   SIP_PYTHONPATH        - path to the sip Python packages
 #
 #  The header sip.h is looked for.
 #  The binary 'sip' is looked for.
@@ -31,16 +33,44 @@ IF(NOT SIP_FIND_QUIETLY)
   MESSAGE(STATUS "Looking for SIP ...")
 ENDIF()
 
-FIND_PROGRAM(SIP_EXECUTABLE sip)
-FIND_PATH(SIP_INCLUDE_DIR sip.h PATH_SUFFIXES python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR} python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}m)
+# Find executable
+FIND_PROGRAM(SIP_EXECUTABLE
+             NAMES sip5 sip4 sip
+             HINTS $ENV{SIP_ROOT_DIR}
+             PATH_SUFFIXES bin)
 
-IF(SIP_INCLUDE_DIR)
-  GET_FILENAME_COMPONENT(SIP_PYTHONPATH "${SIP_INCLUDE_DIR}" PATH)
-  GET_FILENAME_COMPONENT(SIP_PYTHONPATH "${SIP_PYTHONPATH}" PATH)
+IF(SIP_EXECUTABLE)
+  # Set path to sip's Python module
+  GET_FILENAME_COMPONENT(SIP_PYTHONPATH "${SIP_EXECUTABLE}" PATH) # <root>/bin/sip -> <root>/bin
+  GET_FILENAME_COMPONENT(SIP_PYTHONPATH "${SIP_PYTHONPATH}" PATH) # <root>/bin -> <root>
   SET(SIP_PYTHONPATH "${SIP_PYTHONPATH}/lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages")
+
+  # Detect sip version
+  EXECUTE_PROCESS(COMMAND ${SIP_EXECUTABLE} "-V"
+                  OUTPUT_VARIABLE SIP_VERSION
+                  OUTPUT_STRIP_TRAILING_WHITESPACE
+                  ERROR_QUIET)
+ENDIF()
+
+# Find sip-module executable (only for version >= 5)
+IF(SIP_VERSION AND SIP_VERSION VERSION_GREATER_EQUAL "5")
+  FIND_PROGRAM(SIP_MODULE_EXECUTABLE
+               NAMES sip-module
+               HINTS $ENV{SIP_ROOT_DIR}
+               PATH_SUFFIXES bin)
+ENDIF()
+
+# Find header file (only for version < 5)
+IF(NOT SIP_VERSION OR SIP_VERSION VERSION_LESS "5")
+  FIND_PATH(SIP_INCLUDE_DIR
+            NAMES sip.h
+            HINTS $ENV{SIP_ROOT_DIR}
+            PATH_SUFFIXES include python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR} python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}m)
 ENDIF()
 
 INCLUDE(FindPackageHandleStandardArgs)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(SIP REQUIRED_VARS SIP_INCLUDE_DIR SIP_EXECUTABLE SIP_PYTHONPATH)
-
-
+IF(SIP_VERSION AND SIP_VERSION VERSION_GREATER_EQUAL "5")
+  FIND_PACKAGE_HANDLE_STANDARD_ARGS(SIP REQUIRED_VARS SIP_EXECUTABLE SIP_MODULE_EXECUTABLE SIP_PYTHONPATH)
+ELSE()
+  FIND_PACKAGE_HANDLE_STANDARD_ARGS(SIP REQUIRED_VARS SIP_INCLUDE_DIR SIP_EXECUTABLE SIP_PYTHONPATH)
+ENDIF()

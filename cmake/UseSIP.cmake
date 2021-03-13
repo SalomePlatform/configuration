@@ -109,9 +109,18 @@ MACRO(SIP_WRAP_SIP outfiles)
       SET(${outfiles} ${${outfiles}} ${CMAKE_CURRENT_BINARY_DIR}/${_class_source})
     ENDFOREACH()
   ENDFOREACH()
+  IF(SIP_VERSION AND SIP_VERSION VERSION_GREATER_EQUAL "5")
+    LIST(GET _sip_files 0 _main_sip_file)
+    ADD_CUSTOM_COMMAND(
+      OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/sip.h
+      COMMAND ${SIP_MODULE_EXECUTABLE} --sip-h --target-dir ${CMAKE_CURRENT_BINARY_DIR} ${_main_sip_file}
+      DEPENDS ${_sip_files}
+      )
+    SET(_extra_deps ${CMAKE_CURRENT_BINARY_DIR}/sip.h)
+  ENDIF()
   ADD_CUSTOM_COMMAND(
     OUTPUT ${_output}
     COMMAND ${SIP_EXECUTABLE} ${_options} ${CMAKE_CURRENT_SOURCE_DIR}/${_module_input}
-    MAIN_DEPENDENCY ${_module_input}
+    DEPENDS ${_module_input} ${_extra_deps}
     )
 ENDMACRO(SIP_WRAP_SIP)
