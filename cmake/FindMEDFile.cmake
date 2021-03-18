@@ -1,11 +1,13 @@
-# - Find MED file installation
+############################################################################
 #
-# The following variable are set:
-#   MEDFILE_INCLUDE_DIRS
-#   MEDFILE_LIBRARIES
-#   MEDFILE_C_LIBRARIES
-#   MEDFILE_F_LIBRARIES
-#
+# Detect MEDFile (med-fichier)
+# --
+# Defines the following variables
+#   MEDFILE_INCLUDE_DIRS    - include directories
+#   MEDFILE_LIBRARIES       - libraries to link against (C and Fortran)
+#   MEDFILE_C_LIBRARIES     - C libraries only
+#   MEDFILE_EXTRA_LIBRARIES - additional libraries
+# --
 #  The CMake (or environment) variable MEDFILE_ROOT_DIR can be set to
 #  guide the detection and indicate a root directory to look into.
 #
@@ -29,26 +31,42 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-# ------
-
 MESSAGE(STATUS "Check for medfile ...")
-
-# ------
+# --
 
 SET(MEDFILE_ROOT_DIR $ENV{MEDFILE_ROOT_DIR} CACHE PATH "Path to the MEDFile.")
 IF(MEDFILE_ROOT_DIR)
   LIST(APPEND CMAKE_PREFIX_PATH "${MEDFILE_ROOT_DIR}")
 ENDIF(MEDFILE_ROOT_DIR)
+# --
 
+# Detect headers directory
 FIND_PATH(MEDFILE_INCLUDE_DIRS med.h)
-#FIND_PROGRAM(MDUMP mdump)
-FIND_LIBRARY(MEDFILE_C_LIBRARIES NAMES medC)
-FIND_LIBRARY(MEDFILE_F_LIBRARIES NAMES med)
-IF(MEDFILE_F_LIBRARIES)
-  SET(MEDFILE_LIBRARIES ${MEDFILE_C_LIBRARIES} ${MEDFILE_F_LIBRARIES})
-ELSE(MEDFILE_F_LIBRARIES)
-    SET(MEDFILE_LIBRARIES ${MEDFILE_C_LIBRARIES})
-ENDIF(MEDFILE_F_LIBRARIES)
+# --
+
+# Detect libraries
+SET(MEDFILE_LIBRARIES)
+SET(MEDFILE_C_LIBRARIES)
+SET(MEDFILE_EXTRA_LIBRARIES)
+
+FIND_LIBRARY(MEDFILE_LIBRARY_medC NAMES medC)
+IF(MEDFILE_LIBRARY_medC)
+  LIST(APPEND MEDFILE_C_LIBRARIES "${MEDFILE_LIBRARY_medC}")
+  LIST(APPEND MEDFILE_LIBRARIES "${MEDFILE_LIBRARY_medC}")
+ENDIF()
+FIND_LIBRARY(MEDFILE_LIBRARY_medfwrap NAMES medfwrap)
+IF(MEDFILE_LIBRARY_medfwrap)
+  LIST(APPEND MEDFILE_C_LIBRARIES "${MEDFILE_LIBRARY_medfwrap}")
+  LIST(APPEND MEDFILE_LIBRARIES "${MEDFILE_LIBRARY_medfwrap}")
+ENDIF()
+FIND_LIBRARY(MEDFILE_LIBRARY_med NAMES med)
+IF(MEDFILE_LIBRARY_med)
+  LIST(APPEND MEDFILE_LIBRARIES "${MEDFILE_LIBRARY_med}")
+ENDIF()
+FIND_LIBRARY(MEDFILE_LIBRARY_medimport NAMES medimport)
+IF(MEDFILE_LIBRARY_medimport)
+  LIST(APPEND MEDFILE_EXTRA_LIBRARIES "${MEDFILE_LIBRARY_medimport}")
+ENDIF()
 
 INCLUDE(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(MEDFile REQUIRED_VARS MEDFILE_INCLUDE_DIRS MEDFILE_LIBRARIES)
