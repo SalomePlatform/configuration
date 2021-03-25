@@ -51,11 +51,11 @@ ENDIF()
 
 FIND_PATH(_netgen_base_inc_dir nglib.h)
 SET(NETGEN_INCLUDE_DIRS ${_netgen_base_inc_dir} ${ZLIB_INCLUDE_DIRS})
-FIND_PATH(_netgen_add_inc_dir occgeom.hpp HINTS ${_netgen_base_inc_dir} PATH_SUFFIXES share/netgen/include)
+FIND_PATH(_netgen_add_inc_dir occgeom.hpp HINTS ${_netgen_base_inc_dir} PATH_SUFFIXES share/netgen/include include)
 LIST(APPEND NETGEN_INCLUDE_DIRS ${_netgen_add_inc_dir})
 LIST(REMOVE_DUPLICATES NETGEN_INCLUDE_DIRS)
 
-FOREACH(_lib nglib csg gen geom2d gprim interface la mesh occ stl)
+FOREACH(_lib nglib csg gen geom2d gprim interface la mesh occ stl ngcore)
 
   FIND_LIBRARY(NETGEN_${_lib} NAMES ${_lib})
   IF(NETGEN_${_lib})
@@ -68,8 +68,10 @@ INCLUDE(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(NETGEN REQUIRED_VARS NETGEN_INCLUDE_DIRS NETGEN_LIBRARIES)
 
 INCLUDE(CheckCXXSourceCompiles)
+INCLUDE(CMakePushCheckState)
 
 IF(NETGEN_FOUND)
+  CMAKE_PUSH_CHECK_STATE()
 
   # Detect NETGEN V5
   SET(CMAKE_REQUIRED_INCLUDES "${CMAKE_REQUIRED_INCLUDES} ${NETGEN_INCLUDE_DIRS}")
@@ -83,6 +85,20 @@ IF(NETGEN_FOUND)
     }
 " NETGEN_V5
     )
+  # Detect NETGEN V6
+  SET(CMAKE_REQUIRED_FLAGS "-std=c++17")
+  CHECK_CXX_SOURCE_COMPILES("
+    //using namespace std;
+    #include <meshing.hpp>
+    int main()
+    {
+       netgen::MeshingParameters mp;
+       return !mp.meshsizefilename.empty();
+    }
+" NETGEN_V6
+    )
+
+  CMAKE_POP_CHECK_STATE()
 
   IF(NOT Netgen_FIND_QUIETLY)
     MESSAGE(STATUS "Netgen library: ${NETGEN_LIBRARIES}")
@@ -90,9 +106,11 @@ IF(NETGEN_FOUND)
   SET(NETGEN_DEFINITIONS "-DOCCGEOMETRY")
 
   IF(NETGEN_V5)
-    MESSAGE(STATUS "NETGEN V5 or later found")
+    MESSAGE(STATUS "NETGEN V5 found")
     SET(NETGEN_DEFINITIONS "${NETGEN_DEFINITIONS} -DNETGEN_V5")
-  ENDIF(NETGEN_V5)
+  ELSEIF(NETGEN_V6)
+    MESSAGE(STATUS "NETGEN V6 or newer found")
+  ENDIF()
 
   #RNV:  currently on windows use netgen without thread support.
   #TODO: check support of the multithreading on windows
