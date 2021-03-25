@@ -1,5 +1,6 @@
 # - Find NETGEN
 # Sets the following variables:
+#   NETGEN_DEFINITIONS  - compile flags
 #   NETGEN_INCLUDE_DIRS - path to the NETGEN include directories
 #   NETGEN_LIBRARIES    - path to the NETGEN libraries to be linked against
 #
@@ -51,9 +52,14 @@ ENDIF()
 
 FIND_PATH(_netgen_base_inc_dir nglib.h)
 SET(NETGEN_INCLUDE_DIRS ${_netgen_base_inc_dir} ${ZLIB_INCLUDE_DIRS})
-FIND_PATH(_netgen_add_inc_dir occgeom.hpp HINTS ${_netgen_base_inc_dir} PATH_SUFFIXES share/netgen/include include)
-LIST(APPEND NETGEN_INCLUDE_DIRS ${_netgen_add_inc_dir})
-LIST(REMOVE_DUPLICATES NETGEN_INCLUDE_DIRS)
+FIND_PATH(_netgen_add_inc_dir1 occgeom.hpp HINTS ${_netgen_base_inc_dir} PATH_SUFFIXES share/netgen/include include)
+IF(_netgen_add_inc_dir1)
+  LIST(APPEND NETGEN_INCLUDE_DIRS ${_netgen_add_inc_dir1})
+ENDIF()
+FIND_PATH(_netgen_add_inc_dir2 exception.hpp HINTS ${_netgen_base_inc_dir} PATH_SUFFIXES share/netgen/include share/netgen/include/core include include/core)
+IF(_netgen_add_inc_dir2)
+  LIST(APPEND NETGEN_INCLUDE_DIRS ${_netgen_add_inc_dir2})
+ENDIF()
 
 FOREACH(_lib nglib csg gen geom2d gprim interface la mesh occ stl ngcore)
 
@@ -104,13 +110,6 @@ IF(NETGEN_FOUND)
     MESSAGE(STATUS "Netgen library: ${NETGEN_LIBRARIES}")
   ENDIF()
   SET(NETGEN_DEFINITIONS "-DOCCGEOMETRY")
-
-  IF(NETGEN_V5)
-    MESSAGE(STATUS "NETGEN V5 found")
-    SET(NETGEN_DEFINITIONS "${NETGEN_DEFINITIONS} -DNETGEN_V5")
-  ELSEIF(NETGEN_V6)
-    MESSAGE(STATUS "NETGEN V6 or newer found")
-  ENDIF()
 
   #RNV:  currently on windows use netgen without thread support.
   #TODO: check support of the multithreading on windows
