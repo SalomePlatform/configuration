@@ -37,13 +37,17 @@ ENDIF()
 FIND_PROGRAM(SIP_EXECUTABLE
              NAMES sip5 sip4 sip
              HINTS $ENV{SIP_ROOT_DIR}
-             PATH_SUFFIXES bin)
+             PATH_SUFFIXES bin Scripts)
 
 IF(SIP_EXECUTABLE)
   # Set path to sip's Python module
   GET_FILENAME_COMPONENT(SIP_PYTHONPATH "${SIP_EXECUTABLE}" PATH) # <root>/bin/sip -> <root>/bin
   GET_FILENAME_COMPONENT(SIP_PYTHONPATH "${SIP_PYTHONPATH}" PATH) # <root>/bin -> <root>
-  SET(SIP_PYTHONPATH "${SIP_PYTHONPATH}/lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages")
+  IF(WIN32)
+    SET(SIP_PYTHONPATH "${SIP_PYTHONPATH}/lib/site-packages")
+  ELSE()
+    SET(SIP_PYTHONPATH "${SIP_PYTHONPATH}/lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages")
+  ENDIF()
 
   # Detect sip version
   EXECUTE_PROCESS(COMMAND ${SIP_EXECUTABLE} "-V"
@@ -57,7 +61,7 @@ IF(SIP_VERSION AND SIP_VERSION VERSION_GREATER_EQUAL "5")
   FIND_PROGRAM(SIP_MODULE_EXECUTABLE
                NAMES sip-module
                HINTS $ENV{SIP_ROOT_DIR}
-               PATH_SUFFIXES bin)
+               PATH_SUFFIXES bin Scripts)
 ENDIF()
 
 # Find header file (only for version < 5)

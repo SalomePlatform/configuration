@@ -37,6 +37,7 @@ SET(SalomeVTK_COMPONENTS
   InteractionWidgets
   InfovisCore
   InteractionStyle
+  CommonSystem
 )
 
 #   Seting the following variable is equivalent to having passed the components
