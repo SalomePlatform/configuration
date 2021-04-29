@@ -55,6 +55,7 @@ IF(WIN32)
   ADD_DEFINITIONS(-DWNT -DWIN32)
   ADD_DEFINITIONS(-D_WIN32_WINNT=0x0500)      # Windows 2000 or later API is required
   ADD_DEFINITIONS(-DPPRO_NT)                  # For medfile
+  ADD_DEFINITIONS(-DNOMINMAX)
 
   SET(PLATFORM_LIBS Ws2_32.lib)
   LIST(APPEND PLATFORM_LIBS Userenv.lib)      # At least for GEOM suit
