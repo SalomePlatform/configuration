@@ -1,5 +1,5 @@
 <!DOCTYPE config>
-<config comment="SALOME 9.6" name="V9_7_0">
+<config comment="SALOME 9.7" name="V9_7_0">
   <product name="alabaster" version="0.7.6" />
   <product name="babel" version="2.6.0" />
   <product name="boost" version="1.58.0" />
