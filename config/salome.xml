@@ -73,7 +73,11 @@
       <patch comment="Fix problem with shell command" name="numpy.001_shell.patch" sha1="d004dfb9053fcc7bcdc021e8c7aa3eb552a80452" />
     </patches>
   </product>
-  <product name="occt" version="7.5.0p1" />
+  <product name="occt" version="7.5.0p1">
+    <patches>
+      <patch comment="Fix problem with rendering transparent objects" name="occt.001_transparency.patch" sha1="958c573a558397560a2d5bcc0ee4e3b7258ee7fe" />
+    </patches>
+  </product>
   <product name="omniorb" version="4.2.2" />
   <product name="omniorbpy" version="4.2.2" />
   <product name="opencv" version="3.2.0">
