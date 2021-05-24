@@ -1,0 +1,18 @@
+--- qt-everywhere-src-5.12.10/qtbase/src/gui/configure.json	2021-03-17 12:16:55.144830165 +0300
++++ qt-everywhere-src-5.12.10/qtbase/src/gui/configure.json.new	2021-03-17 12:16:41.605223710 +0300
+@@ -758,13 +758,13 @@
+             "use": "xcb"
+         },
+         "xkbcommon": {
+-            "label": "xkbcommon >= 0.5.0",
++            "label": "xkbcommon >= 0.4.3",
+             "test": {
+                 "main": "xkb_context_new(XKB_CONTEXT_NO_FLAGS);"
+             },
+             "headers": [ "xkbcommon/xkbcommon.h" ],
+             "sources": [
+-                { "type": "pkgConfig", "args": "xkbcommon >= 0.5.0" },
++                { "type": "pkgConfig", "args": "xkbcommon >= 0.4.3" },
+                 "-lxkbcommon"
+             ]
+         },

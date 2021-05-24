@@ -1,0 +1,121 @@
+diff -Naur med-4.1.0_SRC.orig/CMakeLists.txt med-4.1.0_SRC.new/CMakeLists.txt
+--- med-4.1.0_SRC.orig/CMakeLists.txt	2020-03-12 18:45:46.000000000 +0300
++++ med-4.1.0_SRC.new/CMakeLists.txt	2021-03-19 16:07:10.097210739 +0300
+@@ -101,7 +101,7 @@
+ IF(WIN32 AND NOT CYGWIN)
+    SET(INSTALL_CMAKE_CONFIG_DIR cmake)
+ ELSE()
+-   SET(INSTALL_CMAKE_CONFIG_DIR share/cmake/med-fichier-${MED_STR_VERSION})
++   SET(INSTALL_CMAKE_CONFIG_DIR share/cmake/medfile-${MED_STR_VERSION})
+ ENDIF()
+ SET(INSTALL_INCLUDE_DIR include)
+ 
+diff -Naur med-4.1.0_SRC.orig/CMakeLists.txt.in med-4.1.0_SRC.new/CMakeLists.txt.in
+--- med-4.1.0_SRC.orig/CMakeLists.txt.in	2020-03-03 16:53:39.000000000 +0300
++++ med-4.1.0_SRC.new/CMakeLists.txt.in	2021-03-19 16:50:43.589542683 +0300
+@@ -101,7 +101,7 @@
+ IF(WIN32 AND NOT CYGWIN)
+    SET(INSTALL_CMAKE_CONFIG_DIR cmake)
+ ELSE()
+-   SET(INSTALL_CMAKE_CONFIG_DIR share/cmake/med-fichier-${MED_STR_VERSION})
++   SET(INSTALL_CMAKE_CONFIG_DIR share/cmake/medfile-${MED_STR_VERSION})
+ ENDIF()
+ SET(INSTALL_INCLUDE_DIR include)
+ 
+diff -Naur med-4.1.0_SRC.orig/config/cmake_files/MEDFileConfig.cmake.in med-4.1.0_SRC.new/config/cmake_files/MEDFileConfig.cmake.in
+--- med-4.1.0_SRC.orig/config/cmake_files/MEDFileConfig.cmake.in	2020-02-24 14:08:41.000000000 +0300
++++ med-4.1.0_SRC.new/config/cmake_files/MEDFileConfig.cmake.in	2021-03-19 14:26:06.733900990 +0300
+@@ -39,13 +39,13 @@
+ IF(MEDFILE_BUILD_SHARED_LIBS)
+   SET(MEDFILE_C_LIBRARIES medC)
+   SET(MEDFILE_EXTRA_LIBRARIES medimportengine)
++  SET(MEDFILE_LIBRARIES medC medfwrap med)
+ ENDIF()
+ IF(MEDFILE_BUILD_STATIC_LIBS)
+   SET(MEDFILE_C_LIBRARIES medC_static)
+   SET(MEDFILE_EXTRA_LIBRARIES medimportengine_static)
++  SET(MEDFILE_LIBRARIES medC_static med_static medfwrap_static)
+ ENDIF()
+-# For now we don't expose Fortran bindings:
+-SET(MEDFILE_LIBRARIES ${MEDFILE_C_LIBRARIES})
+ 
+ # Package root dir:
+ SET_AND_CHECK(MEDFILE_ROOT_DIR_EXP "@PACKAGE_CMAKE_INSTALL_PREFIX@")
+diff -Naur med-4.1.0_SRC.orig/src/CMakeLists.txt med-4.1.0_SRC.new/src/CMakeLists.txt
+--- med-4.1.0_SRC.orig/src/CMakeLists.txt	2020-03-12 18:45:46.000000000 +0300
++++ med-4.1.0_SRC.new/src/CMakeLists.txt	2021-03-19 14:21:15.342441002 +0300
+@@ -113,7 +113,7 @@
+       SOVERSION 11
+       VERSION   11.0.1)
+     TARGET_LINK_LIBRARIES(medfwrap medC)
+-    INSTALL(TARGETS medfwrap EXPORT medfileTargetsF DESTINATION lib${LIB_SUFFIX})
++    INSTALL(TARGETS medfwrap EXPORT ${_export_group} DESTINATION lib${LIB_SUFFIX})
+ 
+     # Add Shared MED library
+     ADD_LIBRARY(med SHARED MEDiterators.c)
+@@ -124,7 +124,7 @@
+     TARGET_LINK_LIBRARIES(med medfwrap)    
+    
+     # Install only the resulting library:
+-    INSTALL(TARGETS med EXPORT medTargetsF DESTINATION lib${LIB_SUFFIX})
++    INSTALL(TARGETS med EXPORT ${_export_group} DESTINATION lib${LIB_SUFFIX})
+   ENDIF()
+ 
+   ######### Static Libraries ##########
+@@ -137,7 +137,7 @@
+     ADD_LIBRARY(medfwrap_static STATIC ${medfort_wrap_SOURCES})
+     SET_TARGET_PROPERTIES(medfwrap_static PROPERTIES OUTPUT_NAME medfwrap)
+     TARGET_LINK_LIBRARIES(medfwrap_static medC_static)
+-    INSTALL(TARGETS medfwrap_static EXPORT medfileTargetsF DESTINATION lib${LIB_SUFFIX})
++    INSTALL(TARGETS medfwrap_static EXPORT ${_export_group} DESTINATION lib${LIB_SUFFIX})
+     
+     # Add Static MED library
+     ADD_LIBRARY(med_static STATIC MEDiterators.c)
+@@ -145,7 +145,7 @@
+     TARGET_LINK_LIBRARIES(med_static medfwrap_static)
+ 
+     # Install only the resulting library:  
+-    INSTALL(TARGETS med_static EXPORT medfileTargetsF DESTINATION lib${LIB_SUFFIX})
++    INSTALL(TARGETS med_static EXPORT ${_export_group} DESTINATION lib${LIB_SUFFIX})
+   ENDIF()
+   
+ ENDIF(CMAKE_Fortran_COMPILER_WORKS)
+diff -Naur med-4.1.0_SRC.orig/src/CMakeLists.txt.in med-4.1.0_SRC.new/src/CMakeLists.txt.in
+--- med-4.1.0_SRC.orig/src/CMakeLists.txt.in	2019-07-03 19:09:45.000000000 +0300
++++ med-4.1.0_SRC.new/src/CMakeLists.txt.in	2021-03-19 16:48:53.988720349 +0300
+@@ -113,7 +113,7 @@
+       SOVERSION @MED_CMAKE_SO_MAJ@
+       VERSION   @MED_CMAKE_SO_MAJ@.@MED_CMAKE_SO_MIN@.@MED_CMAKE_SO_REL@)
+     TARGET_LINK_LIBRARIES(medfwrap medC)
+-    INSTALL(TARGETS medfwrap EXPORT medfileTargetsF DESTINATION lib${LIB_SUFFIX})
++    INSTALL(TARGETS medfwrap EXPORT ${_export_group} DESTINATION lib${LIB_SUFFIX})
+ 
+     # Add Shared MED library
+     ADD_LIBRARY(med SHARED MEDiterators.c)
+@@ -124,7 +124,7 @@
+     TARGET_LINK_LIBRARIES(med medfwrap)    
+    
+     # Install only the resulting library:
+-    INSTALL(TARGETS med EXPORT medTargetsF DESTINATION lib${LIB_SUFFIX})
++    INSTALL(TARGETS med EXPORT ${_export_group} DESTINATION lib${LIB_SUFFIX})
+   ENDIF()
+ 
+   ######### Static Libraries ##########
+@@ -137,7 +137,7 @@
+     ADD_LIBRARY(medfwrap_static STATIC ${medfort_wrap_SOURCES})
+     SET_TARGET_PROPERTIES(medfwrap_static PROPERTIES OUTPUT_NAME medfwrap)
+     TARGET_LINK_LIBRARIES(medfwrap_static medC_static)
+-    INSTALL(TARGETS medfwrap_static EXPORT medfileTargetsF DESTINATION lib${LIB_SUFFIX})
++    INSTALL(TARGETS medfwrap_static EXPORT ${_export_group} DESTINATION lib${LIB_SUFFIX})
+     
+     # Add Static MED library
+     ADD_LIBRARY(med_static STATIC MEDiterators.c)
+@@ -145,7 +145,7 @@
+     TARGET_LINK_LIBRARIES(med_static medfwrap_static)
+ 
+     # Install only the resulting library:  
+-    INSTALL(TARGETS med_static EXPORT medfileTargetsF DESTINATION lib${LIB_SUFFIX})
++    INSTALL(TARGETS med_static EXPORT ${_export_group} DESTINATION lib${LIB_SUFFIX})
+   ENDIF()
+   
+ ENDIF(CMAKE_Fortran_COMPILER_WORKS)

@@ -79,6 +79,7 @@ __all__ = [
     "commentAttr",
     "versionAttr",
     "urlAttr",
+    "sha1Attr",
     "supportedTags",
     "supportedAttributes",
     "tagAttributes",
@@ -144,6 +145,12 @@ def urlAttr():
     """
     return "url"
 
+def sha1Attr():
+    """
+    Return XML attribute for sha1 parameter (string).
+    """
+    return "sha1"
+
 def supportedTags():
     """
     Return list of all supported XML tags (list of strings).
@@ -154,7 +161,7 @@ def supportedAttributes():
     """
     Return list of all supported XML attributes (list of strings).
     """
-    return [nameAttr(), commentAttr(), versionAttr(), urlAttr()]
+    return [nameAttr(), commentAttr(), versionAttr(), urlAttr(), sha1Attr()]
     
 def tagAttributes(tag, force = False):
     """
@@ -191,6 +198,7 @@ def tagAttributes(tag, force = False):
         pass
         attrs[urlAttr()]      = False
         attrs[commentAttr()]  = False
+        attrs[sha1Attr()]     = False
     return attrs
 
 def tagChildren(tag):
@@ -261,6 +269,7 @@ class CfgTool(object):
         """
         self.enc = "utf-8"
         self.cfgFile = cfgFile if cfgFile else defaultConfFile()
+        self.parents = {}
         try:
             self.tree = ET.parse(self.cfgFile).getroot()
             self._checkConfig()
@@ -275,7 +284,7 @@ class CfgTool(object):
                 raise Exception("bad XML file %s: %s" % (self.cfgFile, str(e)))
             pass
         except Exception as e:
-            raise Exception("unkwnown error: %s" % str(e))
+            raise Exception("unknown error: %s" % str(e))
         pass
     
     def encoding(self):
@@ -486,7 +495,7 @@ class CfgTool(object):
         Return value is new XML element (xml.etree.ElementTree.Element).
         """
         child = ET.SubElement(elem, tag)
-        child._parent = elem # set parent!!!
+        self.parents[child] = elem # set parent!!!
         return child
 
     def _processTarget(self, target):
@@ -596,7 +605,7 @@ class CfgTool(object):
         path = []
         while elem is not None:
             path.append(_mkname(elem))
-            elem = elem._parent if hasattr(elem, "_parent") else None
+            elem = self.parents.get(elem)
             pass
         path.reverse()
         return pathSeparator().join(path)
@@ -729,7 +738,7 @@ class CfgTool(object):
             # check all childrens recursively
             children = elem.getchildren()
             for child in children:
-                child._parent = elem # set parent!!!
+                self.parents[child] = elem # set parent!!!
                 self._checkTag(child, elem.tag, errors)
                 pass
             pass

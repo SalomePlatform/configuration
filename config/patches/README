@@ -3,14 +3,11 @@ This directory containes patches needed to build SALOME pre-requisites.
 Comments
 ========
 
-1. graphvis
-   ! Additional patch is applied to binaries installation of grapvis to correct config6 via sed utility.
+1. graphviz
+   ! Additional patch is applied to binaries installation of grapviz via sed utility; this corrects config6 to decrease size of produced png images  
 
 2. qwt
    ! Patch which contains hardcoded path to qwt install directory is applied via sed utility. It is impossible to create such a patch using diff syntax.
 
-3. omniorb
-   ! Additional patch is applied to installed omniorb in order to set correct path to python3 executable.
-
-4. paraview
-   ! Post install patch is applied to ${PARAVIEW_ROOT_DIR}/lib/cmake/paraview-5.6/UseParaView.cmake in order to add 'find_package(ospray REQUIRED)' to the end of this file.
+3. omniorbpy
+   ! Additional patch is applied via sed to installed omniidl executables in order to set correct path to omniORB directory.

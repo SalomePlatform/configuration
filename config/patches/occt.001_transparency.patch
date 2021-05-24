@@ -1,0 +1,25 @@
+diff -Naur OCCT-7.5.0p1_SRC_orig/src/OpenGl/OpenGl_LayerList.cxx OCCT-7.5.0p1_SRC_modif/src/OpenGl/OpenGl_LayerList.cxx
+--- OCCT-7.5.0p1_SRC_orig/src/OpenGl/OpenGl_LayerList.cxx
++++ OCCT-7.5.0p1_SRC_modif/src/OpenGl/OpenGl_LayerList.cxx
+@@ -889,7 +889,7 @@
+   }
+   else
+   {
+-    aCtx->core11fwd->glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
++    aCtx->core15fwd->glBlendFuncSeparate (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
+   }
+ 
+   // During blended order-independent transparency pass the depth test
+diff -Naur OCCT-7.5.0p1_SRC_orig/src/OpenGl/OpenGl_View_Redraw.cxx OCCT-7.5.0p1_SRC_modif/src/OpenGl/OpenGl_View_Redraw.cxx
+--- OCCT-7.5.0p1_SRC_orig/src/OpenGl/OpenGl_View_Redraw.cxx
++++ OCCT-7.5.0p1_SRC_modif/src/OpenGl/OpenGl_View_Redraw.cxx
+@@ -933,7 +933,7 @@
+ #endif
+ 
+   const OpenGl_Vec4 aBgColor = aCtx->Vec4FromQuantityColor (myBgColor);
+-  glClearColor (aBgColor.r(), aBgColor.g(), aBgColor.b(), 0.0f);
++  glClearColor (aBgColor.r(), aBgColor.g(), aBgColor.b(), 1.0f);
+ 
+   glClear (toClear);
+ 
+
