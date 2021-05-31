@@ -39,8 +39,8 @@ IF(MEDFile_FOUND)
   TRY_RUN(_med_int_run_result _med_int_compile_results
           ${CMAKE_BINARY_DIR} ${_med_int_cxx}
           CMAKE_FLAGS "-DINCLUDE_DIRECTORIES:STRING=${MEDFILE_INCLUDE_DIRS};${HDF5_INCLUDE_DIR}"
-          LINK_LIBRARIES ${MEDFILE_C_LIBRARIES}
-          RUN_OUTPUT_VARIABLE _med_int_output)
+	  LINK_LIBRARIES ${MEDFILE_C_LIBRARIES} ${HDF5_LIBRARIES}
+	  RUN_OUTPUT_VARIABLE _med_int_output)
   IF(_med_int_compile_results)
     SET(MED_INT_SIZE ${_med_int_output})
   ELSE()
