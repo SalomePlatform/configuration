@@ -22,7 +22,7 @@
 # HDF5 detection for Salome
 #
 #  !! Please read the generic detection procedure in SalomeMacros.cmake !!
-# 
+#
 # --- HDF5 specificities ----
 #  MPI root directory used for HDF5 compilation is exposed into MPI_ROOT_DIR_EXP
 #
@@ -101,7 +101,7 @@ IF(HDF5_ENABLE_PARALLEL OR HDF5_IS_PARALLEL)
   ENDFOREACH()
   IF(NOT SalomeHDF5_FIND_QUIETLY)
     MESSAGE(STATUS "HDF5 was compiled with MPI: ${MPI_ROOT_DIR_EXP}")
-  ENDIF()  
+  ENDIF()
 ENDIF()
 
 ## Add definitions
@@ -115,7 +115,7 @@ IF(HDF5_IS_PARALLEL AND NOT SALOME_USE_MPI)
    MESSAGE(FATAL_ERROR "HDF5 is compiled with MPI, you have to set SALOME_USE_MPI to ON")
 ENDIF()
 
-IF(HDF5_FOUND) 
+IF(HDF5_FOUND)
   SALOME_ACCUMULATE_HEADERS(HDF5_INCLUDE_DIRS)
   SALOME_ACCUMULATE_ENVIRONMENT(LD_LIBRARY_PATH ${HDF5_LIBRARIES})
 ENDIF()
