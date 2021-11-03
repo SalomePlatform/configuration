@@ -70,7 +70,7 @@ IF(_tbb_libraries)
   SET(CMAKE_REQUIRED_LIBRARIES "${_tbb_libraries}")
 
   CHECK_CXX_SOURCE_COMPILES("
-    #include <tbb/tbb.h>
+    #include <tbb/parallel_for.h>
     using namespace tbb;
     size_t testme(size_t n)
     {
