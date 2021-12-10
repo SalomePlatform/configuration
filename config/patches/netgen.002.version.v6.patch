@@ -1,0 +1,13 @@
+--- netgen-6.2.2101_orig/cmake/generate_version_file.cmake	2021-09-21 17:05:13.000000000 +0300
++++ netgen-6.2.2101_new/cmake/generate_version_file.cmake	2021-10-25 18:10:29.562193300 +0300
+@@ -15,8 +15,8 @@
+       string(REGEX REPLACE "^netgen(.*)" "\\1" git_version_string "${git_version_string}")
+     endif()
+   else()
+-    MESSAGE(WARNING "Could not determine git-version from source code - assuming 6.2.0.0")
+-    set(git_version_string "v6.2.0.0")
++    MESSAGE(WARNING "Could not determine git-version from source code - assuming 6.2.0-0")
++    set(git_version_string "v6.2.0-0")
+   endif()
+ endif()
+ 
