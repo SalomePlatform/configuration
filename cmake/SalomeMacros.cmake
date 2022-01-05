@@ -30,7 +30,9 @@ CMAKE_POLICY(SET CMP0053 NEW)   # For correct Qt 5 detection procedure
 IF(CMAKE_VERSION VERSION_GREATER_EQUAL 3.12)
   CMAKE_POLICY(SET CMP0074 NEW) # Use ROOT variables when detecting packages
 ENDIF()
-
+IF(CMAKE_VERSION VERSION_GREATER_EQUAL 3.18)
+  CMAKE_POLICY(SET CMP0057 NEW)
+ENDIF()
 #----------------------------------------------------------------------------
 # LIST_CONTAINS is a macro useful for determining whether a list has a 
 # particular entry

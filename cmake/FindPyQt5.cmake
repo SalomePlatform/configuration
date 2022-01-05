@@ -56,7 +56,7 @@ GET_FILENAME_COMPONENT(_tmp_ROOT_DIR "${_tmp_ROOT_DIR}" PATH)
 #   - /usr/share/sip/PyQt5/QtCore, for a system install
 #   - or <xyz>/sip/QtCore, for a custom install
 #   - or <xyz>/share/sip/QtCore, for a custom install
-FIND_FILE(PYQT_SIP_MAIN_FILE qobject.sip PATH_SUFFIXES share/sip/QtCore sip/QtCore share/sip/PyQt5/QtCore)
+FIND_FILE(PYQT_SIP_MAIN_FILE qobject.sip PATH_SUFFIXES share/sip/QtCore sip/QtCore share/sip/PyQt5/QtCore lib/python3/dist-packages/PyQt5/bindings/QtCore)
 
 IF(PYQT_SIP_MAIN_FILE)
   GET_FILENAME_COMPONENT(PYQT_SIPS_DIR "${PYQT_SIP_MAIN_FILE}" PATH)
