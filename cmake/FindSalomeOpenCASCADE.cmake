@@ -19,7 +19,7 @@
 # Author: Roman NIKOLAEV
 #
 
-# OpenCascade detection for Salome
+# OpenCASCADE detection for Salome
 #
 #  !! Please read the generic detection procedure in SalomeMacros.cmake !!
 #
@@ -34,12 +34,12 @@ ENDIF()
 IF(OpenCASCADE_FOUND)
   
   IF(NOT CAS_FIND_QUIETLY)
-      MESSAGE(STATUS "Found OpenCascade version: ${OpenCASCADE_VERSION}")
+      MESSAGE(STATUS "Found OpenCASCADE version: ${OpenCASCADE_VERSION}")
   ENDIF()
 
   # OPENCASCADE definitions
-  SET(OpenCascade_DEFINITIONS ${OpenCASCADE_C_FLAGS} ${OpenCASCADE_CXX_FLAGS})
-  SET(OpenCascade_LDFLAGS ${OpenCASCADE_LINKER_FLAGS})
+  SET(OpenCASCADE_DEFINITIONS ${OpenCASCADE_C_FLAGS} ${OpenCASCADE_CXX_FLAGS})
+  SET(OpenCASCADE_LDFLAGS ${OpenCASCADE_LINKER_FLAGS})
 
   SALOME_ACCUMULATE_HEADERS(OpenCASCADE_INCLUDE_DIR)
   SALOME_ACCUMULATE_ENVIRONMENT(LD_LIBRARY_PATH ${OpenCASCADE_LIBRARY_DIR})
