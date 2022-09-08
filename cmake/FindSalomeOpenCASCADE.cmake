@@ -31,10 +31,25 @@ ELSE()
   SALOME_FIND_PACKAGE_AND_DETECT_CONFLICTS(OpenCASCADE OpenCASCADE_INCLUDE_DIR 2)
 ENDIF()
 
+SET(OpenCASCADE_SP_VERSION 0)
 IF(OpenCASCADE_FOUND)
+
+  FIND_FILE(CAS_VERSION_FILE Standard_Version.hxx PATHS ${OpenCASCADE_INCLUDE_DIR})
+  FILE(STRINGS ${CAS_VERSION_FILE} _tmp REGEX "^ *#define OCC_VERSION_SERVICEPACK")
+  IF(_tmp)
+      STRING(REGEX MATCHALL "[0-9]+" _spComponents "${_tmp}")
+      LIST(LENGTH _spComponents _len)
+      IF(${_len} GREATER 0)
+          LIST(GET _spComponents 0 OpenCASCADE_SP_VERSION)
+      ENDIF()
+  ENDIF(_tmp)
   
   IF(NOT CAS_FIND_QUIETLY)
-      MESSAGE(STATUS "Found OpenCASCADE version: ${OpenCASCADE_VERSION}")
+      IF(${OpenCASCADE_SP_VERSION})
+          MESSAGE(STATUS "Found OpenCASCADE version: ${OpenCASCADE_VERSION}p${OpenCASCADE_SP_VERSION}")
+      ELSE()
+          MESSAGE(STATUS "Found OpenCASCADE version: ${OpenCASCADE_VERSION}")
+      ENDIF()
   ENDIF()
 
   # OPENCASCADE definitions
