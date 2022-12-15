@@ -1171,7 +1171,7 @@ FUNCTION(SALOME_SETUP_VERSION version)
   # project name in upper case (if not set in master CMakeLists.txt)
   STRING(TOUPPER ${PROJECT_NAME} _pkg_uc)
   # parse version component
-  STRING(REGEX MATCHALL "[^.]" _components "${version}")
+  STRING (REGEX REPLACE "[.]" ";" _components "${version}")
   LIST(LENGTH _components _length)
   IF(${_length} GREATER 0)
     LIST(GET _components 0 _major)
