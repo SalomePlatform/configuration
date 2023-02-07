@@ -42,7 +42,7 @@ IF(Qt5Core_FOUND)
 ENDIF()
 
 # Add mandatory Qt 5 components below
-SET(Qt5_FIND_COMPONENTS Gui Widgets Network Xml OpenGL PrintSupport Help Test)
+SET(Qt5_FIND_COMPONENTS Gui Widgets Network Xml OpenGL PrintSupport Help Test Svg)
 # Add optional Qt 5 components below
 SET(Qt5_OPTIONAL_COMPONENTS)
 
