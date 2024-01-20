@@ -8,7 +8,7 @@
 # 		    GRAPHVIZ_FOUND        - True if Graphviz was found.
 #
 ###########################################################################
-# Copyright (C) 2007-2023  CEA, EDF, OPEN CASCADE
+# Copyright (C) 2007-2024  CEA, EDF, OPEN CASCADE
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
