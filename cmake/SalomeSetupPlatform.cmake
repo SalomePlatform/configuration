@@ -110,7 +110,7 @@ ENDIF()
 # Option: C++ standard to use
 # Note: CMake by default enables C++ extensions; they can be disabled by additionally
 #       specifying -DCMAKE_CXX_EXTENSIONS=OFF
-SET(SALOME_CXX_STANDARD 11 CACHE STRING "C++ standard to use")
+SET(SALOME_CXX_STANDARD 17 CACHE STRING "C++ standard to use")
 SET(_supported_standards 11 14 17 20)
 SET(_standard_ok FALSE)
 FOREACH(_standard ${_supported_standards})
