@@ -17,11 +17,14 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-INSTALL( CODE "
-SET(INSTALL_PYIDL_DIR lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages/salome) # R1 CHECK
-IF(WIN32 OR APPLE)
-  SET(INSTALL_PYIDL_DIR bin/salome) # R1 CHECK
-ENDIF(WIN32 OR APPLE)
+INSTALL(CODE "
+# Check if install path is defined by module as a global variable.
+SET(INSTALL_PYIDL_DIR \"${INSTALL_PYIDL_DIR}\")
+IF(NOT \"\${INSTALL_PYIDL_DIR}\" STREQUAL \"\")
+  message(STATUS \"CODE INSTALL_PYIDL_DIR set to global value: \${INSTALL_PYIDL_DIR}\")
+ELSE()
+  message(FATAL \"INSTALL_PYIDL_DIR must be set to invoke IDL Python of backend \")
+ENDIF()
 
 MACRO(OMNIORB_COMPILE_IDL_FORPYTHON_ON_INSTALL MYOMNIORBIDLPYTHON MYIDLPYFLAGS MYIDLFILE MYFULLDIR)
   FILE(MAKE_DIRECTORY \${MYFULLDIR})
