@@ -32,6 +32,9 @@ IF(CMAKE_VERSION VERSION_GREATER_EQUAL 3.12)
 ENDIF()
 IF(CMAKE_VERSION VERSION_GREATER_EQUAL 3.18)
   CMAKE_POLICY(SET CMP0057 NEW)
+  IF(WIN32)
+    CMAKE_POLICY(SET CMP0038 OLD)
+  ENDIF(WIN32)
 ENDIF()
 #----------------------------------------------------------------------------
 # LIST_CONTAINS is a macro useful for determining whether a list has a 
