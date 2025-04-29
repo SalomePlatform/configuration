@@ -1,0 +1,18 @@
+{
+    "KERNEL":{
+        "test_ext" : "KERNEL-test",
+        "engine_exts_needed" : ["KERNEL","YACS"]
+    },
+    "SMESH":{
+        "test_ext" : "SMESH-test",
+        "engine_exts_needed" : ["SMESH"]
+    },
+    "GEOM":{
+        "test_ext" : "GEOM",
+        "engine_exts_needed" : ["GEOM"]
+    },
+    "MEDCOUPLING":{
+        "test_ext" : "MEDCOUPLING-dev",
+        "engine_exts_needed" : ["MEDCOUPLING"]
+    }
+}
