@@ -5,6 +5,10 @@
     },
     "SMESH":{
         "test_ext" : "SMESH-test",
+        "engine_exts_needed" : ["SMESH","SHAPER"]
+    },
+    "SMESH_WITHOUT_SHAPER":{
+        "test_ext" : "SMESH-test",
         "engine_exts_needed" : ["SMESH"]
     },
     "GEOM":{
