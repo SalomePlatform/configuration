@@ -16,7 +16,7 @@
         "engine_exts_needed" : ["GEOM"]
     },
     "MEDCOUPLING":{
-        "test_ext" : "MEDCOUPLING-dev",
+        "test_ext" : "MEDCOUPLING",
         "engine_exts_needed" : ["MEDCOUPLING"]
     }
 }
