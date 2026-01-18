@@ -90,14 +90,17 @@ IF(HDF5_ENABLE_PARALLEL OR HDF5_IS_PARALLEL)
     SET(_suffix "-shared")
     SET(HDF5_LIBRARIES "${_target_prefix}hdf5${_suffix}")
   ENDIF()
-  GET_PROPERTY(_lib_lst SOURCE ${HDF5_LIBRARIES} PROPERTY IMPORTED_LINK_INTERFACE_LIBRARIES_NOCONFIG)
-  FOREACH(s ${_lib_lst})
-    STRING(FIND "${s}" "mpi." _res)   # should cover WIN(?) and LINUX
-    IF(_res GREATER -1)
-      GET_FILENAME_COMPONENT(_tmp "${s}" PATH)     # go up to levels
-      GET_FILENAME_COMPONENT(MPI_ROOT_DIR_EXP "${_tmp}" PATH)
-      BREAK()
-    ENDIF()
+  #Loop over HDF5_LIBRARIES, because GET_PROPERTY can have only 1 source at a time
+  FOREACH(_h5lib ${HDF5_LIBRARIES})
+    GET_PROPERTY(_lib_lst SOURCE _h5lib PROPERTY IMPORTED_LINK_INTERFACE_LIBRARIES_NOCONFIG)
+    FOREACH(s ${_lib_lst})
+      STRING(FIND "${s}" "mpi." _res)   # should cover WIN(?) and LINUX
+      IF(_res GREATER -1)
+        GET_FILENAME_COMPONENT(_tmp "${s}" PATH)     # go up to levels
+        GET_FILENAME_COMPONENT(MPI_ROOT_DIR_EXP "${_tmp}" PATH)
+        BREAK()
+      ENDIF()
+    ENDFOREACH()
   ENDFOREACH()
   IF(NOT SalomeHDF5_FIND_QUIETLY)
     MESSAGE(STATUS "HDF5 was compiled with MPI: ${MPI_ROOT_DIR_EXP}")
