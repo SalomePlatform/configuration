@@ -667,14 +667,14 @@ ENDMACRO(SALOME_ADD_MPI_TO_HDF5)
 # Convert a number (smaller than 16) into hexadecimal representation
 # with a leading 0.
 MACRO(SALOME_TOHEXA num result)
-  SET(_hexa_map a b c d e f)
-  IF(${num} LESS 10)
-    SET(${result} "0${num}")
-  ELSE()
-    MATH(EXPR _res "${num}-10" )
-    LIST(GET _hexa_map ${_res} _out)
-    SET(${result} "0${_out}")
+  MATH(EXPR _res "${num}" OUTPUT_FORMAT HEXADECIMAL)
+  STRING(REPLACE "0x" "" _res_stripped "${_res}")
+  STRING(LENGTH "${_res_stripped}" _res_length)
+  IF(_res_length EQUAL 1)
+    SET(_res_stripped "0${_res_stripped}")
   ENDIF()
+  STRING(TOUPPER "${_res_stripped}" _res_upper)
+  SET(${result} "${_res_upper}")
 ENDMACRO(SALOME_TOHEXA)
 
 ####################################################################
