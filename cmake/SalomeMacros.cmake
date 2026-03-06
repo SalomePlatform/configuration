@@ -664,8 +664,9 @@ ENDMACRO(SALOME_ADD_MPI_TO_HDF5)
 
 ####################################################################
 # SALOME_TOHEXA()
-# Convert a number (smaller than 16) into hexadecimal representation
-# with a leading 0.
+# Convert a number into hexadecimal representation
+# with a leading 0 if the number is < 16
+# Examples: 9 -> 09, 15 -> 0F, 17 -> 11
 MACRO(SALOME_TOHEXA num result)
   MATH(EXPR _res "${num}" OUTPUT_FORMAT HEXADECIMAL)
   STRING(REPLACE "0x" "" _res_stripped "${_res}")
