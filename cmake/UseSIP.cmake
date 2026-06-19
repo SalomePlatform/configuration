@@ -54,73 +54,280 @@
 #   - Process several sip modules.
 # 
 ####################################################################
+# MACRO(SIP_WRAP_SIP outfiles)
+#   SET(_output)
+#   SET(_src_ext ".cc")
+#   SET(_options -s ${_src_ext} -c .)
+#   SET(_sip_files)
+#   SET(_get_options "0")
+#   SET(_get_sources "0")
+#   FOREACH(_input ${ARGN})
+#     IF(${_input} STREQUAL "OPTIONS")
+#       SET(_get_options "1")
+#       SET(_get_sources "0")
+#     ELSEIF(${_input} STREQUAL "SOURCES")
+#       SET(_get_sources "1")
+#       SET(_get_options "0")
+#     ELSE()
+#       IF(${_get_options} STREQUAL "1")
+#         SET(_options ${_options} ${_input})
+#       ELSEIF(${_get_sources} STREQUAL "1")
+#         LIST(APPEND _output ${CMAKE_CURRENT_BINARY_DIR}/${_input})
+#         SET(${outfiles} ${${outfiles}} ${CMAKE_CURRENT_BINARY_DIR}/${_input})
+#       ELSE()
+#         SET(_sip_files ${_sip_files} ${_input})
+#       ENDIF()
+#     ENDIF()
+#   ENDFOREACH()
+#   SET(_module_input)
+#   FOREACH(_input ${_sip_files})
+#     FILE(STRINGS ${_input} _sip_modules REGEX "%Module( |\\()")
+#     FILE(STRINGS ${_input} _sip_classes REGEX "^class ")
+#     FOREACH(_sip_module ${_sip_modules})
+#       STRING(REGEX MATCH ".*%Module *\\( *name=.*\\).*" _mod_name "${_sip_module}")
+#       IF (_mod_name)
+# 	STRING(REGEX REPLACE ".*%Module *\\( *name=(.*).*\\).*" "\\1" _mod_name ${_sip_module})
+#       ELSE()
+# 	STRING(REGEX REPLACE ".*%Module *(.*)" "\\1" _mod_name ${_sip_module})
+#       ENDIF()
+#       SET(_mod_header "sipAPI${_mod_name}.h")
+#       SET(_mod_source "sip${_mod_name}cmodule${_src_ext}")
+#       LIST(APPEND _output ${CMAKE_CURRENT_BINARY_DIR}/${_mod_source})
+#       SET(${outfiles} ${${outfiles}} ${CMAKE_CURRENT_BINARY_DIR}/${_mod_source})
+#       SET(_module_input ${_input})
+#     ENDFOREACH()
+#     FOREACH(_sip_class ${_sip_classes})
+#       STRING(REGEX MATCH ".*class +.* *:" _class_name "${_sip_class}")
+#       IF (_class_name)
+# 	STRING(REGEX REPLACE ".*class +(.*) *:.*" "\\1" _class_name ${_sip_class})
+#       ELSE()
+# 	STRING(REGEX REPLACE ".*class *(.*)" "\\1" _class_name ${_sip_class})
+#       ENDIF()
+#       STRING(STRIP ${_class_name} _class_name)
+#       SET(_class_source "sip${_mod_name}${_class_name}${_src_ext}")
+#       LIST(APPEND _output ${CMAKE_CURRENT_BINARY_DIR}/${_class_source})
+#       SET(${outfiles} ${${outfiles}} ${CMAKE_CURRENT_BINARY_DIR}/${_class_source})
+#     ENDFOREACH()
+#   ENDFOREACH()
+#   IF(SIP_VERSION AND SIP_VERSION VERSION_GREATER_EQUAL "5")
+#     LIST(GET _sip_files 0 _main_sip_file)
+#     ADD_CUSTOM_COMMAND(
+#       OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/sip.h
+#       COMMAND ${SIP_MODULE_EXECUTABLE} --sip-h --target-dir ${CMAKE_CURRENT_BINARY_DIR} ${_main_sip_file}
+#       DEPENDS ${_sip_files}
+#       )
+#     SET(_extra_deps ${CMAKE_CURRENT_BINARY_DIR}/sip.h)
+#   ENDIF()
+#   ADD_CUSTOM_COMMAND(
+#     OUTPUT ${_output}
+#     COMMAND ${SIP_EXECUTABLE} ${_options} ${CMAKE_CURRENT_SOURCE_DIR}/${_module_input}
+#     DEPENDS ${_module_input} ${_extra_deps}
+#     )
+# ENDMACRO(SIP_WRAP_SIP)
 MACRO(SIP_WRAP_SIP outfiles)
-  SET(_output)
-  SET(_src_ext ".cc")
-  SET(_options -s ${_src_ext} -c .)
-  SET(_sip_files)
-  SET(_get_options "0")
-  SET(_get_sources "0")
-  FOREACH(_input ${ARGN})
-    IF(${_input} STREQUAL "OPTIONS")
-      SET(_get_options "1")
-      SET(_get_sources "0")
-    ELSEIF(${_input} STREQUAL "SOURCES")
-      SET(_get_sources "1")
-      SET(_get_options "0")
-    ELSE()
-      IF(${_get_options} STREQUAL "1")
-        SET(_options ${_options} ${_input})
-      ELSEIF(${_get_sources} STREQUAL "1")
-        LIST(APPEND _output ${CMAKE_CURRENT_BINARY_DIR}/${_input})
-        SET(${outfiles} ${${outfiles}} ${CMAKE_CURRENT_BINARY_DIR}/${_input})
-      ELSE()
-        SET(_sip_files ${_sip_files} ${_input})
-      ENDIF()
-    ENDIF()
-  ENDFOREACH()
-  SET(_module_input)
-  FOREACH(_input ${_sip_files})
-    FILE(STRINGS ${_input} _sip_modules REGEX "%Module( |\\()")
-    FILE(STRINGS ${_input} _sip_classes REGEX "^class ")
-    FOREACH(_sip_module ${_sip_modules})
-      STRING(REGEX MATCH ".*%Module *\\( *name=.*\\).*" _mod_name "${_sip_module}")
-      IF (_mod_name)
-	STRING(REGEX REPLACE ".*%Module *\\( *name=(.*).*\\).*" "\\1" _mod_name ${_sip_module})
-      ELSE()
-	STRING(REGEX REPLACE ".*%Module *(.*)" "\\1" _mod_name ${_sip_module})
-      ENDIF()
-      SET(_mod_header "sipAPI${_mod_name}.h")
-      SET(_mod_source "sip${_mod_name}cmodule${_src_ext}")
-      LIST(APPEND _output ${CMAKE_CURRENT_BINARY_DIR}/${_mod_source})
-      SET(${outfiles} ${${outfiles}} ${CMAKE_CURRENT_BINARY_DIR}/${_mod_source})
-      SET(_module_input ${_input})
-    ENDFOREACH()
-    FOREACH(_sip_class ${_sip_classes})
-      STRING(REGEX MATCH ".*class +.* *:" _class_name "${_sip_class}")
-      IF (_class_name)
-	STRING(REGEX REPLACE ".*class +(.*) *:.*" "\\1" _class_name ${_sip_class})
-      ELSE()
-	STRING(REGEX REPLACE ".*class *(.*)" "\\1" _class_name ${_sip_class})
-      ENDIF()
-      STRING(STRIP ${_class_name} _class_name)
-      SET(_class_source "sip${_mod_name}${_class_name}${_src_ext}")
-      LIST(APPEND _output ${CMAKE_CURRENT_BINARY_DIR}/${_class_source})
-      SET(${outfiles} ${${outfiles}} ${CMAKE_CURRENT_BINARY_DIR}/${_class_source})
-    ENDFOREACH()
-  ENDFOREACH()
-  IF(SIP_VERSION AND SIP_VERSION VERSION_GREATER_EQUAL "5")
-    LIST(GET _sip_files 0 _main_sip_file)
-    ADD_CUSTOM_COMMAND(
-      OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/sip.h
-      COMMAND ${SIP_MODULE_EXECUTABLE} --sip-h --target-dir ${CMAKE_CURRENT_BINARY_DIR} ${_main_sip_file}
-      DEPENDS ${_sip_files}
-      )
-    SET(_extra_deps ${CMAKE_CURRENT_BINARY_DIR}/sip.h)
-  ENDIF()
-  ADD_CUSTOM_COMMAND(
-    OUTPUT ${_output}
-    COMMAND ${SIP_EXECUTABLE} ${_options} ${CMAKE_CURRENT_SOURCE_DIR}/${_module_input}
-    DEPENDS ${_module_input} ${_extra_deps}
-    )
-ENDMACRO(SIP_WRAP_SIP)
+  # ---------------------------------------------------------------------------
+  # Parse arguments: SIP files, OPTIONS, SOURCES
+  # ---------------------------------------------------------------------------
+  set(_sip_files "")
+  set(_opt_list "")
+  set(_extra_src "")
+  set(_get_options 0)
+  set(_get_sources 0)
+
+  foreach(_input ${ARGN})
+    if("${_input}" STREQUAL "OPTIONS")
+      set(_get_options 1)
+      set(_get_sources 0)
+    elseif("${_input}" STREQUAL "SOURCES")
+      set(_get_options 0)
+      set(_get_sources 1)
+    elseif(_get_options)
+      list(APPEND _opt_list "${_input}")
+    elseif(_get_sources)
+      list(APPEND _extra_src "${_input}")
+    else()
+      list(APPEND _sip_files "${_input}")
+    endif()
+  endforeach()
+
+  # -------------------------------------------------------
+  # If no SIP file provided → nothing to do
+  # -------------------------------------------------------
+  if(NOT _sip_files)
+    message(STATUS "[SIP_WRAP_SIP] No .sip file provided → skip.")
+    set(${outfiles})
+    return()
+  endif()
+
+  # The first SIP file is the one passed to sip-build
+  list(GET _sip_files 0 _sip_main_rel)
+  get_filename_component(_sip_main_abs "${_sip_main_rel}" ABSOLUTE)
+  get_filename_component(_sip_dir "${_sip_main_abs}" DIRECTORY)
+
+  message(STATUS "[SIP_WRAP_SIP] Processing SIP6 file: ${_sip_main_abs}")
+
+  # ----------------------------------------------------------------------------
+  # Parse legacy SIP5-like options: -t and -I
+  # ----------------------------------------------------------------------------
+  set(_tags "")
+  set(_includes "${_sip_dir}")
+  list(APPEND _includes "/opt/homebrew/opt/qt@5/include")
+  list(APPEND _includes "/opt/homebrew/opt/qt@5/lib/QtCore.framework/Versions/5/Headers")
+  ## Append all INCLUDE_DIRECTORIES to _includes 
+  get_directory_property(_all_inc_dirs INCLUDE_DIRECTORIES)
+list(APPEND _includes ${_all_inc_dirs})
+
+  set(_expect_tag 0)
+  set(_expect_inc 0)
+
+  foreach(opt IN LISTS _opt_list)
+    if("${opt}" STREQUAL "-t")
+      set(_expect_tag 1)
+      set(_expect_inc 0)
+    elseif("${opt}" STREQUAL "-I")
+      set(_expect_inc 1)
+      set(_expect_tag 0)
+    elseif(_expect_tag)
+      list(APPEND _tags "${opt}")
+      set(_expect_tag 0)
+    elseif(_expect_inc)
+      list(APPEND _includes "${opt}")
+      set(_expect_inc 0)
+    endif()
+  endforeach()
+
+  # ----------------------------------------------------------------------------
+  # Build directory for SIP6
+  # ----------------------------------------------------------------------------
+  #set(_bdir "${CMAKE_CURRENT_BINARY_DIR}/sipbuild")
+  set(_bdir "${CMAKE_CURRENT_BINARY_DIR}/${outfiles}_sipbuild")
+  file(MAKE_DIRECTORY "${_bdir}")
+
+  # ----------------------------------------------------------------------------
+  # Generate pyproject.toml (VALID for SIP 6.14)
+  # ----------------------------------------------------------------------------
+  set(_py "${_bdir}/pyproject.toml")
+
+  file(WRITE "${_py}"
+"[build-system]
+requires = [\"sip >= 6.0\"]
+build-backend = \"sipbuild.api\"
+
+[project]
+name = \"${outfiles}\"
+version = \"1.0\"
+
+[tool.sip]
+project-factory = \"pyqtbuild:PyQtProject\"
+
+[tool.sip.builder]
+qmake=\"/opt/homebrew/opt/qt@5/bin/qmake\"
+
+[tool.sip.project]
+sip-include-dirs=[\"/Users/simvia/Documents/external/PyQt-dist/PyQt5/bindings\"]
+")
+
+  file(APPEND "${_py}" "abi-version = \"12.15\"\n\n")
+
+  file(APPEND "${_py}" "[tool.sip.bindings.${outfiles}]\n")
+  file(APPEND "${_py}" "include-dirs = [\n")
+foreach(inc IN LISTS _includes)
+    file(APPEND "${_py}" "  \"${inc}\",\n")
+  endforeach()
+
+  file(APPEND "${_py}" "]\n")
+  file(APPEND "${_py}" "sip-file = \"${_sip_main_abs}\"\n")
+
+  if(_tags)
+    file(APPEND "${_py}" "tags = [")
+    set(_first 1)
+    foreach(t IN LISTS _tags)
+      if(_first)
+        file(APPEND "${_py}" "\"${t}\"")
+        set(_first 0)
+      else()
+        file(APPEND "${_py}" ", \"${t}\"")
+      endif()
+    endforeach()
+    file(APPEND "${_py}" "]\n")
+  endif()
+
+  # ----------------------------------------------------------------------------
+  # Call sip-build
+  # ----------------------------------------------------------------------------
+  set(_stamp "${_bdir}/sip.stamp")
+
+  # add_custom_command(
+  #   OUTPUT "${_stamp}"
+  #   COMMAND sip-build --no-compile --protected-is-public --build-dir "${_bdir}"
+  #   COMMAND ${CMAKE_COMMAND} -E touch "${_stamp}"
+  #   WORKING_DIRECTORY "${_bdir}"
+  #   DEPENDS "${_sip_main_abs}"
+  # )
+
+add_custom_command(
+   OUTPUT "${_stamp}"
+  COMMAND ${CMAKE_COMMAND} -E touch "${_stamp}"
+  WORKING_DIRECTORY "${_bdir}"
+    DEPENDS "${_sip_main_abs}"
+)
+
+  execute_process(
+    COMMAND sip-build --no-compile --verbose --build-dir "${_bdir}"
+    WORKING_DIRECTORY "${_bdir}"
+    RESULT_VARIABLE _sip_res
+)
+
+if(_sip_res)
+    message(FATAL_ERROR "sip-build failed with error code ${_sip_res}")
+endif()
+
+  file(GLOB_RECURSE _generated_cpp
+    "${_bdir}/*/*.c*"
+  )
+
+
+  if(NOT _generated_cpp)
+    message(FATAL_ERROR "[SIP_WRAP_SIP] No .cpp generated by SIP6 in ${_bdir}/build")
+  endif()
+
+message(STATUS "[SIP_WRAP_SIP] Generated C++ sources:")
+ foreach(f ${_generated_cpp})
+    message(STATUS "   - ${f}")
+  endforeach()
+
+
+#   file(GLOB_RECURSE _generated_so
+#     "${_bdir}/*/build/*.so"
+#   )
+#   if(NOT _generated_so)
+#     message(FATAL_ERROR "[SIP_WRAP_SIP] No .so generated by SIP6 in ${_bdir}/build")
+#   endif()
+# message(STATUS "[SIP_WRAP_SIP] Generated solib:")
+#  foreach(f ${_generated_so})
+#     message(STATUS "   - ${f}")
+#   endforeach()
+
+
+  # ----------------------------------------------------------------------------
+  # Placeholder source so add_library() works
+  # ----------------------------------------------------------------------------
+  
+
+  set(_placeholder "${_bdir}/placeholder.cpp")
+
+  # add_custom_command(
+  #  OUTPUT "${_placeholder}"
+  #   COMMAND ${CMAKE_COMMAND} -E echo "// placeholder for SIP6 module" > "${_placeholder}"
+  #   # IMPORTANT : le placeholder dépend du stamp sip-build
+  #   DEPENDS "${_stamp}"
+  #   BYPRODUCTS "${_placeholder}"
+  #   WORKING_DIRECTORY "${_bdir}"
+  # )
+
+  # set_source_files_properties("${_placeholder}" PROPERTIES GENERATED TRUE)
+
+  # Provide this placeholder as source
+  set(${outfiles} "${_generated_cpp}")
+
+ENDMACRO()
