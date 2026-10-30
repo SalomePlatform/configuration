@@ -32,28 +32,69 @@ IF(MEDFile_FOUND)
   SALOME_ACCUMULATE_HEADERS(MEDFILE_INCLUDE_DIRS)
   SALOME_ACCUMULATE_ENVIRONMENT(LD_LIBRARY_PATH ${MEDFILE_LIBRARIES})
 
-  # Check size of med_int
-  SET(_med_int_cxx ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/check_med_int_size.cxx)
-  FILE(WRITE ${_med_int_cxx}
-       "#include <med.h>\n#include <stdio.h>\nint main(){printf(\"%d\", sizeof(med_int)); return 0;}")
-  TRY_RUN(_med_int_run_result _med_int_compile_results
-          ${CMAKE_BINARY_DIR} ${_med_int_cxx}
-          CMAKE_FLAGS "-DINCLUDE_DIRECTORIES:STRING=${MEDFILE_INCLUDE_DIRS};${HDF5_INCLUDE_DIR}"
-	  LINK_LIBRARIES ${MEDFILE_C_LIBRARIES} ${HDF5_LIBRARIES}
-	  RUN_OUTPUT_VARIABLE _med_int_output)
-  IF(_med_int_compile_results)
-    SET(MED_INT_SIZE ${_med_int_output})
+  IF(APPLE)
+    # Check size of med_int.
+    # Compile-only test (no TRY_RUN): running a test executable linked to the
+    # MEDFile/HDF5 shared libraries fails on macOS (dylibs not found at run time,
+    # DYLD_LIBRARY_PATH stripped by SIP), which silently gave MED_INT_IS_LONG=FALSE.
+    # MED_INT_IS_LONG may also be forced with -DMED_INT_IS_LONG_OVERRIDE=ON|OFF.
+    SET(_med_int_size_found UNKNOWN)
+    FOREACH(_med_int_try_size 4 8)
+      SET(_med_int_cxx ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/check_med_int_size_${_med_int_try_size}.cxx)
+      FILE(WRITE ${_med_int_cxx}
+           "#include <med.h>\ntypedef char med_int_size_check[(sizeof(med_int) == ${_med_int_try_size}) ? 1 : -1];\nint main(){ return 0; }\n")
+      TRY_COMPILE(_med_int_compile_result
+                  ${CMAKE_BINARY_DIR} ${_med_int_cxx}
+                  CMAKE_FLAGS "-DINCLUDE_DIRECTORIES:STRING=${MEDFILE_INCLUDE_DIRS};${HDF5_INCLUDE_DIR}"
+                  OUTPUT_VARIABLE _med_int_compile_output)
+      IF(_med_int_compile_result)
+        SET(_med_int_size_found ${_med_int_try_size})
+      ENDIF()
+      UNSET(_med_int_compile_result CACHE)
+      UNSET(_med_int_compile_result)
+    ENDFOREACH()
+    SET(MED_INT_SIZE ${_med_int_size_found})
+    IF(DEFINED MED_INT_IS_LONG_OVERRIDE)
+      SET(MED_INT_IS_LONG ${MED_INT_IS_LONG_OVERRIDE})
+    ELSEIF(MED_INT_SIZE EQUAL 8)
+      SET(MED_INT_IS_LONG TRUE)
+    ELSEIF(MED_INT_SIZE EQUAL 4)
+      SET(MED_INT_IS_LONG FALSE)
+    ELSE()
+      MESSAGE(FATAL_ERROR "MEDFile: could not determine size of med_int "
+                          "(includes: ${MEDFILE_INCLUDE_DIRS};${HDF5_INCLUDE_DIR}). "
+                          "Last compiler output:\n${_med_int_compile_output}\n"
+                          "Set -DMED_INT_IS_LONG_OVERRIDE=ON|OFF to bypass this check.")
+    ENDIF()
+    MESSAGE(STATUS "MEDFile: size of med_int is ${MED_INT_SIZE} (MED_INT_IS_LONG=${MED_INT_IS_LONG})")
+    UNSET(_med_int_cxx)
+    UNSET(_med_int_size_found)
+    UNSET(_med_int_try_size)
+    UNSET(_med_int_compile_output)
   ELSE()
-    SET(MED_INT_SIZE UNKNOWN)
+    # Check size of med_int
+    SET(_med_int_cxx ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/check_med_int_size.cxx)
+    FILE(WRITE ${_med_int_cxx}
+         "#include <med.h>\n#include <stdio.h>\nint main(){printf(\"%d\", sizeof(med_int)); return 0;}")
+    TRY_RUN(_med_int_run_result _med_int_compile_results
+            ${CMAKE_BINARY_DIR} ${_med_int_cxx}
+            CMAKE_FLAGS "-DINCLUDE_DIRECTORIES:STRING=${MEDFILE_INCLUDE_DIRS};${HDF5_INCLUDE_DIR}"
+            LINK_LIBRARIES ${MEDFILE_C_LIBRARIES} ${HDF5_LIBRARIES}
+            RUN_OUTPUT_VARIABLE _med_int_output)
+    IF(_med_int_compile_results)
+      SET(MED_INT_SIZE ${_med_int_output})
+    ELSE()
+      SET(MED_INT_SIZE UNKNOWN)
+    ENDIF()
+    IF(MED_INT_SIZE EQUAL 8)
+      SET(MED_INT_IS_LONG TRUE)
+    ELSE()
+      SET(MED_INT_IS_LONG FALSE)
+    ENDIF()
+    MESSAGE(STATUS "MEDFile: size of med_int is ${MED_INT_SIZE}")
+    UNSET(_med_int_cxx)
+    UNSET(_med_int_run_result)
+    UNSET(_med_int_compile_results)
+    UNSET(_med_int_output)
   ENDIF()
-  IF(MED_INT_SIZE EQUAL 8)
-    SET(MED_INT_IS_LONG TRUE)
-  ELSE()
-    SET(MED_INT_IS_LONG FALSE)
-  ENDIF()
-  MESSAGE(STATUS "MEDFile: size of med_int is ${MED_INT_SIZE}")
-  UNSET(_med_int_cxx)
-  UNSET(_med_int_run_result)
-  UNSET(_med_int_compile_results)
-  UNSET(_med_int_output)
 ENDIF()

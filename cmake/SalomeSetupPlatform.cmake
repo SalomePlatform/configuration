@@ -33,6 +33,28 @@ ELSE()
   SET(MACHINE_IS_64 FALSE)
 ENDIF()
 
+## Detect target processor family (x86 or ARM)
+## On Apple, CMAKE_OSX_ARCHITECTURES (when set) overrides the host processor
+IF(APPLE AND CMAKE_OSX_ARCHITECTURES)
+  LIST(LENGTH CMAKE_OSX_ARCHITECTURES _nb_osx_archs)
+  IF(_nb_osx_archs GREATER 1)
+    MESSAGE(WARNING "Universal builds (CMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}) are not supported: "
+                    "SALOME prerequisites are single-architecture. Set CMAKE_OSX_ARCHITECTURES to arm64 or x86_64.")
+  ENDIF()
+  LIST(GET CMAKE_OSX_ARCHITECTURES 0 SALOME_TARGET_PROCESSOR)
+  UNSET(_nb_osx_archs)
+ELSE()
+  SET(SALOME_TARGET_PROCESSOR ${CMAKE_SYSTEM_PROCESSOR})
+ENDIF()
+STRING(TOLOWER "${SALOME_TARGET_PROCESSOR}" _target_proc_lc)
+IF(_target_proc_lc MATCHES "^(arm64|aarch64)")
+  SET(MACHINE_IS_ARM64 TRUE)
+ELSE()
+  SET(MACHINE_IS_ARM64 FALSE)
+ENDIF()
+UNSET(_target_proc_lc)
+
+
 ## Force CMAKE_BUILD_TYPE to Release if not set
 IF(NOT CMAKE_BUILD_TYPE)
   SET(CMAKE_BUILD_TYPE $ENV{CMAKE_BUILD_TYPE})
@@ -68,8 +90,8 @@ IF(WIN32)
   ADD_DEFINITIONS(-D_UNICODE)
   ADD_DEFINITIONS(-DPPRO_NT)                  # For medfile
 ELSE()
-  ## Linux specific:
-  SET(PLATFORM_LIBS dl)                       # Dynamic loading (dlopen, dlsym)
+  ## Linux / macOS specific:
+  SET(PLATFORM_LIBS ${CMAKE_DL_LIBS})         # Dynamic loading (dlopen, dlsym)
   IF(MACHINE_IS_64) 
     ADD_DEFINITIONS(-DPCLINUX64)
   ENDIF(MACHINE_IS_64)
@@ -88,6 +110,37 @@ IF(APPLE)
   IF(SALOME_APPLE_USE_GCC)
     SET(CMAKE_C_COMPILER gcc)
     SET(CMAKE_CXX_COMPILER g++)
+  ENDIF()
+
+  # Most SALOME projects require CMake 2.8 only, which leaves policy CMP0042 OLD:
+  # installed dylibs would then get a bare install name (e.g. "libSalomeNS.dylib")
+  # that dyld can only resolve through DYLD_LIBRARY_PATH, a variable that macOS
+  # strips when a protected binary (/bin/sh, /usr/bin/env...) is executed.
+  # Use @rpath install names and embed the install lib dirs plus the dirs of all
+  # linked prerequisites and upstream SALOME modules.
+  IF(NOT DEFINED CMAKE_MACOSX_RPATH)
+    SET(CMAKE_MACOSX_RPATH ON)
+  ENDIF()
+  IF(NOT DEFINED CMAKE_INSTALL_RPATH_USE_LINK_PATH)
+    SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
+  ENDIF()
+  LIST(APPEND CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib/salome" "${CMAKE_INSTALL_PREFIX}/lib")
+  LIST(REMOVE_DUPLICATES CMAKE_INSTALL_RPATH)
+
+  # Python extension modules and plugins are MODULE libraries (Mach-O bundles):
+  # like ELF shared objects on Linux, let them resolve the Python C-API and the
+  # symbols of the host process at load time instead of failing at link time.
+  IF(NOT CMAKE_MODULE_LINKER_FLAGS MATCHES "dynamic_lookup")
+    SET(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
+  ENDIF()
+
+  # Unlike ELF shared objects, dylibs must not have undefined symbols. The right fix is
+  # to add the missing libraries to TARGET_LINK_LIBRARIES; this option is a porting aid
+  # that restores the Linux behaviour for every dylib of the project being configured.
+  OPTION(SALOME_APPLE_UNDEFINED_DYNAMIC_LOOKUP "Let dylibs resolve undefined symbols at load time" OFF)
+  MARK_AS_ADVANCED(SALOME_APPLE_UNDEFINED_DYNAMIC_LOOKUP)
+  IF(SALOME_APPLE_UNDEFINED_DYNAMIC_LOOKUP AND NOT CMAKE_SHARED_LINKER_FLAGS MATCHES "dynamic_lookup")
+    SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
   ENDIF()
 ENDIF()
 

@@ -21,6 +21,7 @@
 
 # Define the path to the Python script (relative path)
 set(PYTHON_SCRIPT "${CMAKE_CURRENT_LIST_DIR}/configure_rpath_relative.py")
+set(PYTHON_SCRIPT_MACOS "${CMAKE_CURRENT_LIST_DIR}/configure_rpath_macos.py")
 
 # Macro to add post install RPATH configuration
 function(configure_rpath_post_install directories)
@@ -39,6 +40,28 @@ function(configure_rpath_post_install directories)
 
     # Convert the list of directories to a space-separated string
     string(REPLACE ";" " " directories_str "${absolute_directories}")
+
+    if(APPLE)
+        # configure_rpath_relative.py handles ELF files only (readelf, chrpath).
+        # On macOS: $ORIGIN -> @loader_path, absolute rpaths -> @loader_path relative
+        # ones, and relative rpaths to the products that provide the @rpath
+        # dependencies (e.g. libKERNELBasics.dylib from SALOMEBOOTSTRAP).
+        install(CODE "
+        execute_process(
+            COMMAND ${PYTHON_EXECUTABLE} ${PYTHON_SCRIPT_MACOS} --prefix \"\${CMAKE_INSTALL_PREFIX}\" ${directories_str}
+            RESULT_VARIABLE result
+            OUTPUT_VARIABLE output
+            ERROR_VARIABLE error
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+        if(result)
+            message(FATAL_ERROR \"Error configuring RPATH: \${output}\${error}\")
+        else()
+            message(STATUS \"RPATH configured successfully: \${output}\")
+        endif()
+        ")
+        return()
+    endif()
 
     install(CODE "
         execute_process(

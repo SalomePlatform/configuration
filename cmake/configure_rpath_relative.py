@@ -44,8 +44,12 @@ import re
 from typing import List, Set
 from abc import ABC, abstractmethod
 
+IS_MACOS = sys.platform == 'darwin'
+
 SYSTEM_PATH_REGEX = re.compile(
     r'^(/lib|/usr|/lib64|/bin|/sbin|/usr/sbin|/usr/local/lib|/usr/local/bin)')
+
+ORIGIN_KEYWORD = '@loader_path' if IS_MACOS else '$ORIGIN'
 
 class PathConversionStrategy(ABC):
     """
@@ -66,9 +70,9 @@ class PathConversionStrategy(ABC):
 
     def relative_path_to_origin(self, path: str) -> str:
         """
-        Make the given relative path using the $ORIGIN keyword.
+        Make the given relative path using the $ORIGIN (ELF) or @loader_path (Mach-O) keyword.
         """
-        return os.path.join('$ORIGIN', path)
+        return os.path.join(ORIGIN_KEYWORD, path)
 
 class SystemPathConversionStrategy(PathConversionStrategy):
     """
@@ -80,7 +84,7 @@ class SystemPathConversionStrategy(PathConversionStrategy):
 
 class OriginPathConversionStrategy(PathConversionStrategy):
     """
-    Strategy for paths starting with $ORIGIN.
+    Strategy for paths starting with $ORIGIN, or with @loader_path, @executable_path or @rpath on macOS.
     """
     def convert(self, path: str, binary_dir: str) -> str:
         logging.debug("Returning origin path %s as is", path)
@@ -129,7 +133,7 @@ class PathConverter:
         """
         if self.is_system_path(path):
             return self.strategies['system']
-        elif path.startswith('$ORIGIN'):
+        elif path.startswith('$ORIGIN') or (IS_MACOS and path.startswith('@')):
             return self.strategies['origin']
         elif os.path.isabs(path):
             return self.strategies['absolute']
@@ -180,7 +184,7 @@ class RPathManager:
         shared_libs = []
         for root, _, files in os.walk(directory):
             for file in files:
-                if file.endswith('.so') or '.so.' in file:
+                if file.endswith('.so') or '.so.' in file or (IS_MACOS and file.endswith('.dylib')):
                     shared_libs.append(os.path.join(root, file))
         return shared_libs
     
@@ -190,7 +194,9 @@ class RPathManager:
             out,_ = p.communicate()
             if p.returncode != 0:
                 return False
-            return "ELF" == out.decode()[:3] and "executable" in out.decode().lower()
+            out = out.decode()
+            return (out.startswith("ELF") or out.startswith("Mach-O")) and "executable" in out.lower()
+
 
         ret = []
         for root, _, files in os.walk(directory):
@@ -202,7 +208,9 @@ class RPathManager:
 
     def read_rpath(self, lib_path: str) -> str:
         """
-        Read RPATH or RUNPATH from the ELF header using the readelf command.
+        Read RPATH or RUNPATH from the ELF header using the readelf command, or
+        the LC_RPATH load commands of a Mach-O binary using the otool command.
+
 
         Args:
             lib_path (str): The path to the shared library.
@@ -210,6 +218,8 @@ class RPathManager:
         Returns:
             str: The RPATH or RUNPATH value, or an empty string if not found.
         """
+        if IS_MACOS:
+            return self.read_rpath_macho(lib_path)
         try:
             result = subprocess.run(
                 ['readelf', '-d', lib_path], capture_output=True, text=True, check=True)
@@ -220,6 +230,56 @@ class RPathManager:
         except subprocess.CalledProcessError as e:
             logging.error("Error reading %s: %s", lib_path, e)
         return ""
+
+    def read_rpath_macho(self, lib_path: str) -> str:
+        """
+        Read the LC_RPATH entries of a Mach-O binary using the otool command.
+
+        Args:
+            lib_path (str): The path to the binary.
+
+        Returns:
+            str: The colon-separated LC_RPATH entries, or an empty string if not found.
+        """
+        try:
+            result = subprocess.run(
+                ['otool', '-l', lib_path], capture_output=True, text=True, check=True)
+        except subprocess.CalledProcessError as e:
+            logging.error("Error reading %s: %s", lib_path, e)
+            return ""
+
+        rpaths = []
+        in_rpath_cmd = False
+        for line in result.stdout.splitlines():
+            line = line.strip()
+            if line.startswith('cmd '):
+                in_rpath_cmd = line == 'cmd LC_RPATH'
+            elif in_rpath_cmd and line.startswith('path '):
+                # Line format: "path <rpath> (offset <n>)"
+                rpaths.append(line[len('path '):].rsplit(' (offset', 1)[0])
+                in_rpath_cmd = False
+        return ':'.join(rpaths)
+
+    def set_rpath_macho(self, lib: str, rpath_old: str, rpath_new: Set[str]):
+        """
+        Replace the LC_RPATH entries of a Mach-O binary using install_name_tool,
+        then re-sign it: on Apple Silicon a binary with an invalid signature is killed at load time.
+
+        Args:
+            lib (str): The path to the binary.
+            rpath_old (str): The old colon-separated RPATH string.
+            rpath_new (Set[str]): The new RPATH entries.
+        """
+        old_entries = rpath_old.split(':')
+        cmd = ['install_name_tool']
+        for path in old_entries:
+            if path not in rpath_new:
+                cmd += ['-delete_rpath', path]
+        for path in rpath_new:
+            if path not in old_entries:
+                cmd += ['-add_rpath', path]
+        subprocess.run(cmd + [lib], check=True)
+        subprocess.run(['codesign', '--force', '--sign', '-', lib], check=True)
 
     def check_rpath_size(self, lib: str, rpath_old: str, rpath_new_str: str):
         """
@@ -243,7 +303,8 @@ class RPathManager:
             logging.debug("New RPATH for %s is bigger than the old one.", lib)
             self.count_bigger_rpath += 1
 
-        if rpath_new_size > self.max_rpath_size:
+        # Mach-O LC_RPATH entries are separate load commands, not a fixed-size ELF string
+        if not IS_MACOS and rpath_new_size > self.max_rpath_size:
             logging.error(
                 "New RPATH size for %s (%d bytes) exceeds the maximum allowed size (%d bytes).",
                 lib, rpath_new_size, self.max_rpath_size
@@ -282,6 +343,9 @@ class RPathManager:
 
         # Set new RPATH
         try:
+            if IS_MACOS:
+                self.set_rpath_macho(lib, rpath_old, rpath_new)
+                return
             #subprocess.run(['patchelf', '--set-rpath', rpath_new_str, lib], check=True)
             subprocess.run(['chrpath', '-r', rpath_new_str, lib], check=True)
         except subprocess.CalledProcessError as e:

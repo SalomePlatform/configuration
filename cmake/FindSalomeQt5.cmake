@@ -55,7 +55,7 @@ ELSE()
   LIST(APPEND Qt5_OPTIONAL_COMPONENTS WebEngineCore WebEngine WebEngineWidgets)
 ENDIF()
 
-IF(NOT WIN32)
+IF(NOT WIN32 AND NOT APPLE)
   ## QtX11Extras package is used on Linux only
   LIST(APPEND Qt5_FIND_COMPONENTS X11Extras)
 ENDIF()
